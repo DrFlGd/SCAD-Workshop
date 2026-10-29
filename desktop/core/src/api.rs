@@ -148,6 +148,7 @@ impl App {
         let engine = self.engine().await?;
         let jobs = self.config().concurrency.unwrap_or_else(default_concurrency);
         let r = Arc::new(Renderer::new(engine, self.site.clone(), self.paths.data_dir.join("cache"), jobs).map_err(e2s)?);
+        r.set_mitcad(crate::mitcad::locate(self.config().mitcad_cli.as_deref()));
         *g = Some(r.clone());
         drop(g);
         if let Ok(c) = self.catalog() {
@@ -511,7 +512,28 @@ impl App {
                     "concurrency": r.as_ref().map(|r| r.concurrency()),
                     "cache_bytes": r.as_ref().map(|r| r.cache_size()),
                     "starter": self.paths.starter.as_ref().is_some_and(|s| s.join("starter.json").is_file()),
+                    // MitCad, for Fusion 360 files (experimental, 0.4.27): where it is, or why not
+                    "mitcad": match r.as_ref().map(|r| r.mitcad()) {
+                        Some(Ok(m)) => json!({ "path": m.exe.display().to_string(), "configured": self.config().mitcad_cli.is_some() }),
+                        Some(Err(e)) => json!({ "error": e, "configured": self.config().mitcad_cli.is_some() }),
+                        None => json!({ "error": "The render engine isn't ready.", "configured": self.config().mitcad_cli.is_some() }),
+                    },
                 }))
+            }
+            "mitcad_set" => {
+                // Settings › Engine: where mitcad-cli is (a file or its folder), or nothing to look for it again
+                let path = args["path"].as_str().filter(|p| !p.trim().is_empty()).map(PathBuf::from);
+                let mut cfg = self.config();
+                cfg.mitcad_cli = path;
+                cfg.save(&self.config_path()).map_err(e2s)?;
+                let found = crate::mitcad::locate(cfg.mitcad_cli.as_deref());
+                if let Ok(r) = self.renderer().await {
+                    r.set_mitcad(found.clone());
+                }
+                j(match found {
+                    Ok(m) => json!({ "path": m.exe.display().to_string(), "configured": cfg.mitcad_cli.is_some() }),
+                    Err(e) => json!({ "error": e, "configured": cfg.mitcad_cli.is_some() }),
+                })
             }
             "read" => self.read_file(arg(&args, "path").map_err(e2s)?).map(Reply::Bytes).map_err(e2s),
             "to_3mf" => {

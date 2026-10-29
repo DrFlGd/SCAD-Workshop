@@ -50,7 +50,8 @@ class DesktopEngine {
   }
 
   render(model, values, onEvent = () => {}) {
-    if (!this.hybrid || model.browser === false || !this.info.engine) return this.renderNative(model, values, onEvent);
+    // (a Fusion 360 file goes to MitCad, through the native path; 0.4.27)
+    if (!this.hybrid || model.browser === false || !this.info.engine || model.engine === "mitcad") return this.renderNative(model, values, onEvent);
     const pick = this.picks()[model.key];
     if (pick === "native") return this.renderNative(model, values, onEvent);
     if (pick === "wasm") return this.withFallback(this.wasmEngine().render(model, values, onEvent), model, values, onEvent);
@@ -107,7 +108,7 @@ class DesktopEngine {
     let settled = false;
     const promise = new Promise((resolve, reject) => {
       rejectRun = reject;
-      if (!this.info.engine) {
+      if (!this.info.engine && model.engine !== "mitcad") {
         reject(Object.assign(new Error(this.info.engine_error || "OpenSCAD isn't available."), { logs: [] }));
         return;
       }
@@ -120,6 +121,7 @@ class DesktopEngine {
         defines: (model.parameters || []).filter((p) => p.define).map((p) => p.name),
         call: model.call || null, // a component: the app writes the call with these values
         format: model.format || null, // "3mf": OpenSCAD's own, objects apart and colours kept (0.4.19); "svg"/"dxf": a drawing
+        engine: model.engine || null, // "mitcad": a Fusion 360 file, generated with MitCad (experimental, 0.4.27)
       };
       // edited files (the Code tab): stored by their hash in the app's data folder, used in place of the originals
       const edited = Object.entries(model.edits || {});

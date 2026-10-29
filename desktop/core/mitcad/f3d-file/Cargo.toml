@@ -1,0 +1,16 @@
+# SPDX-License-Identifier: MIT
+[package]
+name = "mitcad-f3d-file"
+description = "The document inside an .f3d file's zip container, its display meshes and its appearance asset packages"
+version = "0.0.0"
+edition = "2024"
+license = "MIT"
+
+[lib]
+name = "mitcad_f3d_file"
+
+[dependencies]
+# The zip container (shared with the .FCStd reader).
+mitcad-zip = { path = "../zip" }
+# Vector helpers on [f64; 3] (the display meshes' checks).
+mitcad-vec3 = { path = "../vec3" }

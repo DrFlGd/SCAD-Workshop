@@ -1,0 +1,29 @@
+# SPDX-License-Identifier: MIT
+[package]
+name = "mitcad-f3d-design"
+description = "The design segment of .f3d files (timeline, parameters, sketches, features, components) decoded into the dump IR"
+version = "0.0.0"
+edition = "2024"
+license = "MIT"
+
+[lib]
+name = "mitcad_f3d_design"
+
+[dependencies]
+# The ASM bodies whose history the feature inputs are found in.
+mitcad-asm = { path = "../asm" }
+# The design dump IR (core/import/SCHEMA.md).
+mitcad-dump = { path = "../dump" }
+# The streams, records and sketches decoded (mitcad#779).
+mitcad-f3d-decode = { path = "../f3d-decode" }
+# The document inside the zip container and its asset packages.
+mitcad-f3d-file = { path = "../f3d-file" }
+# The names of the B-rep entities that feature inputs name.
+mitcad-f3d-names = { path = "../f3d-names" }
+# The zip container (shared with the .FCStd reader).
+mitcad-zip = { path = "../zip" }
+# Vector helpers on [f64; 3].
+mitcad-vec3 = { path = "../vec3" }
+# The design dump IR is JSON.
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", features = ["float_roundtrip"] }

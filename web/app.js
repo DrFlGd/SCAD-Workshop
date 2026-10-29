@@ -219,7 +219,9 @@ function renderModelHeader(detail) {
   const copy = c ? (c.provider === "project" ? "your copy" : "the app's copy") : "";
   $("#model-project").replaceChildren(detail.source_id
     ? el("a", { href: `#/browse/source/${encodeURIComponent(detail.source_id)}`, text: from, title: "The project it's from" })
-    : from || "", ...(c ? [" · ", el("code", { text: `${c.module}()` }), ` · ${copy}`] : []));
+    : from || "", ...(c ? [" · ", el("code", { text: `${c.module}()` }), ` · ${copy}`] : []),
+    // a Fusion 360 file, generated with MitCad (experimental, 0.4.27)
+    ...(detail.engine === "mitcad" ? [" · ", el("span", { id: "model-engine", title: "A Fusion 360 file (.f3d). Its settings are the file's user parameters; Generate rebuilds it with MitCad, which you install separately." }, "Fusion 360 file, made with MitCad (experimental)")] : []));
   $("#model-summary").textContent = detail.summary;
   // one credit line on every page: By … · Source · License · Docs
   const link = (href, text, out = true) => el("a", { href, text, ...(out ? { target: "_blank", rel: "noopener" } : {}) });
@@ -730,9 +732,10 @@ function settingsBar(presets) {
     el("div", { class: "menu-panel", role: "menu" },
       el("button", { type: "button", role: "menuitem", id: "settings-rename", text: "Rename…", onclick: () => { closeMenu(); openSaveDialog("rename"); } }),
       el("button", { type: "button", role: "menuitem", id: "settings-delete", text: "Delete", onclick: () => { closeMenu(); deleteSaved(); } }),
-      el("hr"),
+      // (a Fusion 360 file's settings aren't OpenSCAD's; 0.4.27)
+      ...(state.model?.engine === "mitcad" ? [] : [el("hr"),
       el("button", { type: "button", role: "menuitem", id: "settings-export", text: "Export for OpenSCAD", title: "All saved settings for this model, as an OpenSCAD Customizer file", onclick: () => { closeMenu(); exportSettings(); } }),
-      el("button", { type: "button", role: "menuitem", id: "settings-import-btn", text: "Import OpenSCAD file…", onclick: () => { closeMenu(); $("#settings-import").click(); } })));
+      el("button", { type: "button", role: "menuitem", id: "settings-import-btn", text: "Import OpenSCAD file…", onclick: () => { closeMenu(); $("#settings-import").click(); } })])));
   const bar = el("div", { class: "preset-bar" },
     el("label", { for: "settings-pick", class: "visually-hidden", text: "Start from" }), pick,
     el("button", { type: "button", class: "ghost", id: "settings-save", text: "Save",
@@ -2223,6 +2226,7 @@ function desktopSettings() {
         el("button", { type: "button", class: "ghost", text: "Forget", onclick: () => { store.prefs.set("gw-engine-pick", {}); line.firstChild.textContent = "Forgotten: the next render of each model tries both engines again. "; } }));
       return line;
     })() : null,
+    mitcadLine(info),
     el("p", {}, "Finished renders are kept so repeating one is instant: ", cacheLine, ". ",
       el("button", { type: "button", class: "ghost", text: "Clear", onclick: async () => {
         try { await platform.workspace.clearCache(); const i = await platform.refreshInfo(); cacheLine.textContent = gb(i.cache_bytes); } catch (e) { toast(String(e)); }
@@ -2231,6 +2235,28 @@ function desktopSettings() {
     el("p", { id: "app-version" }, `SCAD Workshop ${info.version || "(version unknown)"}. `,
       el("a", { href: RELEASES_URL, target: "_blank", rel: "noopener", text: "All releases and what changed" }))),
   ];
+}
+
+/** Settings › Engine: MitCad, for Fusion 360 files (experimental, 0.4.27): where it was found, or how to get it;
+ *  Choose… points the app at mitcad-cli (or its folder), Forget looks for it again. */
+function mitcadLine(info) {
+  const line = el("p", { id: "mitcad-line" });
+  const draw = (m) => {
+    const choose = el("button", { type: "button", class: "ghost", id: "mitcad-choose", text: "Choose…", onclick: async () => {
+      const p = await platform.library.pickFile("Choose MitCad's mitcad-cli", info.os === "windows" ? ["exe"] : []);
+      if (!p) return;
+      try { draw(await platform.api("mitcad_set", { path: p })); platform.refreshInfo(); } catch (e) { toast(String(e.message || e)); }
+    } });
+    const forget = m.configured ? el("button", { type: "button", class: "ghost", id: "mitcad-forget", text: "Forget", onclick: async () => {
+      try { draw(await platform.api("mitcad_set", { path: null })); platform.refreshInfo(); } catch (e) { toast(String(e.message || e)); }
+    } }) : null;
+    line.replaceChildren(el("b", { text: "Fusion 360 files (experimental): " }),
+      m.path ? ["MitCad found: ", el("code", { text: m.path }), ". "] : [m.error || "MitCad isn't available.", " "],
+      m.path ? null : [el("a", { href: "https://github.com/mitcad/Mitcad/releases", target: "_blank", rel: "noopener", text: "Get MitCad" }), ". "],
+      choose, " ", forget);
+  };
+  draw(info.mitcad || { error: "MitCad isn't available." });
+  return line;
 }
 
 // ---------------------------------------------------------------- boot

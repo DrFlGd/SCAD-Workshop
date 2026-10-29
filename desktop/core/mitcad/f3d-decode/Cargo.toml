@@ -1,0 +1,22 @@
+# SPDX-License-Identifier: MIT
+[package]
+name = "mitcad-f3d-decode"
+description = "The streams, records and sketches of the design segment of .f3d files decoded"
+version = "0.0.0"
+edition = "2024"
+license = "MIT"
+
+[lib]
+name = "mitcad_f3d_decode"
+
+[dependencies]
+# The B-rep curves stored curves are evaluated as.
+mitcad-asm = { path = "../asm" }
+# The design dump IR (core/import/SCHEMA.md) and the item state types.
+mitcad-dump = { path = "../dump" }
+# The edge tails that recipes name (mitcad-f3d-names).
+mitcad-f3d-names = { path = "../f3d-names" }
+# Vector helpers on [f64; 3].
+mitcad-vec3 = { path = "../vec3" }
+# Sketch texts, NURBS curves and the learning dump's records are JSON.
+serde_json = { version = "1", features = ["float_roundtrip"] }

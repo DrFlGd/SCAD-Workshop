@@ -35,9 +35,17 @@ pub struct RenderRequest {
     /// materials (0.4.19); "svg" or "dxf": a 2D model's drawing (0.4.23); otherwise binary STL.
     #[serde(default)]
     pub format: Option<String>,
+    /// "mitcad": a Fusion 360 file, generated with MitCad (experimental, 0.4.27); otherwise OpenSCAD.
+    #[serde(default)]
+    pub engine: Option<String>,
 }
 
 impl RenderRequest {
+    /// A Fusion 360 file, generated with MitCad rather than OpenSCAD (an `.f3d` entry counts as asked).
+    pub fn mitcad(&self) -> bool {
+        self.engine.as_deref() == Some("mitcad") || self.entry.to_lowercase().ends_with(".f3d")
+    }
+
     pub fn three_mf(&self) -> bool {
         self.format.as_deref() == Some("3mf")
     }
@@ -97,10 +105,10 @@ impl std::fmt::Display for RenderFailure {
 impl std::error::Error for RenderFailure {}
 
 impl RenderFailure {
-    fn failed(message: impl Into<String>, logs: Vec<String>) -> Self {
+    pub(crate) fn failed(message: impl Into<String>, logs: Vec<String>) -> Self {
         Self { message: message.into(), cancelled: false, logs }
     }
-    fn cancelled(logs: Vec<String>) -> Self {
+    pub(crate) fn cancelled(logs: Vec<String>) -> Self {
         Self { message: "Render cancelled.".into(), cancelled: true, logs }
     }
 }
@@ -130,6 +138,8 @@ pub struct Renderer {
     pub use_cache: bool,
     /// Extra environment for OpenSCAD (Windows: a fontconfig setup with a persistent cache).
     env: Vec<(String, std::ffi::OsString)>,
+    /// MitCad's command-line tool for Fusion 360 files, when found (experimental, 0.4.27).
+    mitcad: std::sync::RwLock<Result<crate::mitcad::MitCad, String>>,
 }
 
 /// Default number of renders at once: all cores but one, at least one.
@@ -210,7 +220,16 @@ impl Renderer {
             cache_limit: 1 << 30,
             use_cache: true,
             env,
+            mitcad: std::sync::RwLock::new(Err("MitCad hasn't been looked for.".into())),
         })
+    }
+
+    /// Where MitCad is (or why not), for Fusion 360 files; set from the app's configuration.
+    pub fn set_mitcad(&self, found: Result<crate::mitcad::MitCad, String>) {
+        *self.mitcad.write().unwrap() = found;
+    }
+    pub fn mitcad(&self) -> Result<crate::mitcad::MitCad, String> {
+        self.mitcad.read().unwrap().clone()
     }
 
     pub fn engine(&self) -> &NativeEngine {
@@ -308,7 +327,9 @@ impl Renderer {
         defines.sort();
         let defines = defines.join("\n");
         let call = req.call.as_ref().map(|c| serde_json::to_vec(c).unwrap_or_default()).unwrap_or_default();
-        let key = sha_hex(&[self.engine.version.as_bytes(), req.entry.as_bytes(), &files, &values, defines.as_bytes(), &call]);
+        // (a Fusion 360 file's render depends on MitCad's build, not OpenSCAD's)
+        let engine = if req.mitcad() { self.mitcad().map(|m| m.tag).unwrap_or_else(|_| "mitcad".into()) } else { self.engine.version.clone() };
+        let key = sha_hex(&[engine.as_bytes(), req.entry.as_bytes(), &files, &values, defines.as_bytes(), &call]);
         // (a 3MF or a drawing is cached beside the STL of the same render, by its own key)
         if req.ext() == "stl" { key } else { format!("{key}-{}", req.ext()) }
     }
@@ -343,7 +364,7 @@ impl Renderer {
         F: Fn(RenderEvent) + Send + Sync,
     {
         // a model that turned out to be 2D (below) is found as its drawing next time
-        let may_be_flat = req.call.is_none() && !req.flat();
+        let may_be_flat = req.call.is_none() && !req.flat() && !req.mitcad();
         if self.use_cache {
             if let Some(hit) = self.cached(req).or_else(|| may_be_flat.then(|| self.cached(&req.as_svg())).flatten()) {
                 return Ok(hit);
@@ -418,6 +439,9 @@ impl Renderer {
         let job_dir = self.cache_dir.join("jobs").join(format!("{}-{}", safe_job, std::process::id()));
         let _cleanup = RemoveOnDrop(job_dir.clone());
         std::fs::create_dir_all(&job_dir).map_err(|e| RenderFailure::failed(format!("Couldn't create a job folder: {e}"), vec![]))?;
+        if req.mitcad() {
+            return self.render_mitcad(req, &tree, &entry, &job_dir, started, prepare_ms, on_event, cancel).await;
+        }
         let params = job_dir.join("params.json");
         let out = job_dir.join(format!("out.{}", req.ext()));
         let mut cmd = self.engine.command();
@@ -536,6 +560,36 @@ impl Renderer {
             let _ = std::fs::remove_file(&tmp);
         }
         Ok(RenderOutput { stl, format: req.ext().into(), ms, prepare_ms, cached: false, logs })
+    }
+
+    /// A Fusion 360 file through MitCad (experimental, 0.4.27): 3MF when asked for, else STL; cached as
+    /// OpenSCAD's renders are.
+    #[allow(clippy::too_many_arguments)]
+    async fn render_mitcad<F>(&self, req: &RenderRequest, tree: &Path, entry: &Path, job_dir: &Path, started: Instant, prepare_ms: u64, on_event: &F, cancel: &Notify) -> Result<RenderOutput, RenderFailure>
+    where
+        F: Fn(RenderEvent) + Send + Sync,
+    {
+        let tool = self.mitcad().map_err(|e| RenderFailure::failed(e, vec![]))?;
+        let sha = req.files.get(&req.entry).or_else(|| req.files.get(&format!("/{}", req.entry.trim_start_matches('/')))).cloned()
+            .ok_or_else(|| RenderFailure::failed("The Fusion file isn't among the model's files.", vec![]))?;
+        let ext = if req.ext() == "3mf" { "3mf" } else { "stl" };
+        let file = tree.join(entry);
+        let job = crate::mitcad::Job { tool: &tool, cache_dir: &self.cache_dir, job_dir, file: &file, sha: &sha, values: &req.values, ext };
+        let (stl, logs) = crate::mitcad::generate(&job, on_event, cancel).await?;
+        let ms = started.elapsed().as_millis() as u64;
+        if self.use_cache {
+            let key = self.cache_key(req);
+            let renders = self.cache_dir.join("renders");
+            let tmp = renders.join(format!("{key}.tmp-mitcad-{}", std::process::id()));
+            if std::fs::write(&tmp, &stl).is_ok() && std::fs::rename(&tmp, renders.join(format!("{key}.{ext}"))).is_ok() {
+                let meta = CacheMeta { ms, engine: tool.tag.clone(), model: req.model.clone() };
+                let _ = std::fs::write(renders.join(format!("{key}.json")), serde_json::to_vec(&meta).unwrap_or_default());
+                let _ = self.prune();
+            } else {
+                let _ = std::fs::remove_file(&tmp);
+            }
+        }
+        Ok(RenderOutput { stl, format: ext.into(), ms, prepare_ms, cached: false, logs })
     }
 
     /// Total size of cached renders in bytes.
@@ -709,6 +763,7 @@ pub fn default_request(model: &Value, common_files: &Value) -> Result<RenderRequ
         defines,
         call: serde_json::from_value(model["call"].clone()).ok(),
         format: None,
+        engine: model["engine"].as_str().map(String::from),
     })
 }
 

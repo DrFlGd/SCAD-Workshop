@@ -294,6 +294,9 @@ pub fn build(lib: &Library, engine: &str, common_files: &Value, url: &str, libs:
             detail["files_id"] = json!(project::files_id(&d["files"]));
             if has_thumb(&format!("{mid}.webp")) {
                 detail["thumb"] = json!(file_url(&format!("sources/{id}/thumbs/{mid}.webp")));
+            } else if has_thumb(&format!("{mid}.png")) {
+                // a Fusion 360 file's saved preview, until the model is first generated (0.4.27)
+                detail["thumb"] = json!(file_url(&format!("sources/{id}/thumbs/{mid}.png")));
             }
             if let Some(icon) = vals.get("icon").and_then(Value::as_str).and_then(&pic) {
                 detail["thumb"] = json!(icon);
