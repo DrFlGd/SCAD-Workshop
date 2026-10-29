@@ -83,6 +83,10 @@ The development sandbox has a network allowlist and is reset between sessions (t
 
 ## Unreleased
 
+## 0.4.28 — 2026-10-29 · Download MitCad, and the app's reading goes to MitCad
+
+Released first time. The owner asked (2026-10-29) to download and patch MitCad from the app to test the Rugged Box file, and was open to the app reading the file and passing the model to MitCad; that second route is what was built, since MitCad can't be patched on a user's machine and its `--dump` option makes it unnecessary.
+
 - **Download MitCad from the app, and the app's reading of Fusion files goes to MitCad.** Settings › Engine › Download MitCad gets MitCad 0.35.0 (229 MB) into the app's own folder, checks its hash and unpacks it; the app uses that copy from then on. Generate now gives MitCad the design as the app's reader reads it (`mitcad-cli import-f3d --dump`), so the reader's patch reaches MitCad without changing MitCad: the owner's Rugged Box imports with all its user parameters and the lid follows them. The box bottom keeps its saved shape (MitCad can't rebuild its Fillet2 from the file's history), and the render log now names each item MitCad kept as the file's shape. Also fixed: Settings › Engine's MitCad line printed `null` and `[object HTMLElement]`. For the next person: the reader is pinned to MitCad 0.35.0's commit and `PIN.json` records that release's downloads; move both with `tools/fetch_mitcad.py --commit <sha> --release <tag>` (design: docs/DESKTOP_PLAN.md, "The app's reading handed to MitCad"). MitCad was run for real in the cloud session this time (releases download there now; `cargo test` with `WORKSHOP_MITCAD_CLI`).
 
 ## 0.4.27 — 2026-10-29 · Fusion 360 files through MitCad (experimental)
