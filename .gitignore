@@ -4,6 +4,7 @@ node_modules/
 *.log
 # build output: engine download, static site, check reports
 build/
+!desktop/core/mitcad/*/src/build/
 _site/
 shots/
 bench.json
