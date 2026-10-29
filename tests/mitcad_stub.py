@@ -8,8 +8,17 @@ log.write(json.dumps(args) + "\n")
 if args[0] == "import-f3d":
     src = args[1]; save = args[args.index("--save") + 1]; report = args[args.index("--report") + 1]
     print("importing", src)
-    json.dump({"format": "mitcad", "version": 2, "parameters": [], "features": []}, open(save, "w"))
-    json.dump({"counts": {"parametric": 70, "partial": 2, "fallback": 4}}, open(report, "w"))
+    if "--dump" in args:
+        # the design as the app's reader read it (0.4.28): say how many user parameters it has
+        dump = json.load(open(args[args.index("--dump") + 1]))
+        log.write("DUMP user parameters: %d\n" % len((dump.get("parameters") or {}).get("user") or []))
+    json.dump({"format": 2, "parameters": [], "features": []}, open(save, "w"))
+    # the shape of MitCad's report: one design, its timeline items' outcomes
+    items = [{"name": "Item0", "type": "Group", "outcome": "skipped", "note": "no geometry: a timeline group"}]
+    items += [{"name": f"Extrude{i}", "type": "ExtrudeFeature", "outcome": "parametric", "component": "Box"} for i in range(69)]
+    items += [{"name": "Fillet2", "type": "FilletFeature", "outcome": "fallback", "note": "its result is not in the file's history", "component": "Box"},
+              {"name": "Extrude1", "type": "ExtrudeFeature", "outcome": "skipped", "note": "its sketch has no profiles", "component": "Seal"}]
+    json.dump({"file": os.path.basename(src), "designs": [{"parameters": {"imported": 216, "literal": []}, "items": items}]}, open(report, "w"))
     sys.exit(0)
 if args[0] == "run":
     script = json.load(open(args[1])); opened = args[args.index("--open") + 1]

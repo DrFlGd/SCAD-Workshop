@@ -39,9 +39,9 @@ Notes
 
 | Project | Authors | Upstream @ commit | License | Path |
 | --- | --- | --- | --- | --- |
-| MitCad (the `.f3d` reader crates only) | MitCad contributors | [mitcad/Mitcad](https://github.com/mitcad/Mitcad) @ `eba5e3b` | MIT | `desktop/core/mitcad` |
+| MitCad (the `.f3d` reader crates only) | MitCad contributors | [mitcad/Mitcad](https://github.com/mitcad/Mitcad) @ `e40cc87` (v0.35.0) | MIT | `desktop/core/mitcad` |
 
-Eight Rust crates of MitCad's reader for Fusion 360 files, copied at the pinned commit by `tools/fetch_mitcad.py` with one patch (`desktop/core/mitcad/patches/`, waiting to go upstream); see `desktop/core/mitcad/README.md`. MitCad itself (the application and `mitcad-cli`, which the app runs to generate from an `.f3d`) is installed by the user and isn't shipped.
+Eight Rust crates of MitCad's reader for Fusion 360 files, copied at the pinned commit by `tools/fetch_mitcad.py` with one patch (`desktop/core/mitcad/patches/`, waiting to go upstream); see `desktop/core/mitcad/README.md`. MitCad itself (the application and `mitcad-cli`, which the app runs to generate from an `.f3d`) isn't shipped: Settings › Engine › Download MitCad fetches the official release (v0.35.0, from MitCad's GitHub releases, with its own LICENSE and THIRD-PARTY-NOTICES) into the app's data folder, or the user installs it.
 
 ## Site runtime
 

@@ -140,6 +140,29 @@ impl App {
             .clone()
     }
 
+    /// Where Download MitCad puts it (0.4.28).
+    fn mitcad_dir(&self) -> PathBuf {
+        self.paths.data_dir.join("mitcad")
+    }
+
+    /// Settings › Engine's MitCad line: where it was found (or why not), whether that's the app's
+    /// own download, and the download on offer (the release our copy of its reader comes from).
+    fn mitcad_info(&self, found: Option<&Result<crate::mitcad::MitCad, String>>) -> Value {
+        let configured = self.config().mitcad_cli.is_some();
+        let own = crate::mitcad::downloaded(&self.mitcad_dir());
+        let release = crate::mitcad::pinned_release();
+        let mut v = match found {
+            Some(Ok(m)) => json!({ "path": m.exe.display().to_string(), "downloaded": own.as_ref().is_some_and(|p| std::path::absolute(p).unwrap_or(p.clone()) == m.exe) }),
+            Some(Err(e)) => json!({ "error": e }),
+            None => json!({ "error": "The render engine isn't ready." }),
+        };
+        v["configured"] = json!(configured);
+        if let Some(r) = release {
+            v["download"] = json!({ "version": r.version, "mb": r.size >> 20, "page": r.page, "done": own.is_some() });
+        }
+        v
+    }
+
     pub async fn renderer(&self) -> Result<Arc<Renderer>, String> {
         let mut g = self.renderer.lock().await;
         if let Some(r) = g.as_ref() {
@@ -148,7 +171,7 @@ impl App {
         let engine = self.engine().await?;
         let jobs = self.config().concurrency.unwrap_or_else(default_concurrency);
         let r = Arc::new(Renderer::new(engine, self.site.clone(), self.paths.data_dir.join("cache"), jobs).map_err(e2s)?);
-        r.set_mitcad(crate::mitcad::locate(self.config().mitcad_cli.as_deref()));
+        r.set_mitcad(crate::mitcad::locate(self.config().mitcad_cli.as_deref(), Some(&self.mitcad_dir())));
         *g = Some(r.clone());
         drop(g);
         if let Ok(c) = self.catalog() {
@@ -334,6 +357,23 @@ impl App {
         json!({ "job": id })
     }
 
+    /// [`Self::spawn`] for work that leaves the library alone (downloading MitCad): it doesn't
+    /// wait for, or hold up, the library's jobs.
+    fn spawn_aside<F, Fut>(self: &Arc<Self>, label: &str, work: F) -> Value
+    where
+        F: FnOnce(Arc<Self>, String) -> Fut + Send + 'static,
+        Fut: std::future::Future<Output = Result<Value>> + Send + 'static,
+    {
+        let id = self.start_job(label);
+        let app = self.clone();
+        let jid = id.clone();
+        tokio::spawn(async move {
+            let r = work(app.clone(), jid.clone()).await;
+            app.job_done(&jid, r);
+        });
+        json!({ "job": id })
+    }
+
     fn jobs_json(&self) -> Value {
         Value::Array(
             self.jobs
@@ -513,11 +553,7 @@ impl App {
                     "cache_bytes": r.as_ref().map(|r| r.cache_size()),
                     "starter": self.paths.starter.as_ref().is_some_and(|s| s.join("starter.json").is_file()),
                     // MitCad, for Fusion 360 files (experimental, 0.4.27): where it is, or why not
-                    "mitcad": match r.as_ref().map(|r| r.mitcad()) {
-                        Some(Ok(m)) => json!({ "path": m.exe.display().to_string(), "configured": self.config().mitcad_cli.is_some() }),
-                        Some(Err(e)) => json!({ "error": e, "configured": self.config().mitcad_cli.is_some() }),
-                        None => json!({ "error": "The render engine isn't ready.", "configured": self.config().mitcad_cli.is_some() }),
-                    },
+                    "mitcad": self.mitcad_info(r.as_ref().map(|r| r.mitcad()).as_ref()),
                 }))
             }
             "mitcad_set" => {
@@ -526,14 +562,34 @@ impl App {
                 let mut cfg = self.config();
                 cfg.mitcad_cli = path;
                 cfg.save(&self.config_path()).map_err(e2s)?;
-                let found = crate::mitcad::locate(cfg.mitcad_cli.as_deref());
+                let found = crate::mitcad::locate(cfg.mitcad_cli.as_deref(), Some(&self.mitcad_dir()));
                 if let Ok(r) = self.renderer().await {
                     r.set_mitcad(found.clone());
                 }
-                j(match found {
-                    Ok(m) => json!({ "path": m.exe.display().to_string(), "configured": cfg.mitcad_cli.is_some() }),
-                    Err(e) => json!({ "error": e, "configured": cfg.mitcad_cli.is_some() }),
-                })
+                j(self.mitcad_info(Some(&found)))
+            }
+            "mitcad_install" => {
+                // Settings › Engine › Download MitCad (0.4.28): the release PIN.json names, into the app's
+                // data folder; then it's the MitCad the app uses (unless one is chosen in Settings)
+                let version = crate::mitcad::pinned_release().map(|r| r.version).unwrap_or_default();
+                Ok(Reply::Json(self.spawn_aside(&format!("Downloading MitCad {version}"), move |app, job| async move {
+                    let root = app.mitcad_dir();
+                    let app2 = app.clone();
+                    let job2 = job.clone();
+                    tokio::task::spawn_blocking(move || {
+                        crate::mitcad::install(
+                            &root,
+                            |stage| app2.job_stage(&job2, stage),
+                            || app2.job_cancelled(&job2),
+                        )
+                    })
+                    .await??;
+                    let found = crate::mitcad::locate(app.config().mitcad_cli.as_deref(), Some(&app.mitcad_dir()));
+                    if let Ok(r) = app.renderer().await {
+                        r.set_mitcad(found.clone());
+                    }
+                    Ok(app.mitcad_info(Some(&found)))
+                })))
             }
             "read" => self.read_file(arg(&args, "path").map_err(e2s)?).map(Reply::Bytes).map_err(e2s),
             "to_3mf" => {
