@@ -1,6 +1,6 @@
 {
   "repository": "https://github.com/mitcad/Mitcad",
-  "commit": "eba5e3b533d5cce0eadafbb52cb877a94f5d91df",
+  "commit": "e40cc87d4deb16d314044284b4ee5a573ad01318",
   "crates": [
     "vec3",
     "zip",
@@ -11,8 +11,27 @@
     "f3d-decode",
     "f3d-design"
   ],
-  "content_sha256": "f2c5336edb1d692022126aa97b56ef3e01488dd1efd996d6fff9c84ef30c41f9",
+  "content_sha256": "c4cab003b127ad3ad7629148c0a57ee816710b37820e8803be852dc85e2fc225",
   "patches": [
     "0001-user-parameters-before-version-8.patch"
-  ]
+  ],
+  "release": {
+    "tag": "v0.35.0",
+    "version": "0.35.0",
+    "page": "https://github.com/mitcad/Mitcad/releases/tag/v0.35.0",
+    "assets": {
+      "windows-x64": {
+        "url": "https://github.com/mitcad/Mitcad/releases/download/v0.35.0/mitcad-0.35.0-windows-x64.zip",
+        "size": 234784822,
+        "sha256": "f97350239530dffba707ec50c90be389bb578a95c540cbeedeecb321f3ee28b5",
+        "cli": "mitcad-0.35.0-windows-x64/bin/mitcad-cli.exe"
+      },
+      "linux-x64": {
+        "url": "https://github.com/mitcad/Mitcad/releases/download/v0.35.0/Mitcad-0.35.0-x86_64.AppImage",
+        "size": 240962040,
+        "sha256": "5fccc2e582ee19770f7862fe1f7ee9a6b0e201a79123540f3203c68551fb1fe4",
+        "cli": "squashfs-root/usr/bin/mitcad-cli"
+      }
+    }
+  }
 }

@@ -13,7 +13,7 @@ import { setContext } from "./ui/context.js";
 import { html, render } from "./lib/html.js";
 import { LibrarySettingsPage } from "./ui/libsettings.js";
 import { unflagItems } from "./ui/actions.js";
-import { saveComponentThumb, when, sourceById, rescanLocal, madeFrom } from "./ui/library.js";
+import { saveComponentThumb, when, sourceById, rescanLocal, madeFrom, runJob } from "./ui/library.js";
 import { ui, recordRecent, setTabs, layoutFor, isDark, setTheme, THEMES, setSkin, SKINS } from "./ui/state.js";
 import { scopeFromPath } from "./ui/context.js";
 import { scopeInfo } from "./ui/sidebar.js";
@@ -2238,22 +2238,37 @@ function desktopSettings() {
 }
 
 /** Settings › Engine: MitCad, for Fusion 360 files (experimental, 0.4.27): where it was found, or how to get it;
- *  Choose… points the app at mitcad-cli (or its folder), Forget looks for it again. */
+ *  Download gets the MitCad release the app's reader of Fusion files comes from (0.4.28), Choose… points the
+ *  app at a mitcad-cli of your own (or its folder), Forget looks for it again. */
 function mitcadLine(info) {
   const line = el("p", { id: "mitcad-line" });
   const draw = (m) => {
+    const fail = (e) => toast(String(e.message || e));
     const choose = el("button", { type: "button", class: "ghost", id: "mitcad-choose", text: "Choose…", onclick: async () => {
       const p = await platform.library.pickFile("Choose MitCad's mitcad-cli", info.os === "windows" ? ["exe"] : []);
       if (!p) return;
-      try { draw(await platform.api("mitcad_set", { path: p })); platform.refreshInfo(); } catch (e) { toast(String(e.message || e)); }
+      try { draw(await platform.api("mitcad_set", { path: p })); platform.refreshInfo(); } catch (e) { fail(e); }
     } });
     const forget = m.configured ? el("button", { type: "button", class: "ghost", id: "mitcad-forget", text: "Forget", onclick: async () => {
-      try { draw(await platform.api("mitcad_set", { path: null })); platform.refreshInfo(); } catch (e) { toast(String(e.message || e)); }
+      try { draw(await platform.api("mitcad_set", { path: null })); platform.refreshInfo(); } catch (e) { fail(e); }
     } }) : null;
-    line.replaceChildren(el("b", { text: "Fusion 360 files (experimental): " }),
-      m.path ? ["MitCad found: ", el("code", { text: m.path }), ". "] : [m.error || "MitCad isn't available.", " "],
-      m.path ? null : [el("a", { href: "https://github.com/mitcad/Mitcad/releases", target: "_blank", rel: "noopener", text: "Get MitCad" }), ". "],
-      choose, " ", forget);
+    const d = m.download;
+    // offered until the app's own copy is the one in use
+    const download = d && !m.downloaded ? el("button", { type: "button", id: "mitcad-download", text: `Download MitCad ${d.version} (${d.mb} MB)`,
+      title: `The MitCad release the app's reader of Fusion files comes from, into the app's own folder (${d.page})`,
+      onclick: async (ev) => {
+        ev.target.disabled = true;
+        try { draw(await runJob(platform.api("mitcad_install"), `Downloading MitCad ${d.version}`, { stoppable: true })); platform.refreshInfo(); }
+        catch (e) { ev.target.disabled = false; fail(e); }
+      } }) : null;
+    // (replaceChildren takes nodes and text only: the parts flattened, the empty ones left out)
+    line.replaceChildren(...[el("b", { text: "Fusion 360 files (experimental): " }),
+      m.path ? [m.downloaded ? `MitCad ${d?.version || ""}, downloaded by the app: ` : "MitCad found: ", el("code", { text: m.path }), ". "]
+        : [d && !m.configured ? "MitCad isn't installed." : m.error || "MitCad isn't available.", " "],
+      m.path && !m.downloaded && d ? `The app is tested with MitCad ${d.version}. ` : null,
+      download, download ? " " : null,
+      !m.path && !d ? [el("a", { href: "https://github.com/mitcad/Mitcad/releases", target: "_blank", rel: "noopener", text: "Get MitCad" }), ". "] : null,
+      choose, " ", forget].flat(2).filter((x) => x != null));
   };
   draw(info.mitcad || { error: "MitCad isn't available." });
   return line;

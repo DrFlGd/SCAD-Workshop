@@ -4,6 +4,7 @@
     python3 tools/fetch_mitcad.py                      # at the pinned commit (desktop/core/mitcad/PIN.json)
     python3 tools/fetch_mitcad.py --commit <sha>       # move the pin
     python3 tools/fetch_mitcad.py --from-git ~/Mitcad  # from a local clone instead of GitHub
+    python3 tools/fetch_mitcad.py --commit <sha> --release v0.35.0   # and the release the app downloads
 
 MitCad (https://github.com/mitcad/Mitcad, MIT) reads Fusion 360's `.f3d` files
 in pure Rust. The app uses its reader crates to list an `.f3d`'s user parameters
@@ -19,6 +20,13 @@ workspace keys MitCad inherits become explicit), applies the patches in
 desktop/core/mitcad/patches/ (fixes waiting to go upstream), and records the
 commit and the content hash in PIN.json. A build without the hash matching
 isn't checked: PIN.json is for people and the next refresh.
+
+`--release <tag>` (0.4.28) also records the MitCad release made from that commit,
+which Settings › Engine › Download MitCad installs: its Windows ZIP and Linux
+AppImage, each with its size and SHA-256 (both are downloaded to hash them, about
+450 MB) and where `mitcad-cli` is once unpacked. The app hands MitCad the design as
+this reader reads it (`mitcad-cli import-f3d --dump`), so the reader and the MitCad
+it talks to should be the same version: move both together.
 """
 import argparse
 import hashlib
@@ -100,6 +108,33 @@ def rewrite_manifest(text, name):
     return text
 
 
+def release_assets(tag):
+    """The release's Windows ZIP and Linux AppImage: URL, size, SHA-256 and where mitcad-cli is unpacked."""
+    version = tag.lstrip("v")
+    base = f"https://github.com/{REPO}/releases/download/{tag}"
+    wanted = {
+        "windows-x64": (f"mitcad-{version}-windows-x64.zip", f"mitcad-{version}-windows-x64/bin/mitcad-cli.exe"),
+        # `--appimage-extract` unpacks into squashfs-root/
+        "linux-x64": (f"Mitcad-{version}-x86_64.AppImage", "squashfs-root/usr/bin/mitcad-cli"),
+    }
+    out = {}
+    for platform, (name, cli) in wanted.items():
+        url = f"{base}/{name}"
+        print(f"downloading {name} to hash it")
+        h, size = hashlib.sha256(), 0
+        with urllib.request.urlopen(url, timeout=120) as r:
+            while chunk := r.read(1 << 20):
+                h.update(chunk)
+                size += len(chunk)
+        out[platform] = {"url": url, "size": size, "sha256": h.hexdigest(), "cli": cli}
+    # the release's own manifest lists the AppImage's hash: a check on the download
+    with urllib.request.urlopen(f"{base}/update-manifest.json", timeout=60) as r:
+        manifest = json.loads(r.read())["manifest"]["assets"]
+    if manifest.get("linux-x64", {}).get("sha256") not in (None, out["linux-x64"]["sha256"]):
+        sys.exit("the AppImage's hash differs from the release's update-manifest.json")
+    return {"tag": tag, "version": version, "page": f"https://github.com/{REPO}/releases/tag/{tag}", "assets": out}
+
+
 def content_hash(dest):
     h = hashlib.sha256()
     for p in sorted(x for x in dest.rglob("*") if x.is_file() and x.name != "PIN.json"):
@@ -113,9 +148,10 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--commit", help="the commit to pin (default: PIN.json's)")
     ap.add_argument("--from-git", help="a local clone of MitCad to take the files from")
+    ap.add_argument("--release", help="the MitCad release tag made from the commit (the app downloads it); kept from PIN.json when left out")
     a = ap.parse_args()
-    pin = json.loads(PIN.read_text()) if PIN.is_file() else {}
-    commit = a.commit or pin.get("commit")
+    old = json.loads(PIN.read_text()) if PIN.is_file() else {}
+    commit = a.commit or old.get("commit")
     if not commit:
         sys.exit("no commit: give --commit or keep desktop/core/mitcad/PIN.json")
     files = fetch_tree(commit, a.from_git)
@@ -153,6 +189,12 @@ def main():
             d.rmdir()
     pin = {"repository": f"https://github.com/{REPO}", "commit": commit, "crates": CRATES, "content_sha256": content_hash(DEST),
            "patches": [p.name for p in patches]}
+    if a.release:
+        pin["release"] = release_assets(a.release)
+    elif old.get("release") and old.get("commit") == commit:
+        pin["release"] = old["release"]
+    elif old.get("release"):
+        print(f"note: the pin moved, so the release ({old['release']['tag']}) is dropped; give --release")
     PIN.write_text(json.dumps(pin, indent=2) + "\n")
     print(f"pinned {commit[:12]} ({pin['content_sha256'][:12]}…)")
 

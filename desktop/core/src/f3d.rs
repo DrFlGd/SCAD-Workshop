@@ -64,14 +64,7 @@ fn step_of(v: f64) -> f64 {
 /// not the bodies' history), so it runs at ingest beside OpenSCAD's settings export.
 pub fn read(path: &Path) -> Result<F3dInfo> {
     let package = mitcad_f3d_design::package(path).map_err(|e| anyhow!("{e}"))?;
-    // an .f3z package: its root design, else the first document
-    let (label, doc) = package
-        .root
-        .as_ref()
-        .and_then(|r| package.documents.iter().find(|(l, _)| l == r))
-        .or_else(|| package.documents.first())
-        .context("no design in the file")?;
-    let design = mitcad_f3d_design::decode_streams(doc, label).map_err(|e| anyhow!("{e}"))?;
+    let (_, doc, design) = choose(&package)?;
     let dump = design.dump.context("the file has no design segment")?;
     let mut info = F3dInfo { label: mitcad_f3d_design::short_name(path), writer: dump.generator.as_ref().and_then(|g| g.writer.clone()).unwrap_or_default(), ..Default::default() };
     info.timeline_items = dump.timeline_items().len();
@@ -111,6 +104,43 @@ pub fn read(path: &Path) -> Result<F3dInfo> {
     }
     info.preview_png = best.map(|(_, b)| b);
     Ok(info)
+}
+
+/// The design MitCad's importer would pick: an `.f3z` package's root design, else the one
+/// with the longest timeline (a plain `.f3d` has one). Its streams decoded, inputs not resolved.
+fn choose(package: &mitcad_f3d_design::Package) -> Result<(&str, &mitcad_f3d_file::F3dFile, mitcad_f3d_design::FileDesign)> {
+    let decode = |(l, d): &(String, mitcad_f3d_file::F3dFile)| mitcad_f3d_design::decode_streams(d, l).map_err(|e| anyhow!("{e}"));
+    if let Some(i) = package.root.as_ref().and_then(|r| package.documents.iter().position(|(l, _)| l == r)) {
+        let (l, d) = &package.documents[i];
+        return Ok((l, d, decode(&package.documents[i])?));
+    }
+    // (the last of the longest, as MitCad's `max_by_key`)
+    let mut best: Option<(usize, usize, mitcad_f3d_design::FileDesign)> = None;
+    for (i, doc) in package.documents.iter().enumerate() {
+        let design = decode(doc)?;
+        let items = design.dump.as_ref().map_or(0, |d| d.timeline_items().len());
+        if best.as_ref().is_none_or(|(_, n, _)| items >= *n) {
+            best = Some((i, items, design));
+        }
+    }
+    let (i, _, design) = best.context("no design in the file")?;
+    let (l, d) = &package.documents[i];
+    Ok((l, d, design))
+}
+
+/// The design as MitCad's importer reads it from the file, with our reader (and its patches,
+/// `desktop/core/mitcad/patches/`): the dump IR with the features' inputs found in the bodies'
+/// history, as JSON for `mitcad-cli import-f3d --dump`. MitCad then replays our reading of the
+/// design instead of its own, so a fix in our reader needs no change to MitCad (0.4.28).
+/// Inputs in other documents (a design that derives from another file) aren't found here.
+pub fn design_dump(path: &Path, threads: usize) -> Result<String> {
+    let package = mitcad_f3d_design::package(path).map_err(|e| anyhow!("{e}"))?;
+    let (_, doc, mut design) = choose(&package)?;
+    if design.dump.is_none() {
+        anyhow::bail!("the file has no design segment");
+    }
+    mitcad_f3d_design::resolve_inputs(&mut design, doc, threads.max(1));
+    Ok(serde_json::to_string(&design.dump)?)
 }
 
 /// The settings as OpenSCAD's parameter export would list them, for [`crate::sitebuild::assemble_model`].
@@ -183,5 +213,12 @@ mod tests {
         assert_eq!(wall["unit"], "mm");
         assert_eq!(wall["caption"], "Thickness of the walls");
         assert!(info.formulas.iter().any(|f| f["name"] == "ScrewThreadDiameter"));
+        // the design for MitCad carries the user parameters the reader's patch reads
+        let dump: Value = serde_json::from_str(&design_dump(Path::new(&p), 2).unwrap()).unwrap();
+        let user = dump["parameters"]["user"].as_array().expect("user parameters");
+        assert!(user.iter().any(|u| u["name"] == "WallThickness"));
+        if let Ok(out) = std::env::var("WORKSHOP_F3D_DUMP_OUT") {
+            std::fs::write(out, dump.to_string()).unwrap();
+        }
     }
 }

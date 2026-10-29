@@ -6,8 +6,11 @@ MIT-licensed (`Copyright (c) 2026 MitCad contributors`); the crates keep their `
 headers and READMEs. Nothing here is edited by hand: a change goes in `patches/` and the copy is refreshed.
 
 The app uses them in `desktop/core/src/f3d.rs` to list an `.f3d`'s user parameters (the settings form)
-and its saved preview, without MitCad installed. Generating needs MitCad's own `mitcad-cli`
-(`desktop/core/src/mitcad.rs`). Experimental: docs/DESKTOP_PLAN.md, "Fusion 360 files through MitCad".
+and its saved preview, without MitCad installed, and to hand MitCad the design as this copy reads it
+(`mitcad-cli import-f3d --dump`, 0.4.28): so a patch here reaches MitCad without changing MitCad.
+Generating needs MitCad's own `mitcad-cli` (`desktop/core/src/mitcad.rs`), which Settings › Engine can
+download: the release `PIN.json` records, the one this copy comes from. Experimental:
+docs/DESKTOP_PLAN.md, "Fusion 360 files through MitCad".
 
 | Crate | What |
 | --- | --- |
@@ -20,14 +23,17 @@ and its saved preview, without MitCad installed. Generating needs MitCad's own `
 | `f3d-decode` | The design streams decoded: records, parameters, sketches |
 | `f3d-design` | The design segment built into the dump IR (the entry points `package`, `decode_streams`) |
 
-**Patches** (waiting to go upstream):
+**Patches** (held back from upstream for now: owner, 2026-10-29, test internally first):
 
 - `0001-user-parameters-before-version-8.patch`: user parameters of older writers (class version 5,
   Fusion 2.0.13881 of 2022) keep their comment before the number; the reader looked for the number
-  within 24 bytes and so read none of them. With it, every parameter of the owner's test file reads.
+  within 24 bytes and so read none of them. With it, every parameter of the owner's test file reads,
+  and MitCad builds the file with them from the app's reading (0.4.28).
 
-**Refreshing:** `python3 tools/fetch_mitcad.py` (the pinned commit) or `--commit <sha>` to move the pin;
-`--from-git <clone>` takes the files from a local clone. The script rewrites each `Cargo.toml` (MitCad's
+**Refreshing:** `python3 tools/fetch_mitcad.py` (the pinned commit), or move the pin to a MitCad release
+with `--commit <the tag's commit> --release <tag>` (the reader and the MitCad the app downloads move
+together: the dump the app hands over is MitCad's internal format); `--from-git <clone>` takes the files
+from a local clone. The script rewrites each `Cargo.toml` (MitCad's
 crates inherit version, edition and license from their workspace), drops the corpus tests, applies the
 patches and records the content hash. When a patch no longer applies, upstream has changed that code:
 check whether the fix landed there and drop the patch.
