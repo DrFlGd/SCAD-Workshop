@@ -1,0 +1,17 @@
+# SPDX-License-Identifier: MIT
+[package]
+name = "mitcad-dump"
+description = "The design dump IR of the .f3d and .ipt readers and the import (core/import/SCHEMA.md) as Rust types"
+version = "0.0.0"
+edition = "2024"
+license = "MIT"
+
+[lib]
+name = "mitcad_dump"
+
+[dependencies]
+# Vector helpers on [f64; 3] (the IR's `Vec3`).
+mitcad-vec3 = { path = "../vec3" }
+# The dump IR is JSON.
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", features = ["float_roundtrip"] }

@@ -1,0 +1,14 @@
+# SPDX-License-Identifier: MIT
+[package]
+name = "mitcad-asm"
+description = "ASM B-rep reader of the .f3d, .ipt and .dwg readers: the binary and text formats, their history, a neutral B-rep model and the conversion to it"
+version = "0.0.0"
+edition = "2024"
+license = "MIT"
+
+[lib]
+name = "mitcad_asm"
+
+[dependencies]
+# Vector helpers on [f64; 3].
+mitcad-vec3 = { path = "../vec3" }

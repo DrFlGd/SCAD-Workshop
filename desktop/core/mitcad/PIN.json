@@ -1,0 +1,18 @@
+{
+  "repository": "https://github.com/mitcad/Mitcad",
+  "commit": "eba5e3b533d5cce0eadafbb52cb877a94f5d91df",
+  "crates": [
+    "vec3",
+    "zip",
+    "asm",
+    "dump",
+    "f3d-names",
+    "f3d-file",
+    "f3d-decode",
+    "f3d-design"
+  ],
+  "content_sha256": "f2c5336edb1d692022126aa97b56ef3e01488dd1efd996d6fff9c84ef30c41f9",
+  "patches": [
+    "0001-user-parameters-before-version-8.patch"
+  ]
+}

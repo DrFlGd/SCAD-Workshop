@@ -294,7 +294,7 @@ pub async fn ingest(
         bail!("The files for {id} aren't there ({}).", root.display());
     }
     on_progress("Looking through the files…".into());
-    let found = {
+    let mut found = {
         let root = root.clone();
         tokio::task::spawn_blocking(move || scan::survey(&root)).await?
     };
@@ -520,7 +520,7 @@ pub async fn ingest(
     for (i, (mid, _, fmap, _, _, entry)) in planned.iter().enumerate() {
         let mut files = common_files.clone();
         files.extend(fmap.clone());
-        let req = RenderRequest { model: format!("{id}/{mid}"), entry: format!("/{entry}"), files, values: Default::default(), defines: vec![], call: None, format: None };
+        let req = RenderRequest { model: format!("{id}/{mid}"), entry: format!("/{entry}"), files, values: Default::default(), defines: vec![], call: None, format: None, engine: None };
         let r = renderer.clone();
         set.spawn(async move { (i, r.export_params(&req).await) });
     }
@@ -551,7 +551,7 @@ pub async fn ingest(
         let (mid, _, fmap, _, _, entry) = &planned[i];
         let mut files = common_files.clone();
         files.extend(fmap.clone());
-        let req = RenderRequest { model: format!("{id}/{mid}"), entry: format!("/{entry}"), files, values: Default::default(), defines: vec![], call: None, format: None };
+        let req = RenderRequest { model: format!("{id}/{mid}"), entry: format!("/{entry}"), files, values: Default::default(), defines: vec![], call: None, format: None, engine: None };
         if let Ok(v) = renderer.export_params(&req).await {
             raws[i] = Some(Ok(v));
         }
@@ -593,6 +593,70 @@ pub async fn ingest(
                 models.push(detail);
             }
             Err(e) => problems.push(json!({ "kind": "settings", "model": key, "message": format!("{entry}: {e}") })),
+        }
+    }
+    // Fusion 360 files with user parameters are models too, read with MitCad's reader (experimental,
+    // 0.4.27; docs/DESKTOP_PLAN.md, "Fusion 360 files through MitCad"): the settings and the preview from
+    // the file; generating needs MitCad installed. The file leaves the Parts Library item it was listed in.
+    if role != "library" {
+        on_progress("Reading Fusion 360 files…".into());
+        let fusion: Vec<scan::FileInfo> = scan::list_files(&root).into_iter().filter(|f| {
+            let l = f.rel.to_lowercase();
+            (l.ends_with(".f3d") || l.ends_with(".f3z")) && !l.split('/').any(|p| p == "test" || p == "tests")
+        }).collect();
+        for f in fusion {
+            let host = root.join(&f.rel);
+            let entry = f.rel.clone();
+            let info = match crate::f3d::read(&host) {
+                Ok(i) => i,
+                Err(e) => {
+                    problems.push(json!({ "kind": "settings", "model": format!("{id}/{}", model_id(&entry)), "message": format!("{entry}: couldn't be read as a Fusion 360 file ({e:#})") }));
+                    continue;
+                }
+            };
+            if info.parameters.is_empty() {
+                continue; // nothing to set: it stays a part
+            }
+            let mut mid = model_id(&entry);
+            let base = mid.clone();
+            let mut n = 2;
+            while used_ids.contains(&mid) {
+                mid = format!("{base}-{n}");
+                n += 1;
+            }
+            used_ids.push(mid.clone());
+            let key = format!("{id}/{mid}");
+            let sha = sha_file(&host)?;
+            blobs.insert(sha.clone(), format!("{id}@{version}:{entry}"));
+            renderer.add_blobs([(sha.clone(), host.clone())]);
+            let entry_v = format!("/{entry}");
+            let fmap: BTreeMap<String, String> = [(entry_v.clone(), sha)].into();
+            let stem = Path::new(&entry).file_stem().map(|s| s.to_string_lossy().into_owned()).unwrap_or_default();
+            let model = json!({ "id": mid, "name": scan::humanize(&stem), "entrypoint": entry, "status": "available", "presets": [] });
+            fam["models"].as_array_mut().unwrap().push(model.clone());
+            let (_, mut detail) = sitebuild::assemble_model(&fam, &model, &key, &entry_v, &fmap, &json!({}), &crate::f3d::raw_params(&info), f.bytes)?;
+            detail["engine"] = json!("mitcad");
+            detail["folder"] = json!(ingest::dirname(&entry_v).trim_start_matches('/'));
+            detail["fusion"] = json!({ "formulas": info.formulas, "timeline_items": info.timeline_items, "components": info.components, "writer": info.writer, "design": info.label });
+            // each setting's unit (mm, deg, …): what its value goes back to MitCad with
+            let units = crate::f3d::units(&info);
+            for p in detail["parameters"].as_array_mut().into_iter().flatten() {
+                if let Some(u) = p["name"].as_str().and_then(|n| units.get(n)) {
+                    p["unit"] = json!(u);
+                }
+            }
+            if let Some(png) = &info.preview_png {
+                let thumbs = lib.source_dir(&id)?.join("thumbs");
+                std::fs::create_dir_all(&thumbs)?;
+                crate::config::write_atomic(&thumbs.join(format!("{mid}.png")), png)?;
+            }
+            models.push(detail);
+            for part in found.parts.iter_mut() {
+                if let Some(files) = part["files"].as_array_mut() {
+                    files.retain(|x| x["path"] != entry.as_str());
+                }
+            }
+            found.parts.retain(|p| p["files"].as_array().is_some_and(|f| !f.is_empty()));
         }
     }
     // a library project: its modules, for Components

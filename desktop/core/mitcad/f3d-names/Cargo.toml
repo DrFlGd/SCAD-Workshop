@@ -1,0 +1,16 @@
+# SPDX-License-Identifier: MIT
+[package]
+name = "mitcad-f3d-names"
+description = "Names of the B-rep entities in .f3d body blobs and the entities that feature inputs name"
+version = "0.0.0"
+edition = "2024"
+license = "MIT"
+
+[lib]
+name = "mitcad_f3d_names"
+
+[dependencies]
+# The ASM bodies whose entities carry the names.
+mitcad-asm = { path = "../asm" }
+# The names as the dump IR's recipes give them (`EntityName`).
+mitcad-dump = { path = "../dump" }

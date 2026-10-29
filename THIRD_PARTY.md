@@ -35,6 +35,14 @@ Notes
 - Models made from NopSCADlib (GPL) and MCAD (LGPL) components: the license applies to the code; check it before sharing the generated files commercially.
 - `catalog/components.json` holds start values for modules whose docs have no example (written for this project).
 
+## MitCad's `.f3d` reader (compiled into the desktop app)
+
+| Project | Authors | Upstream @ commit | License | Path |
+| --- | --- | --- | --- | --- |
+| MitCad (the `.f3d` reader crates only) | MitCad contributors | [mitcad/Mitcad](https://github.com/mitcad/Mitcad) @ `eba5e3b` | MIT | `desktop/core/mitcad` |
+
+Eight Rust crates of MitCad's reader for Fusion 360 files, copied at the pinned commit by `tools/fetch_mitcad.py` with one patch (`desktop/core/mitcad/patches/`, waiting to go upstream); see `desktop/core/mitcad/README.md`. MitCad itself (the application and `mitcad-cli`, which the app runs to generate from an `.f3d`) is installed by the user and isn't shipped.
+
 ## Site runtime
 
 | Component | Use | License |

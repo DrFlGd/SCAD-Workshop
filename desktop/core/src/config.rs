@@ -43,6 +43,10 @@ pub struct AppConfig {
     /// For GitHub's API (raises the hourly limit; needed for private repositories).
     #[serde(default)]
     pub github_token: Option<String>,
+    /// MitCad's `mitcad-cli` (or its folder) for Fusion 360 files, when chosen in Settings › Engine;
+    /// otherwise the app looks on PATH and where the installers put it (experimental, 0.4.27).
+    #[serde(default)]
+    pub mitcad_cli: Option<PathBuf>,
 }
 
 impl AppConfig {

@@ -83,6 +83,8 @@ The development sandbox has a network allowlist and is reset between sessions (t
 
 ## Unreleased
 
+- **Fusion 360 files through MitCad (experimental).** An `.f3d` in a project with user parameters is now a Parametric Model: its settings are the file's user parameters (read with MitCad's reader, compiled in: `desktop/core/mitcad/`, pinned and patched by `tools/fetch_mitcad.py`), its thumbnail the preview Fusion saved, and Generate rebuilds it with MitCad's `mitcad-cli`, which you install yourself (Settings › Engine says where it was found, with Choose… and Forget). Design and findings: docs/DESKTOP_PLAN.md, "Fusion 360 files through MitCad". For the next person: the reader patch (older writers' user parameters) needs to go upstream before a released MitCad can generate from such files; `cargo test` reads a real file when `WORKSHOP_F3D_SAMPLE` names one; the render path was checked with a stand-in `mitcad-cli`, not MitCad itself (no MitCad in the cloud session).
+
 ## 0.4.26 — 2026-10-17 · The UI review
 
 Released with 101 of 101 checks after two CI fixes. The UI review after milestone 6 (owner, 2026-10-17: check the UI isn't overengineered); the review is in the plan's "UI review after milestone 6".

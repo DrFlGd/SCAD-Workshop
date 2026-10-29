@@ -404,7 +404,7 @@ async fn site_finish(mut a: Args) -> Result<()> {
         for m in native {
             let mut files = plan.common_files.clone();
             files.extend(m.files.clone());
-            let req = workshop_core::RenderRequest { model: m.key.clone(), entry: m.entry.clone(), files, values: Default::default(), defines: vec![], call: None, format: None };
+            let req = workshop_core::RenderRequest { model: m.key.clone(), entry: m.entry.clone(), files, values: Default::default(), defines: vec![], call: None, format: None, engine: None };
             let v = match r.export_params(&req).await {
                 Ok(v) => v,
                 Err(e) => json!({ "error": format!("{}\n{}", e.message, e.logs.join("\n")) }),

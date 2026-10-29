@@ -598,16 +598,17 @@ export function sideModelButtons(box, detail) {
   };
   const ICON_CODE = '<svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5"/></svg>';
   const ICON_DOC = '<svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 21V5"/></svg>';
-  box.prepend(mk("code", "Code", ICON_CODE, "code"));
+  // (a Fusion 360 file has no code to show; 0.4.27)
+  if (detail.engine !== "mitcad") box.prepend(mk("code", "Code", ICON_CODE, "code"));
   projectRefFor(detail).then(listDocs).then((i) => {
     if (!box.isConnected) return;
     const first = (i.docs || []).filter((d) => !d.for || d.for === "project")[0];
     // and content you added to this model (milestone 6): the edge tabs only show while the panel is open
     const own = (i.docs || []).filter((d) => d.for === `item:${detail.id}`);
-    let at = box.querySelector("[data-side-open=code]");
+    let at = box.querySelector("[data-side-open=code]") || null;
     for (const d of [first, ...own].filter(Boolean)) {
       const b = mk(d.id, d === first && d.kind === "html" ? "README" : d.title, ICON_DOC, d.id);
-      at?.after(b);
+      if (at) at.after(b); else box.prepend(b);
       at = b;
     }
     box.hidden = false;

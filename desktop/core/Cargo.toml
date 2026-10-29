@@ -25,6 +25,9 @@ tokio = { version = "1", features = ["process", "io-util", "sync", "rt-multi-thr
 toml = { version = "0.8", features = ["preserve_order"] }
 ureq = { version = "2", features = ["proxy-from-env"] }
 zip = { version = "9.0.3", default-features = false, features = ["deflate"] }
+# MitCad's .f3d reader (desktop/core/mitcad/, pinned and patched by tools/fetch_mitcad.py; 0.4.27)
+mitcad-f3d-design = { path = "mitcad/f3d-design" }
+mitcad-f3d-file = { path = "mitcad/f3d-file" }
 
 [target.'cfg(unix)'.dependencies]
 libc = "0.2"
