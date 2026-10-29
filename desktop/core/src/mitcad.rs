@@ -443,8 +443,38 @@ where
     Err(RenderFailure::failed(last.unwrap_or_else(|| "MitCad couldn't import this file.".into()), logs.clone()))
 }
 
-/// Import the file once (its timeline replayed), then set the parameters and export: the file and the log.
-pub async fn generate<F>(job: &Job<'_>, on_event: &F, cancel: &Notify) -> Result<(Vec<u8>, Vec<String>), RenderFailure>
+/// The features `mitcad-cli run` reports as failed (`  F13 Extrude10 (extrude): error: …`), by name.
+fn failed_features(lines: &[String]) -> Vec<String> {
+    lines
+        .iter()
+        .filter_map(|l| {
+            let l = l.trim_start();
+            let (head, _) = l.split_once("): error")?;
+            let (uid_name, _kind) = head.rsplit_once(" (")?;
+            let (uid, name) = uid_name.split_once(' ')?;
+            (uid.starts_with('F') && uid[1..].chars().all(|c| c.is_ascii_digit())).then(|| name.to_string())
+        })
+        .collect()
+}
+
+/// What the page says when MitCad made the model but some features failed with these settings:
+/// the model is incomplete (0.4.29).
+fn failure_warning(failed: &[String]) -> Option<String> {
+    if failed.is_empty() {
+        return None;
+    }
+    let shown: Vec<&str> = failed.iter().take(4).map(String::as_str).collect();
+    let more = if failed.len() > shown.len() { format!(" and {} more", failed.len() - shown.len()) } else { String::new() };
+    Some(format!(
+        "MitCad couldn't rebuild {} with these settings ({}{more}), so the model is incomplete. The log has MitCad's reasons.",
+        if failed.len() == 1 { "1 feature".to_string() } else { format!("{} features", failed.len()) },
+        shown.join(", ")
+    ))
+}
+
+/// Import the file once (its timeline replayed), then set the parameters and export: the file,
+/// the log, and a warning when features failed with these settings.
+pub async fn generate<F>(job: &Job<'_>, on_event: &F, cancel: &Notify) -> Result<(Vec<u8>, Vec<String>, Option<String>), RenderFailure>
 where
     F: Fn(RenderEvent) + Send + Sync,
 {
@@ -489,7 +519,13 @@ where
     on_event(RenderEvent::Stage { stage: "Rebuilding with MitCad…".into() });
     let mut cmd = tokio::process::Command::new(&job.tool.exe);
     cmd.arg("run").arg(&script_path).arg("--open").arg(&imported).current_dir(job.job_dir);
+    let before = logs.len();
     let status = run_logged(cmd, &job.tool.exe, on_event, cancel, &mut logs).await?;
+    let warning = failure_warning(&failed_features(&logs[before.min(logs.len())..]));
+    if let Some(w) = &warning {
+        on_event(RenderEvent::Log { line: w.clone() });
+        logs.push(w.clone());
+    }
     let bytes = std::fs::read(&out).unwrap_or_default();
     let empty = if job.ext == "stl" { bytes.len() <= 84 } else { bytes.is_empty() };
     if !status.success() || empty {
@@ -500,7 +536,7 @@ where
         });
         return Err(RenderFailure::failed(msg, logs));
     }
-    Ok((bytes, logs))
+    Ok((bytes, logs, warning))
 }
 
 #[cfg(test)]
@@ -524,6 +560,25 @@ mod tests {
         let r = json!({ "designs": [{ "parameters": { "imported": 192, "literal": ["d6", "d7"] }, "items": [] }] });
         assert_eq!(report_summary(&r)[1], "MitCad import: 192 parameters, 2 of them fixed numbers (their formulas weren't read).");
         assert!(report_summary(&json!({})).is_empty());
+    }
+
+    #[test]
+    fn failed_features_make_a_warning() {
+        let lines: Vec<String> = [
+            "Timeline (marker at the end):",
+            "  F12 Sketch6 (sketch): ok",
+            "  F13 Extrude10 (extrude): error: the extrusion does not touch any participant body",
+            "  F27 Fillet2 (base): warning: Stands in for Fillet2",
+            "  F64 Fillet4 (fillet): error: the body has no edge E{F35:start(r{c19[c27,c28]})|F36:side(c1)}",
+            "Bodies:",
+        ]
+        .map(String::from)
+        .to_vec();
+        assert_eq!(failed_features(&lines), ["Extrude10", "Fillet4"]);
+        assert_eq!(failure_warning(&failed_features(&lines)).unwrap(), "MitCad couldn't rebuild 2 features with these settings (Extrude10, Fillet4), so the model is incomplete. The log has MitCad's reasons.");
+        let many: Vec<String> = (1..=7).map(|i| format!("Extrude{i}")).collect();
+        assert!(failure_warning(&many).unwrap().contains("(Extrude1, Extrude2, Extrude3, Extrude4 and 3 more)"));
+        assert!(failure_warning(&[]).is_none());
     }
 
     #[test]
@@ -560,7 +615,8 @@ mod tests {
         let job = Job { tool: &tool, cache_dir: &cache, job_dir: &job_dir, file: Path::new(&sample), sha: "abc123", values: &values, ext: "stl" };
         let cancel = Notify::new();
         let events = std::sync::Mutex::new(vec![]);
-        let (stl, logs) = generate(&job, &|ev| events.lock().unwrap().push(ev), &cancel).await.unwrap();
+        let (stl, logs, warning) = generate(&job, &|ev| events.lock().unwrap().push(ev), &cancel).await.unwrap();
+        assert!(warning.is_none(), "{warning:?}");
         assert_eq!(crate::render::stl_triangles(&stl), Some(2), "one triangle per setting the stand-in was given");
         let imports: Vec<String> = std::fs::read_dir(cache.join("mitcad")).unwrap().flatten().map(|e| e.file_name().to_string_lossy().to_string()).collect();
         assert!(imports.iter().any(|n| n.starts_with("abc123-") && n.ends_with(".mitcad")), "{imports:?}");
@@ -574,7 +630,7 @@ mod tests {
         assert!(calls.contains("\"WallThickness\": \"3 mm\"") && calls.contains("\"RibWidth\": \"5.5 mm\""), "{calls}");
         assert!(!calls.contains("NotASetting"));
         // the second render finds the import there
-        let (stl2, _) = generate(&job, &|_| {}, &cancel).await.unwrap();
+        let (stl2, _, _) = generate(&job, &|_| {}, &cancel).await.unwrap();
         assert_eq!(stl2.len(), stl.len());
         assert_eq!(std::fs::read_to_string(&log).unwrap().matches("import-f3d").count(), 1);
         let _ = std::fs::remove_dir_all(&dir);
@@ -598,7 +654,8 @@ mod tests {
             let mut values = BTreeMap::new();
             values.insert("WallThickness".to_string(), json!(wall));
             let job = Job { tool: &tool, cache_dir: &cache, job_dir: &job_dir, file: Path::new(&sample), sha: "rugged", values: &values, ext: "stl" };
-            let (stl, logs) = generate(&job, &|_| {}, &cancel).await.unwrap();
+            let (stl, logs, warning) = generate(&job, &|_| {}, &cancel).await.unwrap();
+            assert!(warning.is_none() || i > 0, "{warning:?}");
             if i == 0 {
                 assert!(logs.iter().any(|l| l.contains("--dump")), "{logs:?}");
                 assert!(logs.iter().any(|l| l == "MitCad import: 216 parameters."), "{logs:?}");

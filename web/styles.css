@@ -275,6 +275,8 @@ body.show-help .field .help { display: block; }
 .status.ok::before { background: var(--ok); }
 .status.stale::before { background: var(--tool); }
 .status.busy::before { background: var(--focus); animation: pulse 1s infinite; }
+.status.warn::before { background: var(--tool); }
+.status.warn { color: var(--danger); }
 .status.error { color: var(--danger); }
 .status.error::before { background: var(--danger); }
 @keyframes pulse { 50% { opacity: .3; } }

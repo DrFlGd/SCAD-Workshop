@@ -1013,7 +1013,9 @@ function updateStatusForEdits() {
   const valuesSame = state.rendered && same(JSON.parse(state.rendered), state.values);
   const codeSame = (state.renderedEdits || "") === editsKey(editsOf(state.model.key));
   if (valuesSame && codeSame) {
-    setStatus("ok", `Preview matches your settings.${state.formatNote ? ` ${state.formatNote}` : ""}`);
+    // (a render that came out incomplete says so for as long as it's the one shown)
+    if (state.lastResult?.warning) setStatus("warn", state.lastResult.warning);
+    else setStatus("ok", `Preview matches your settings.${state.formatNote ? ` ${state.formatNote}` : ""}`);
     if (!a.classList.contains("is-disabled")) a.textContent = downloadText(state.downloadFormat);
   } else if (state.rendered) {
     setStatus("stale", valuesSame ? "Code changed. Generate to update the preview and download." : "Settings changed. Generate to update the preview and download.");
@@ -1459,7 +1461,8 @@ async function showResult(result, values, restoring = false, ek = state.rendered
     showDims(dims, result.blob.size);
     setDownload(result.blob, friendlyName(state.model, values));
     if (!restoring) {
-      setStatus("ok", result.cached ? "Preview matches your settings." : `Preview matches your settings. Made in ${fmt(result.ms / 1000)} s on this device.`);
+      if (result.warning) setStatus("warn", result.warning);
+      else setStatus("ok", result.cached ? "Preview matches your settings." : `Preview matches your settings. Made in ${fmt(result.ms / 1000)} s on this device.`);
       if (state.model?.kind === "component") saveComponentThumb(state.model.key, result.blob); // the first render becomes its thumbnail
       // Save as part or Make again waiting for this render (and not one with other settings since)
       const after = state.afterRender;

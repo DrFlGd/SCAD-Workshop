@@ -88,6 +88,9 @@ pub struct RenderOutput {
     pub prepare_ms: u64,
     pub cached: bool,
     pub logs: Vec<String>,
+    /// The model came out, but not whole: what to tell the user (MitCad's features that failed
+    /// with these settings, 0.4.29). Kept with a cached render.
+    pub warning: Option<String>,
 }
 
 #[derive(Debug, Serialize)]
@@ -118,6 +121,8 @@ struct CacheMeta {
     ms: u64,
     engine: String,
     model: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    warning: Option<String>,
 }
 
 const MAX_LOG_LINES: usize = 400;
@@ -356,7 +361,8 @@ impl Renderer {
         let meta: Option<CacheMeta> = std::fs::read(self.cache_dir.join("renders").join(format!("{key}.json")))
             .ok()
             .and_then(|b| serde_json::from_slice(&b).ok());
-        Some(RenderOutput { stl, format: req.ext().into(), ms: meta.map(|m| m.ms).unwrap_or(0), prepare_ms: 0, cached: true, logs: vec![] })
+        let (ms, warning) = meta.map(|m| (m.ms, m.warning)).unwrap_or((0, None));
+        Some(RenderOutput { stl, format: req.ext().into(), ms, prepare_ms: 0, cached: true, logs: vec![], warning })
     }
 
     pub async fn render<F>(&self, job: &str, req: &RenderRequest, on_event: F) -> Result<RenderOutput, RenderFailure>
@@ -547,19 +553,19 @@ impl Renderer {
         }
 
         if !self.use_cache {
-            return Ok(RenderOutput { stl, format: req.ext().into(), ms, prepare_ms, cached: false, logs });
+            return Ok(RenderOutput { stl, format: req.ext().into(), ms, prepare_ms, cached: false, logs, warning: None });
         }
         let key = self.cache_key(req);
         let renders = self.cache_dir.join("renders");
         let tmp = renders.join(format!("{key}.tmp-{safe_job}"));
         if std::fs::write(&tmp, &stl).is_ok() && std::fs::rename(&tmp, renders.join(format!("{key}.{}", req.ext()))).is_ok() {
-            let meta = CacheMeta { ms, engine: self.engine.version.clone(), model: req.model.clone() };
+            let meta = CacheMeta { ms, engine: self.engine.version.clone(), model: req.model.clone(), warning: None };
             let _ = std::fs::write(renders.join(format!("{key}.json")), serde_json::to_vec(&meta).unwrap_or_default());
             let _ = self.prune();
         } else {
             let _ = std::fs::remove_file(&tmp);
         }
-        Ok(RenderOutput { stl, format: req.ext().into(), ms, prepare_ms, cached: false, logs })
+        Ok(RenderOutput { stl, format: req.ext().into(), ms, prepare_ms, cached: false, logs, warning: None })
     }
 
     /// A Fusion 360 file through MitCad (experimental, 0.4.27): 3MF when asked for, else STL; cached as
@@ -575,21 +581,21 @@ impl Renderer {
         let ext = if req.ext() == "3mf" { "3mf" } else { "stl" };
         let file = tree.join(entry);
         let job = crate::mitcad::Job { tool: &tool, cache_dir: &self.cache_dir, job_dir, file: &file, sha: &sha, values: &req.values, ext };
-        let (stl, logs) = crate::mitcad::generate(&job, on_event, cancel).await?;
+        let (stl, logs, warning) = crate::mitcad::generate(&job, on_event, cancel).await?;
         let ms = started.elapsed().as_millis() as u64;
         if self.use_cache {
             let key = self.cache_key(req);
             let renders = self.cache_dir.join("renders");
             let tmp = renders.join(format!("{key}.tmp-mitcad-{}", std::process::id()));
             if std::fs::write(&tmp, &stl).is_ok() && std::fs::rename(&tmp, renders.join(format!("{key}.{ext}"))).is_ok() {
-                let meta = CacheMeta { ms, engine: tool.tag.clone(), model: req.model.clone() };
+                let meta = CacheMeta { ms, engine: tool.tag.clone(), model: req.model.clone(), warning: warning.clone() };
                 let _ = std::fs::write(renders.join(format!("{key}.json")), serde_json::to_vec(&meta).unwrap_or_default());
                 let _ = self.prune();
             } else {
                 let _ = std::fs::remove_file(&tmp);
             }
         }
-        Ok(RenderOutput { stl, format: ext.into(), ms, prepare_ms, cached: false, logs })
+        Ok(RenderOutput { stl, format: ext.into(), ms, prepare_ms, cached: false, logs, warning })
     }
 
     /// Total size of cached renders in bytes.
