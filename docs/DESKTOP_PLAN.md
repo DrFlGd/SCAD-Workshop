@@ -1339,3 +1339,16 @@ The owner asked (2026-10-29): "add the option to download and patch MitCAD from 
 5. **The log says what MitCad couldn't rebuild**: after the import, "MitCad import: 69 of 71 timeline items parametric.", the parameter count (and how many came in as fixed numbers), and one line per item kept as the file's shape or left out, with MitCad's reason, so the box bottom not changing isn't a mystery. MitCad's text output replaces `--json` (the JSON report filled the log).
 
 **Tests.** `cargo test` with `WORKSHOP_F3D_SAMPLE` and `WORKSHOP_MITCAD_CLI` (a real `mitcad-cli`) generates the Rugged Box at two wall thicknesses and checks the model changes; with `WORKSHOP_MITCAD_INSTALL_TEST` it downloads and unpacks the pinned release (`WORKSHOP_MITCAD_DOWNLOAD_URL` serves it locally). Unpacking a ZIP and the report summary have their own tests; the stand-in `mitcad-cli` now writes MitCad's report shape and records the design it was handed.
+
+### 0.4.29 notes: when MitCad drops features
+
+The owner's first test of 0.4.28 (2026-10-29): the Rugged Box at its saved values comes out right, but inner width 400 and depth 60 give a stretched lid with the ribs, hinges and latch mounts left behind, and the page said "Preview matches your settings". Reproduced here exactly (408.5 × 178.5 × 108.8 mm). Two limits of MitCad 0.35.0's replay, the same with its own reading of the file:
+
+- 12 sketches (ribs, hinges, latch mounts) are projections of the box's edges in Fusion. The file doesn't say which edges a projected curve follows; MitCad looks for the one edge each curve lies on and, finding none, keeps them fixed ("linked curves kept as fixed reference geometry"). When the box grows they no longer touch it: 20 features fail.
+- The box bottom's Fillet2 isn't in the file's history, so the bottom is the stored body from there on and no setting changes it.
+
+Each setting changed by 20% on its own: the lid follows about half, the latches follow the screw and latch settings, the bottom none; anything moving the walls costs the lid its Fillet4.
+
+**What the app does now:** `mitcad-cli run`'s timeline lines that end in `error` are the features that failed; when there are any, the render still shows (it's the model as far as MitCad got) but the status line says "MitCad couldn't rebuild N features with these settings (…), so the model is incomplete", in red, for as long as that render is shown, and a cached render keeps the warning (`warning` in the render's cache metadata). `RenderOutput.warning` carries it to the page.
+
+**Asked of the owner:** report both limits to MitCad with the file (a draft issue is in the project files), work out projected-curve links in our reader ourselves, or park Fusion files with the warning.

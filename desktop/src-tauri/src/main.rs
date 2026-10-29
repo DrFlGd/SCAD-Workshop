@@ -54,7 +54,7 @@ async fn render(job: String, req: RenderRequest, on_event: Channel<Value>, state
     match res {
         Ok(out) => {
             let tail: Vec<&String> = out.logs.iter().rev().take(200).rev().collect();
-            let _ = on_event.send(json!({ "type": "done", "ms": out.ms, "cached": out.cached, "format": out.format, "logs": tail }));
+            let _ = on_event.send(json!({ "type": "done", "ms": out.ms, "cached": out.cached, "format": out.format, "warning": out.warning, "logs": tail }));
             Ok(Response::new(out.stl))
         }
         Err(e) => Err(serde_json::to_value(&e).unwrap_or_else(|_| json!({ "message": e.message }))),

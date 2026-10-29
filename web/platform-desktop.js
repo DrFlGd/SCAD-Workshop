@@ -131,7 +131,8 @@ class DesktopEngine {
         const ms = meta?.ms ?? performance.now() - started;
         // (a 2D model asked for as STL comes back as its SVG drawing, 0.4.23)
         const format = meta?.format || model.format || "stl";
-        resolve({ blob: new Blob([buf], { type: MIME[format] || "model/stl" }), format, ms, cached: meta ? !!meta.cached : ms < 40, logs: meta?.logs || [], engine: "native" });
+        resolve({ blob: new Blob([buf], { type: MIME[format] || "model/stl" }), format, ms, cached: meta ? !!meta.cached : ms < 40, logs: meta?.logs || [], engine: "native",
+          warning: meta?.warning || null }); // the model came out incomplete (MitCad's failed features, 0.4.29)
       }, (e) => {
         settled = true;
         reject(Object.assign(new Error(e?.message || String(e)), { logs: e?.logs || [], cancelled: !!e?.cancelled }));
