@@ -1,0 +1,109 @@
+   Compiling workshop-core v0.4.29 (D:\a\SCAD-Workshop\SCAD-Workshop\desktop\core)
+    Finished `release` profile [optimized] target(s) in 37.43s
+     Running unittests src\lib.rs (target\release\deps\workshop_core-c13f6fe6b16a5fc7.exe)
+
+running 89 tests
+test api::tests::base64 ... ok
+test catalog::tests::near_misses_and_merging ... ok
+test components::tests::arguments_doc ... ok
+test catalog::tests::form_edit_matches_a_manifest_ui_block ... ok
+test components::tests::arithmetic_is_a_value ... ok
+test components::tests::choices_from_the_docs ... ok
+test components::tests::choices_pointed_to ... ok
+test components::tests::examples_become_values ... ok
+test components::tests::expressions_are_checked ... ok
+test components::tests::literals ... ok
+test components::tests::names ... ok
+test components::tests::modules_found ... ok
+test components::tests::source_for_a_call ... ok
+test components::tests::type_lists ... ok
+test components::tests::values_in_calls_become_settings ... ok
+test components::tests::settings_borrow_the_librarys_own ... ok
+test content::tests::copies_get_their_own_names ... ok
+test docs::tests::raw_html_is_cleaned ... ok
+test docs::tests::readme_to_html ... ok
+test f3d::tests::expressions_for_mitcad ... ok
+test f3d::tests::internal_units ... ok
+test f3d::tests::plain_numbers_and_formulas ... ok
+test f3d::tests::reads_a_sample_file ... ok
+test format::tests::kinds_by_path ... ok
+test format::tests::recipes_take_one_shape ... ok
+test ingest::tests::choices_read_from_the_code ... ok
+test ingest::tests::defaults_fit_their_limits ... ok
+test ingest::tests::fnmatch_patterns ... ok
+test docs::tests::documents_in_a_folder ... ok
+test ingest::tests::normpath_like_python ... ok
+test ingest::tests::old_plain_steps_fit_their_defaults ... ok
+test ingest::tests::params_convert ... ok
+test ingest::tests::references_skip_comments ... ok
+test ingest::tests::html_cleaned ... ok
+test ingest::tests::settings_edge_cases ... ok
+test library::tests::dates ... ok
+test backup::tests::backup_and_restore ... ok
+test check::tests::finds_and_repairs ... ok
+test library::tests::newer_format_is_read_only ... ok
+test library::tests::paths_stay_inside ... ok
+test library::tests::collections_are_kept_by_id ... ok
+test library::tests::slugs ... ok
+test library::tests::migrates_a_phase_1_workspace ... ok
+test mesh::tests::colours_travel_in_the_stl ... ok
+test mesh::tests::finds_a_3mf_picture ... ok
+test mesh::tests::reads_3mf_colour_groups_and_base_materials ... ok
+test mesh::tests::reads_3mf_with_components_in_other_files ... ok
+test mesh::tests::reads_bambu_and_prusa_extruder_colours ... ok
+test mesh::tests::reads_obj ... ok
+test mesh::tests::reads_stl_both_ways ... ok
+test mesh::tests::writes_a_3mf_that_reads_back ... ok
+test meta::tests::patches_undo ... ok
+test meta::tests::precedence ... ok
+test mitcad::tests::a_wrong_path_says_so ... ok
+test mitcad::tests::downloads_mitcad ... ok
+test mitcad::tests::failed_features_make_a_warning ... ok
+test mitcad::tests::generates_with_mitcad ... ok
+test mitcad::tests::summarises_an_import_report ... ok
+test mitcad::tests::the_pinned_release_names_a_download ... ok
+test library::tests::format_1_library_is_upgraded ... ok
+test library::tests::readme_is_refreshed_unless_changed ... ok
+test pdf::tests::other_pdfs_and_damage ... ok
+test pdf::tests::licenses_and_dates ... ok
+test library::tests::trash_round_trip ... ok
+test project::tests::model_ids ... ok
+test mitcad::tests::unzips_a_release_zip ... ok
+test render::tests::model_paths_stay_inside_the_tree ... ok
+test render::tests::parameter_set_matches_the_browser_worker ... ok
+test render::tests::stages_from_openscad_output ... ok
+test render::tests::triangle_count ... ok
+test scan::tests::a_drawing_file_nobody_fronts_stays_a_model ... ok
+test pdf::tests::reads_a_simpler_pdf ... ok
+test scan::tests::a_folder_of_examples ... ok
+test scan::tests::categories_and_names ... ok
+test scan::tests::licenses ... ok
+test scan::tests::made_parts_carry_their_recipe ... ok
+test scan::tests::readme_first_paragraph ... ok
+test pdf::tests::reads_a_printables_page ... ok
+test scan::tests::top_level_shapes ... ok
+test sitebuild::tests::dates_and_line_endings ... ok
+test sources::tests::archive_paths ... ok
+test sources::tests::dates_as_the_page_writes_them ... ok
+test sources::tests::github_urls ... ok
+test sources::tests::release_tags_compare_as_versions ... ok
+test scan::tests::front_ends_over_a_shared_engine ... ok
+test sources::tests::zip_round_trip ... ok
+test scan::tests::survey_a_project ... ok
+test sources::tests::starter_projects_on_github ... ok
+test project::tests::scanning_for_changes ... ok
+
+test result: ok. 89 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.33s
+
+     Running unittests src\bin\workshop-cli.rs (target\release\deps\workshop_cli-234a686f9e142ed4.exe)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests workshop_core
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+

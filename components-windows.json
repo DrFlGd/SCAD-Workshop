@@ -1,0 +1,96 @@
+{
+  "summary": {
+    "first example": {
+      "pass": 3,
+      "fail": 0
+    },
+    "later example": {
+      "pass": 1,
+      "fail": 0
+    },
+    "suggested": {
+      "pass": 3,
+      "fail": 0
+    },
+    "guessed": {
+      "pass": 0,
+      "fail": 0
+    },
+    "no example": {
+      "pass": 1,
+      "fail": 0
+    },
+    "needs input": 1
+  },
+  "results": [
+    {
+      "key": "@bosl2/bevel_gear",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 1.56,
+      "triangles": 12224,
+      "error": null
+    },
+    {
+      "key": "@bosl2/cuboid",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.57,
+      "triangles": 12,
+      "error": null
+    },
+    {
+      "key": "@bosl2/knuckle_hinge",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@bosl2/spur_gear",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.74,
+      "triangles": 2368,
+      "error": null
+    },
+    {
+      "key": "@bosl2/threaded_rod",
+      "status": "pass",
+      "start": "later example",
+      "seconds": 0.69,
+      "triangles": 5040,
+      "error": null
+    },
+    {
+      "key": "@mcad/bevel_gear",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.28,
+      "triangles": 216,
+      "error": null
+    },
+    {
+      "key": "@round-anything/polyRoundExtrude",
+      "status": "pass",
+      "start": "suggested",
+      "seconds": 0.23,
+      "triangles": 1932,
+      "error": null
+    },
+    {
+      "key": "@threads-scad/MetricBolt",
+      "status": "pass",
+      "start": "suggested",
+      "seconds": 0.42,
+      "triangles": 14504,
+      "error": null
+    },
+    {
+      "key": "@threads-scad/ScrewThread",
+      "status": "pass",
+      "start": "suggested",
+      "seconds": 0.35,
+      "triangles": 9216,
+      "error": null
+    }
+  ]
+}

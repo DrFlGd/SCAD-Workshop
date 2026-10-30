@@ -1,0 +1,414 @@
+{
+  "library": true,
+  "os": "windows",
+  "models": 58,
+  "failed": 0,
+  "results": [
+    {
+      "key": "anylid/lid",
+      "status": "pass",
+      "seconds": 0.3,
+      "triangles": 3984,
+      "error": null
+    },
+    {
+      "key": "cullenect-label/label",
+      "status": "pass",
+      "seconds": 4.64,
+      "triangles": 30156,
+      "error": null
+    },
+    {
+      "key": "gridfinity-basket/basket",
+      "status": "pass",
+      "seconds": 0.59,
+      "triangles": 37708,
+      "error": null
+    },
+    {
+      "key": "gridfinity-extended/baseplate",
+      "status": "pass",
+      "seconds": 4.03,
+      "triangles": 3348,
+      "error": null
+    },
+    {
+      "key": "gridfinity-extended/bin",
+      "status": "pass",
+      "seconds": 13.58,
+      "triangles": 3576,
+      "error": null
+    },
+    {
+      "key": "gridfinity-extended/chess",
+      "status": "pass",
+      "seconds": 2.89,
+      "triangles": 492,
+      "error": null
+    },
+    {
+      "key": "gridfinity-extended/connector-clips",
+      "status": "pass",
+      "seconds": 3.88,
+      "triangles": 1184,
+      "error": null
+    },
+    {
+      "key": "gridfinity-extended/drawers",
+      "status": "pass",
+      "seconds": 15.45,
+      "triangles": 62672,
+      "error": null
+    },
+    {
+      "key": "gridfinity-extended/glue-stick",
+      "status": "pass",
+      "seconds": 3.04,
+      "triangles": 1838,
+      "error": null
+    },
+    {
+      "key": "gridfinity-extended/item-holder",
+      "status": "pass",
+      "seconds": 14.04,
+      "triangles": 9268,
+      "error": null
+    },
+    {
+      "key": "gridfinity-extended/lid",
+      "status": "pass",
+      "seconds": 3.28,
+      "triangles": 4552,
+      "error": null
+    },
+    {
+      "key": "gridfinity-extended/marble",
+      "status": "pass",
+      "seconds": 13.17,
+      "triangles": 4920,
+      "error": null
+    },
+    {
+      "key": "gridfinity-extended/removable-walls",
+      "status": "pass",
+      "seconds": 13.66,
+      "triangles": 24854,
+      "error": null
+    },
+    {
+      "key": "gridfinity-extended/sieve",
+      "status": "pass",
+      "seconds": 13.37,
+      "triangles": 4550,
+      "error": null
+    },
+    {
+      "key": "gridfinity-extended/silverware",
+      "status": "pass",
+      "seconds": 14.49,
+      "triangles": 33268,
+      "error": null
+    },
+    {
+      "key": "gridfinity-extended/sliding-lid",
+      "status": "pass",
+      "seconds": 18.0,
+      "triangles": 5284,
+      "error": null
+    },
+    {
+      "key": "gridfinity-extended/socket-holder",
+      "status": "pass",
+      "seconds": 3.07,
+      "triangles": 4166,
+      "error": null
+    },
+    {
+      "key": "gridfinity-extended/tray",
+      "status": "pass",
+      "seconds": 13.4,
+      "triangles": 18978,
+      "error": null
+    },
+    {
+      "key": "gridfinity-extended/vertical-divider",
+      "status": "pass",
+      "seconds": 14.31,
+      "triangles": 8830,
+      "error": null
+    },
+    {
+      "key": "gridfinity-kitchen/edge-cutout",
+      "status": "pass",
+      "seconds": 3.16,
+      "triangles": 1434,
+      "error": null
+    },
+    {
+      "key": "gridfinity-kitchen/full-cutout",
+      "status": "pass",
+      "seconds": 3.16,
+      "triangles": 2874,
+      "error": null
+    },
+    {
+      "key": "gridfinity-kitchen/spacer",
+      "status": "pass",
+      "seconds": 3.11,
+      "triangles": 1192,
+      "error": null
+    },
+    {
+      "key": "gridfinity-kitchen/spacer-with-walls",
+      "status": "pass",
+      "seconds": 3.13,
+      "triangles": 1600,
+      "error": null
+    },
+    {
+      "key": "gridfinity-rebuilt/baseplate",
+      "status": "pass",
+      "seconds": 0.26,
+      "triangles": 3576,
+      "error": null
+    },
+    {
+      "key": "gridfinity-rebuilt/bin",
+      "status": "pass",
+      "seconds": 0.46,
+      "triangles": 17132,
+      "error": null
+    },
+    {
+      "key": "gridfinity-rebuilt/vase-bin",
+      "status": "pass",
+      "seconds": 0.28,
+      "triangles": 3582,
+      "error": null
+    },
+    {
+      "key": "gridfinity-rugged-box/box",
+      "status": "pass",
+      "seconds": 1.51,
+      "triangles": 72086,
+      "error": null
+    },
+    {
+      "key": "gridflock/baseplate",
+      "status": "pass",
+      "seconds": 0.81,
+      "triangles": 30144,
+      "error": null
+    },
+    {
+      "key": "hsw/grid",
+      "status": "pass",
+      "seconds": 0.17,
+      "triangles": 1160,
+      "error": null
+    },
+    {
+      "key": "hsw/grid-v2-3",
+      "status": "pass",
+      "seconds": 0.43,
+      "triangles": 18014,
+      "error": null
+    },
+    {
+      "key": "just-fit-base-grid/baseplate",
+      "status": "pass",
+      "seconds": 0.36,
+      "triangles": 14562,
+      "error": null
+    },
+    {
+      "key": "kevenaar-box-label/label",
+      "status": "pass",
+      "seconds": 0.2,
+      "triangles": 13778,
+      "error": null
+    },
+    {
+      "key": "label-generator-gridfinity/bin-label",
+      "status": "pass",
+      "seconds": 0.19,
+      "triangles": 2250,
+      "error": null
+    },
+    {
+      "key": "label-generator-gridfinity/box-label",
+      "status": "pass",
+      "seconds": 0.25,
+      "triangles": 14598,
+      "error": null
+    },
+    {
+      "key": "minimalist-kitchen-gridfinity/bin",
+      "status": "pass",
+      "seconds": 0.22,
+      "triangles": 2652,
+      "error": null
+    },
+    {
+      "key": "opengrid-shelf/shelf",
+      "status": "pass",
+      "seconds": 0.16,
+      "triangles": 3746,
+      "error": null
+    },
+    {
+      "key": "opengrid/border",
+      "status": "pass",
+      "seconds": 0.43,
+      "triangles": 212,
+      "error": null
+    },
+    {
+      "key": "opengrid/snap",
+      "status": "pass",
+      "seconds": 1.57,
+      "triangles": 2920,
+      "error": null
+    },
+    {
+      "key": "opengrid/tile",
+      "status": "pass",
+      "seconds": 1.26,
+      "triangles": 1640,
+      "error": null
+    },
+    {
+      "key": "pred-label-bin/bin",
+      "status": "pass",
+      "seconds": 0.34,
+      "triangles": 5090,
+      "error": null
+    },
+    {
+      "key": "santalla-screw-label/label",
+      "status": "pass",
+      "seconds": 0.48,
+      "triangles": 2254,
+      "error": null
+    },
+    {
+      "key": "underware/bridge-channel",
+      "status": "pass",
+      "seconds": 0.64,
+      "triangles": 624,
+      "error": null
+    },
+    {
+      "key": "underware/cable-winder",
+      "status": "pass",
+      "seconds": 3.4,
+      "triangles": 17206,
+      "error": null
+    },
+    {
+      "key": "underware/diagonal-channel",
+      "status": "pass",
+      "seconds": 0.61,
+      "triangles": 520,
+      "error": null
+    },
+    {
+      "key": "underware/i-bridge-channel",
+      "status": "pass",
+      "seconds": 0.67,
+      "triangles": 372,
+      "error": null
+    },
+    {
+      "key": "underware/i-channel",
+      "status": "pass",
+      "seconds": 0.59,
+      "triangles": 484,
+      "error": null
+    },
+    {
+      "key": "underware/i-channel-hok",
+      "status": "pass",
+      "seconds": 0.83,
+      "triangles": 620,
+      "error": null
+    },
+    {
+      "key": "underware/i-channel-leaf",
+      "status": "pass",
+      "seconds": 2.96,
+      "triangles": 25402,
+      "error": null
+    },
+    {
+      "key": "underware/i-channel-tex",
+      "status": "pass",
+      "seconds": 1.97,
+      "triangles": 2524,
+      "error": null
+    },
+    {
+      "key": "underware/i-channel-wood",
+      "status": "pass",
+      "seconds": 9.11,
+      "triangles": 48422,
+      "error": null
+    },
+    {
+      "key": "underware/i-height-change-channel",
+      "status": "pass",
+      "seconds": 0.73,
+      "triangles": 316,
+      "error": null
+    },
+    {
+      "key": "underware/i-width-change-channel",
+      "status": "pass",
+      "seconds": 1.08,
+      "triangles": 252,
+      "error": null
+    },
+    {
+      "key": "underware/l-channel",
+      "status": "pass",
+      "seconds": 4.19,
+      "triangles": 17206,
+      "error": null
+    },
+    {
+      "key": "underware/mitre-channel",
+      "status": "pass",
+      "seconds": 3.46,
+      "triangles": 5718,
+      "error": null
+    },
+    {
+      "key": "underware/s-channel",
+      "status": "pass",
+      "seconds": 1.29,
+      "triangles": 2238,
+      "error": null
+    },
+    {
+      "key": "underware/t-channel",
+      "status": "pass",
+      "seconds": 4.63,
+      "triangles": 22714,
+      "error": null
+    },
+    {
+      "key": "underware/text-label",
+      "status": "pass",
+      "seconds": 0.69,
+      "triangles": 7844,
+      "error": null
+    },
+    {
+      "key": "underware/x-channel",
+      "status": "pass",
+      "seconds": 6.76,
+      "triangles": 49200,
+      "error": null
+    }
+  ]
+}

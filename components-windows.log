@@ -1,0 +1,10 @@
+skip  @bosl2/knuckle_hinge                           needs input: ["length","segs","offset","pin_diam","pin_fn","teardrop","clip","tap_depth","screw_head","knuckle_clearance","orient","spin"]
+pass  @bosl2/cuboid                                  first example    0.57s       12 tris 
+pass  @bosl2/spur_gear                               first example    0.74s     2368 tris 
+pass  @mcad/bevel_gear                               no example       0.28s      216 tris 
+pass  @round-anything/polyRoundExtrude               suggested        0.23s     1932 tris 
+pass  @bosl2/threaded_rod                            later example    0.69s     5040 tris 
+pass  @bosl2/bevel_gear                              first example    1.56s    12224 tris 
+pass  @threads-scad/ScrewThread                      suggested        0.35s     9216 tris 
+pass  @threads-scad/MetricBolt                       suggested        0.42s    14504 tris 
+{"first example":{"pass":3,"fail":0},"later example":{"pass":1,"fail":0},"suggested":{"pass":3,"fail":0},"guessed":{"pass":0,"fail":0},"no example":{"pass":1,"fail":0},"needs input":1}
