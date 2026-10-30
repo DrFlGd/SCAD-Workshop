@@ -83,6 +83,10 @@ The development sandbox has a network allowlist and is reset between sessions (t
 
 ## Unreleased
 
+## 0.4.29 — 2026-10-29 · When MitCad drops features
+
+Released first time. After the owner's first test of Fusion files on 0.4.28: the Rugged Box broke when its size changed and the page didn't say so.
+
 - **A Fusion model that MitCad can't rebuild whole says so.** When features fail with the chosen settings (the owner's Rugged Box at width 400: the ribs and hinges are projected sketches MitCad keeps fixed), the status line now says how many and which, in red, instead of "Preview matches your settings"; cached renders keep the warning. Findings in docs/DESKTOP_PLAN.md, "0.4.29 notes"; the MitCad limits themselves are waiting on the owner's choice (report upstream, fix in our reader, or park).
 
 ## 0.4.28 — 2026-10-29 · Download MitCad, and the app's reading goes to MitCad
