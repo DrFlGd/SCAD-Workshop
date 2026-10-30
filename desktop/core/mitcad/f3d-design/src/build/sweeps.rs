@@ -155,7 +155,7 @@ impl Builder<'_> {
     }
 
     /// A sketch entity as a reference.
-    fn sketch_entity(&self, e: u64) -> Option<Reference> {
+    pub(super) fn sketch_entity(&self, e: u64) -> Option<Reference> {
         let (sid, lid) = self.local_ids.get(&e)?;
         let f = self.feat_of_sk.get(sid).copied();
         let object_type = if is_point_class(self.seg.guid_of(e)) {
@@ -174,6 +174,11 @@ impl Builder<'_> {
 
     /// The sketch curve or point an entity input names.
     pub(super) fn input_entity(&self, input: u64) -> Option<Reference> {
+        self.sketch_entity(self.input_entity_object(input)?)
+    }
+
+    /// The object of the sketch curve or point an entity input names.
+    pub(super) fn input_entity_object(&self, input: u64) -> Option<u64> {
         let seg = self.seg;
         for r in seg.ref_ids(seg.data_of(input)) {
             let d = seg.data_of(r);
@@ -191,7 +196,7 @@ impl Builder<'_> {
                 }
                 _ => continue,
             };
-            return self.sketch_entity(e?);
+            return e;
         }
         None
     }

@@ -593,7 +593,7 @@ pub fn resolve(data: &mut AppearanceData, doc: &F3dFile, threads: usize) {
             continue;
         };
         let Some(file) = doc
-            .read(&entry.entry)
+            .read_large(&entry.entry)
             .ok()
             .and_then(|d| AsmFile::parse(&d).ok())
         else {

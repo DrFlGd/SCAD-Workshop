@@ -44,6 +44,8 @@ mod primitives;
 mod sheet;
 // Derived designs (mitcad#324).
 mod derive;
+// What linked curves follow where it is another sketch's curve.
+mod projections;
 
 /// Helpers for the decoder's tests.
 #[cfg(test)]
@@ -3452,6 +3454,7 @@ pub fn build(seg: &Segment, dec: &Decoded, file: &str, segment_dir: &str) -> Dum
             }
         }
     }
+    b.projection_sources(&mut sketch_infos);
     for f in seg.objects_of(CONSTRUCTION_PLANE) {
         for r in seg.ref_ids(seg.data(f)) {
             if seg.guid_of(r) == Some(ORIGIN_PLANE) {

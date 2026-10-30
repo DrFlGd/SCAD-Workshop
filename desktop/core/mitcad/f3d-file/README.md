@@ -9,5 +9,10 @@
 | `ogs` | The display meshes saved with a document, an independent check of the bodies ([OGS_FORMAT.md](../f3d/OGS_FORMAT.md)). |
 | `protein` | The appearance and material asset packages (mitcad#228). |
 
+`F3dFile::read` takes the zip reader's default limit (256 MiB per entry);
+`F3dFile::read_large` is the opt-in for body blobs and the documents of an
+`.f3z` package (mitcad#923), which `mitcad-f3d-design`'s `package` opens one
+at a time.
+
 Until mitcad#776 this was part of `mitcad-f3d`, which re-exports it
 under the same paths (`mitcad_f3d::container`, `mitcad_f3d::F3dFile`, ...).

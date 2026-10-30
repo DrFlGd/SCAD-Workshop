@@ -4,9 +4,14 @@
 //!
 //! The reader supports what those programs write: the central directory
 //! (also ZIP64), local headers, and the methods stored (0), deflate (8) and
-//! Zstandard (93). Entries are verified with their CRC-32, and one entry
-//! decompresses to at most 4 GiB. Encryption and multi-disk archives are not
-//! supported. Explicit Zstandard history windows must fit the larger of the
+//! Zstandard (93). Entries are verified with their CRC-32. One entry
+//! decompresses to at most [`DEFAULT_ENTRY_LIMIT`] (256 MiB) unless the
+//! caller opts in to a larger limit ([`Archive::read_with_limit`], up to
+//! [`LARGE_ENTRY_LIMIT`], for the body blobs and nested documents of
+//! `.f3d`/`.f3z` files and other large payloads), and an entry that
+//! declares more than [`MAX_EXPANSION_RATIO`] times its compressed size is
+//! refused before it is decompressed (mitcad#923). Encryption and
+//! multi-disk archives are not supported. Explicit Zstandard history windows must fit the larger of the
 //! remaining declared output and 8 MiB, and must not exceed 100 MiB;
 //! unnecessarily large windows are rejected before decoding. Single-segment
 //! frames must fit the remaining output. The [`Writer`] writes stored and
@@ -113,8 +118,28 @@ pub struct Archive {
     entries: Vec<Entry>,
 }
 
-/// Upper bound for one decompressed entry, guarding against bogus sizes.
-const MAX_ENTRY_SIZE: u64 = 4 << 30;
+/// Upper bound for one decompressed entry read with [`Archive::read`]: an
+/// entry is held whole in memory, so a few-MB archive must not be able to
+/// declare gigabytes (mitcad#923). Entries of the files Mitcad reads stay
+/// far below it (design streams and body blobs of `.f3d` files: tens of
+/// MB).
+pub const DEFAULT_ENTRY_LIMIT: u64 = 256 << 20;
+
+/// The largest limit a caller may opt in to with
+/// [`Archive::read_with_limit`] (sizes up to `0xFFFF_FFFE` need no ZIP64).
+pub const LARGE_ENTRY_LIMIT: u64 = 4 << 30;
+
+/// The most an entry may declare per compressed byte: deflate's own
+/// ceiling (each 258-byte match costs at least two bits), so no valid
+/// deflate entry is refused. The Zstandard entries of real files stay below
+/// 100:1, so an entry that declares more is damaged or hostile and is
+/// refused before it is decompressed (mitcad#923).
+pub const MAX_EXPANSION_RATIO: u64 = 1032;
+
+/// Entries up to this size skip the ratio check: they cannot exhaust
+/// memory, and a Zstandard run of equal bytes legitimately packs a few KB
+/// into a dozen bytes.
+const RATIO_CHECK_FLOOR: u64 = 1 << 20;
 
 fn u16_at(data: &[u8], pos: usize) -> Option<u16> {
     data.get(pos..pos + 2)
@@ -172,6 +197,15 @@ impl Archive {
         self.read(entry)
     }
 
+    /// [`Archive::read_by_name`] with the limit of
+    /// [`Archive::read_with_limit`].
+    pub fn read_by_name_with_limit(&self, name: &str, limit: u64) -> Result<Vec<u8>, ZipError> {
+        let entry = self
+            .find(name)
+            .ok_or_else(|| ZipError::NotFound(name.to_string()))?;
+        self.read_with_limit(entry, limit)
+    }
+
     /// Where the entry's stored bytes start in the archive (after its local
     /// header, name and extra field).
     pub fn data_offset(&self, entry: &Entry) -> Result<usize, ZipError> {
@@ -201,20 +235,26 @@ impl Archive {
             .ok_or_else(|| corrupt("entry data outside the file"))
     }
 
-    /// Decompresses an entry and checks its CRC-32.
+    /// Decompresses an entry and checks its CRC-32. The entry may declare
+    /// at most [`DEFAULT_ENTRY_LIMIT`] bytes; see
+    /// [`Archive::read_with_limit`] for larger ones.
     pub fn read(&self, entry: &Entry) -> Result<Vec<u8>, ZipError> {
+        self.read_with_limit(entry, DEFAULT_ENTRY_LIMIT)
+    }
+
+    /// [`Archive::read`] of an entry that may declare up to `limit` bytes
+    /// (at most [`LARGE_ENTRY_LIMIT`]): the explicit opt-in for payloads
+    /// that are legitimately large, such as the body blobs of a design.
+    /// The ratio check ([`MAX_EXPANSION_RATIO`]) applies whatever the
+    /// limit, so the output stays proportional to the archive's size.
+    pub fn read_with_limit(&self, entry: &Entry, limit: u64) -> Result<Vec<u8>, ZipError> {
         if entry.flags & 1 != 0 {
             return Err(ZipError::Unsupported(format!(
                 "encrypted entry {}",
                 entry.name
             )));
         }
-        if entry.size > MAX_ENTRY_SIZE {
-            return Err(ZipError::Unsupported(format!(
-                "entry {} is too large",
-                entry.name
-            )));
-        }
+        check_declared_size(entry, limit)?;
         let size = usize::try_from(entry.size)
             .map_err(|_| ZipError::Unsupported(format!("entry {} is too large", entry.name)))?;
         let raw = self.raw(entry)?;
@@ -250,13 +290,36 @@ impl Archive {
     }
 }
 
+/// Refuses, before anything is decompressed, an entry that declares more
+/// than `limit` (itself at most [`LARGE_ENTRY_LIMIT`]) or more than
+/// [`MAX_EXPANSION_RATIO`] bytes per compressed byte.
+fn check_declared_size(entry: &Entry, limit: u64) -> Result<(), ZipError> {
+    let limit = limit.min(LARGE_ENTRY_LIMIT);
+    if entry.size > limit {
+        return Err(ZipError::Unsupported(format!(
+            "entry {} declares {} bytes, more than the limit of {limit}",
+            entry.name, entry.size
+        )));
+    }
+    if entry.size > RATIO_CHECK_FLOOR
+        && entry.size / entry.compressed_size.max(1) > MAX_EXPANSION_RATIO
+    {
+        return Err(ZipError::Corrupt(format!(
+            "entry {} declares {} bytes from {} compressed bytes, \
+             more than {MAX_EXPANSION_RATIO}:1",
+            entry.name, entry.size, entry.compressed_size
+        )));
+    }
+    Ok(())
+}
+
 fn decompress_zstd(raw: &[u8], size: usize) -> Result<Vec<u8>, String> {
     let mut out = Vec::new();
     decompress_zstd_into(raw, size, &mut out)?;
     Ok(out)
 }
 
-/// ruzstd 0.8.1 retains the entire advertised history before returning bytes.
+/// ruzstd 0.9.1 retains the entire advertised history before returning bytes.
 /// Check explicit windows before initializing it: a tiny unknown-size frame
 /// must not force an arbitrarily large internal allocation. Encoders choose
 /// the window by their level, not by the content (2 MiB in the files of
@@ -893,6 +956,100 @@ mod tests {
         }
         let first = archive.find("a.usdc").unwrap();
         assert_eq!(archive.data_offset(first).unwrap(), 64);
+    }
+
+    /// A one-entry archive whose deflate entry `x` holds `compressed` bytes
+    /// that are no valid deflate stream (0xff opens a block of the reserved
+    /// type) and declares `size` bytes, in its local header and the central
+    /// directory. A read that got past the size checks would fail to
+    /// inflate it with `ZipError::Decompress`.
+    fn declared_deflate_archive(compressed: usize, size: u32) -> Archive {
+        let data = vec![0xffu8; compressed];
+        let mut bytes = stored_zip(&[("x", data.as_slice())]);
+        let central = u32_at(&bytes, bytes.len() - 22 + 16).unwrap() as usize;
+        for (method_at, size_at) in [(8, 22), (central + 10, central + 24)] {
+            bytes[method_at..method_at + 2].copy_from_slice(&Method::Deflate.code().to_le_bytes());
+            bytes[size_at..size_at + 4].copy_from_slice(&size.to_le_bytes());
+        }
+        let archive = Archive::new(bytes).unwrap();
+        assert_eq!(archive.entries()[0].method, Method::Deflate);
+        assert_eq!(archive.entries()[0].size, u64::from(size));
+        archive
+    }
+
+    #[test]
+    fn refuses_an_entry_above_the_default_limit_before_inflating() {
+        // 300 MiB declared from 1 MiB (300:1, within the ratio).
+        let archive = declared_deflate_archive(1 << 20, 300 << 20);
+        let entry = &archive.entries()[0];
+        match archive.read(entry) {
+            Err(ZipError::Unsupported(what)) => assert!(what.contains("limit"), "{what}"),
+            other => panic!("expected the limit to refuse it, got {other:?}"),
+        }
+        assert!(matches!(
+            archive.read_by_name("x"),
+            Err(ZipError::Unsupported(_))
+        ));
+        // The opt-in lets it through to the inflation, which fails on the
+        // invalid stream: the limit alone refused it above.
+        assert!(matches!(
+            archive.read_with_limit(entry, LARGE_ENTRY_LIMIT),
+            Err(ZipError::Decompress(_))
+        ));
+        assert!(matches!(
+            archive.read_by_name_with_limit("x", 512 << 20),
+            Err(ZipError::Decompress(_))
+        ));
+        // A limit above the largest one is the largest one.
+        assert!(matches!(
+            archive.read_with_limit(entry, u64::MAX),
+            Err(ZipError::Decompress(_))
+        ));
+        assert!(matches!(
+            archive.read_with_limit(entry, 299 << 20),
+            Err(ZipError::Unsupported(_))
+        ));
+    }
+
+    #[test]
+    fn refuses_an_entry_expanding_more_than_deflate_can() {
+        // 100 MiB declared from 10 KiB (10240:1), below the default limit.
+        let archive = declared_deflate_archive(10 << 10, 100 << 20);
+        let entry = &archive.entries()[0];
+        for result in [
+            archive.read(entry),
+            archive.read_with_limit(entry, LARGE_ENTRY_LIMIT),
+        ] {
+            match result {
+                Err(ZipError::Corrupt(what)) => assert!(what.contains("1032:1"), "{what}"),
+                other => panic!("expected the ratio check to refuse it, got {other:?}"),
+            }
+        }
+        // 100:1 passes the checks (and fails to inflate the invalid stream).
+        let archive = declared_deflate_archive(1 << 20, 100 << 20);
+        assert!(matches!(
+            archive.read_by_name("x"),
+            Err(ZipError::Decompress(_))
+        ));
+        // A Zstandard run of equal bytes: 4 MiB from about 140 bytes.
+        let expected = vec![7u8; 4 << 20];
+        let archive = zstd_archive(&zstd_rle_frame(expected.len(), true), &expected);
+        assert!(matches!(
+            archive.read_by_name("x"),
+            Err(ZipError::Corrupt(_))
+        ));
+    }
+
+    #[test]
+    fn reads_deflate_entries_at_deflates_best_ratio() {
+        // Zeros deflate at close to the ceiling; above the check's floor.
+        let zeros = vec![0u8; 3 << 20];
+        let mut writer = Writer::new();
+        writer.add("zeros", &zeros, Method::Deflate).unwrap();
+        let archive = Archive::new(writer.finish().unwrap()).unwrap();
+        let entry = archive.find("zeros").unwrap();
+        assert!(entry.size / entry.compressed_size > 100, "{entry:?}");
+        assert_eq!(archive.read(entry).unwrap(), zeros);
     }
 
     #[test]
