@@ -1,0 +1,9 @@
+serving on http://127.0.0.1:8790/ (home /home/runner/work/_temp/p2home)
+/invoke/api: Broken pipe (os error 32)
+render jmvu7yzim1b (local-defaults/broken): ERROR: Assertion '(size < 5)' failed: "size must be under 5" in file broken.scad, line 2
+render jmvu7z0221d (local-defaults/broken): ERROR: Assertion '(size < 5)' failed: "size must be under 5" in file broken.scad, line 2
+render jmvu7z0fr1e (local-defaults/broken): ERROR: Assertion '(size < 5)' failed: "size must be under 5" in file broken.scad, line 2
+render jmvu7z79w1o (folder-settings-cases/bad): ERROR: Assertion '(size > 0)' failed: "size must be over 0" in file Bad.scad, line 2
+render jmvu7z81s1t (folder-settings-cases/bad): ERROR: Assertion '(size > 0)' failed: "size must be over 0" in file Bad.scad, line 2
+render jmvu86vsl7x (local-bevel/bevel-gear): OpenSCAD produced no geometry. These settings may not be valid for this model.
+render jmvu875dw82 (local-bevel/bevel-gear): OpenSCAD produced no geometry. These settings may not be valid for this model.

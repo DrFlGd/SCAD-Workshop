@@ -1,0 +1,2 @@
+
+(scad-workshop:10305): dbind-WARNING **: 00:10:37.463: AT-SPI: Error retrieving accessibility bus address: org.freedesktop.DBus.Error.ServiceUnknown: The name org.a11y.Bus was not provided by any .service files

@@ -1,0 +1,1539 @@
+{
+  "summary": {
+    "first example": {
+      "pass": 146,
+      "fail": 0
+    },
+    "later example": {
+      "pass": 21,
+      "fail": 0
+    },
+    "suggested": {
+      "pass": 0,
+      "fail": 0
+    },
+    "guessed": {
+      "pass": 0,
+      "fail": 0
+    },
+    "no example": {
+      "pass": 2,
+      "fail": 0
+    },
+    "needs input": 32
+  },
+  "results": [
+    {
+      "key": "@bosl2/acme_threaded_nut",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.44,
+      "triangles": 1978,
+      "error": null
+    },
+    {
+      "key": "@bosl2/acme_threaded_rod",
+      "status": "pass",
+      "start": "later example",
+      "seconds": 0.46,
+      "triangles": 3264,
+      "error": null
+    },
+    {
+      "key": "@bosl2/anchor_arrow",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.42,
+      "triangles": 214,
+      "error": null
+    },
+    {
+      "key": "@bosl2/anchor_arrow2d",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.5,
+      "triangles": 24,
+      "error": null
+    },
+    {
+      "key": "@bosl2/arc",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.32,
+      "triangles": 16,
+      "error": null
+    },
+    {
+      "key": "@bosl2/ball_bearing",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.47,
+      "triangles": 12360,
+      "error": null
+    },
+    {
+      "key": "@bosl2/ball_screw_rod",
+      "status": "pass",
+      "start": "later example",
+      "seconds": 0.54,
+      "triangles": 3814,
+      "error": null
+    },
+    {
+      "key": "@bosl2/bent_cutout_mask",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.26,
+      "triangles": 100,
+      "error": null
+    },
+    {
+      "key": "@bosl2/bevel_gear",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 1.17,
+      "triangles": 12224,
+      "error": null
+    },
+    {
+      "key": "@bosl2/bezier_sweep",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@bosl2/bezpath_sweep",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@bosl2/bottle_adapter_cap_to_cap",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.48,
+      "triangles": 6160,
+      "error": null
+    },
+    {
+      "key": "@bosl2/bottle_adapter_neck_to_cap",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.83,
+      "triangles": 21140,
+      "error": null
+    },
+    {
+      "key": "@bosl2/bottle_adapter_neck_to_neck",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.67,
+      "triangles": 35760,
+      "error": null
+    },
+    {
+      "key": "@bosl2/bspp_threaded_rod",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.8,
+      "triangles": 13950,
+      "error": null
+    },
+    {
+      "key": "@bosl2/buttress_threaded_nut",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.67,
+      "triangles": 3572,
+      "error": null
+    },
+    {
+      "key": "@bosl2/buttress_threaded_rod",
+      "status": "pass",
+      "start": "later example",
+      "seconds": 0.35,
+      "triangles": 6364,
+      "error": null
+    },
+    {
+      "key": "@bosl2/chamfer_corner_mask",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.23,
+      "triangles": 8,
+      "error": null
+    },
+    {
+      "key": "@bosl2/chamfer_cylinder_mask",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@bosl2/chamfer_edge_mask",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.29,
+      "triangles": 12,
+      "error": null
+    },
+    {
+      "key": "@bosl2/circle",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.32,
+      "triangles": 236,
+      "error": null
+    },
+    {
+      "key": "@bosl2/contour",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@bosl2/corrugated_wall",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.36,
+      "triangles": 3248,
+      "error": null
+    },
+    {
+      "key": "@bosl2/crown_gear",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.36,
+      "triangles": 3436,
+      "error": null
+    },
+    {
+      "key": "@bosl2/cube",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.32,
+      "triangles": 12,
+      "error": null
+    },
+    {
+      "key": "@bosl2/cubetruss",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.48,
+      "triangles": 1676,
+      "error": null
+    },
+    {
+      "key": "@bosl2/cubetruss_clip",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.34,
+      "triangles": 96,
+      "error": null
+    },
+    {
+      "key": "@bosl2/cubetruss_corner",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.93,
+      "triangles": 4254,
+      "error": null
+    },
+    {
+      "key": "@bosl2/cubetruss_foot",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.53,
+      "triangles": 180,
+      "error": null
+    },
+    {
+      "key": "@bosl2/cubetruss_joiner",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.71,
+      "triangles": 390,
+      "error": null
+    },
+    {
+      "key": "@bosl2/cubetruss_segment",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.25,
+      "triangles": 224,
+      "error": null
+    },
+    {
+      "key": "@bosl2/cubetruss_support",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.33,
+      "triangles": 156,
+      "error": null
+    },
+    {
+      "key": "@bosl2/cubetruss_uclip",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.25,
+      "triangles": 60,
+      "error": null
+    },
+    {
+      "key": "@bosl2/cuboid",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.3,
+      "triangles": 12,
+      "error": null
+    },
+    {
+      "key": "@bosl2/cyl",
+      "status": "pass",
+      "start": "later example",
+      "seconds": 0.34,
+      "triangles": 3840,
+      "error": null
+    },
+    {
+      "key": "@bosl2/cylinder",
+      "status": "pass",
+      "start": "later example",
+      "seconds": 0.28,
+      "triangles": 236,
+      "error": null
+    },
+    {
+      "key": "@bosl2/dashed_stroke",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@bosl2/debug_bezier",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.7,
+      "triangles": 1076,
+      "error": null
+    },
+    {
+      "key": "@bosl2/debug_bezier_patches",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@bosl2/debug_nurbs",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.98,
+      "triangles": 3064,
+      "error": null
+    },
+    {
+      "key": "@bosl2/debug_polygon",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.32,
+      "triangles": 6356,
+      "error": null
+    },
+    {
+      "key": "@bosl2/debug_region",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@bosl2/dovetail",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.24,
+      "triangles": 20,
+      "error": null
+    },
+    {
+      "key": "@bosl2/egg",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@bosl2/ellipse",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.23,
+      "triangles": 236,
+      "error": null
+    },
+    {
+      "key": "@bosl2/enveloping_worm",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 1.69,
+      "triangles": 7196,
+      "error": null
+    },
+    {
+      "key": "@bosl2/fillet",
+      "status": "pass",
+      "start": "later example",
+      "seconds": 0.24,
+      "triangles": 92,
+      "error": null
+    },
+    {
+      "key": "@bosl2/frame_ref",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.45,
+      "triangles": 1176,
+      "error": null
+    },
+    {
+      "key": "@bosl2/garden_hose_female",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.32,
+      "triangles": 3652,
+      "error": null
+    },
+    {
+      "key": "@bosl2/garden_hose_gasket",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.35,
+      "triangles": 720,
+      "error": null
+    },
+    {
+      "key": "@bosl2/garden_hose_male",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.49,
+      "triangles": 3662,
+      "error": null
+    },
+    {
+      "key": "@bosl2/garden_hose_threaded_rod",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.48,
+      "triangles": 5674,
+      "error": null
+    },
+    {
+      "key": "@bosl2/generic_airplane",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.42,
+      "triangles": 932,
+      "error": null
+    },
+    {
+      "key": "@bosl2/generic_bottle_cap",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.51,
+      "triangles": 3496,
+      "error": null
+    },
+    {
+      "key": "@bosl2/generic_bottle_neck",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.47,
+      "triangles": 17676,
+      "error": null
+    },
+    {
+      "key": "@bosl2/generic_threaded_nut",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@bosl2/generic_threaded_rod",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@bosl2/glued_circles",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.31,
+      "triangles": 484,
+      "error": null
+    },
+    {
+      "key": "@bosl2/half_joiner",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.37,
+      "triangles": 136,
+      "error": null
+    },
+    {
+      "key": "@bosl2/half_joiner2",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.34,
+      "triangles": 172,
+      "error": null
+    },
+    {
+      "key": "@bosl2/half_joiner_clear",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.27,
+      "triangles": 28,
+      "error": null
+    },
+    {
+      "key": "@bosl2/hex_drive_mask",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@bosl2/hex_panel",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.41,
+      "triangles": 1728,
+      "error": null
+    },
+    {
+      "key": "@bosl2/hexagon",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.33,
+      "triangles": 20,
+      "error": null
+    },
+    {
+      "key": "@bosl2/hirth",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.26,
+      "triangles": 512,
+      "error": null
+    },
+    {
+      "key": "@bosl2/hull_region",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@bosl2/isosurface",
+      "status": "pass",
+      "start": "later example",
+      "seconds": 0.6,
+      "triangles": 3304,
+      "error": null
+    },
+    {
+      "key": "@bosl2/jittered_poly",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@bosl2/join_prism",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.42,
+      "triangles": 1796,
+      "error": null
+    },
+    {
+      "key": "@bosl2/joiner",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.36,
+      "triangles": 300,
+      "error": null
+    },
+    {
+      "key": "@bosl2/joiner_clear",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.39,
+      "triangles": 68,
+      "error": null
+    },
+    {
+      "key": "@bosl2/keyhole",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.29,
+      "triangles": 336,
+      "error": null
+    },
+    {
+      "key": "@bosl2/knuckle_hinge",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@bosl2/linear_bearing",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.43,
+      "triangles": 2596,
+      "error": null
+    },
+    {
+      "key": "@bosl2/linear_bearing_housing",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.45,
+      "triangles": 604,
+      "error": null
+    },
+    {
+      "key": "@bosl2/linear_sweep",
+      "status": "pass",
+      "start": "later example",
+      "seconds": 0.4,
+      "triangles": 716,
+      "error": null
+    },
+    {
+      "key": "@bosl2/living_hinge_mask",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.31,
+      "triangles": 12,
+      "error": null
+    },
+    {
+      "key": "@bosl2/lmXuu_bearing",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.44,
+      "triangles": 2736,
+      "error": null
+    },
+    {
+      "key": "@bosl2/lmXuu_housing",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.39,
+      "triangles": 612,
+      "error": null
+    },
+    {
+      "key": "@bosl2/manfrotto_rc2_plate",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 1.46,
+      "triangles": 152,
+      "error": null
+    },
+    {
+      "key": "@bosl2/mask2d_chamfer",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.23,
+      "triangles": 16,
+      "error": null
+    },
+    {
+      "key": "@bosl2/mask2d_cove",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.28,
+      "triangles": 72,
+      "error": null
+    },
+    {
+      "key": "@bosl2/mask2d_dovetail",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.23,
+      "triangles": 16,
+      "error": null
+    },
+    {
+      "key": "@bosl2/mask2d_ogee",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.29,
+      "triangles": 500,
+      "error": null
+    },
+    {
+      "key": "@bosl2/mask2d_rabbet",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.22,
+      "triangles": 12,
+      "error": null
+    },
+    {
+      "key": "@bosl2/mask2d_roundover",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.28,
+      "triangles": 72,
+      "error": null
+    },
+    {
+      "key": "@bosl2/mask2d_smooth",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.21,
+      "triangles": 76,
+      "error": null
+    },
+    {
+      "key": "@bosl2/mask2d_teardrop",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.22,
+      "triangles": 44,
+      "error": null
+    },
+    {
+      "key": "@bosl2/mason_cap",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.58,
+      "triangles": 5112,
+      "error": null
+    },
+    {
+      "key": "@bosl2/mason_neck",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.39,
+      "triangles": 4228,
+      "error": null
+    },
+    {
+      "key": "@bosl2/metaballs",
+      "status": "pass",
+      "start": "later example",
+      "seconds": 5.97,
+      "triangles": 16408,
+      "error": null
+    },
+    {
+      "key": "@bosl2/metaballs2d",
+      "status": "pass",
+      "start": "later example",
+      "seconds": 0.38,
+      "triangles": 380,
+      "error": null
+    },
+    {
+      "key": "@bosl2/narrowing_strut",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.24,
+      "triangles": 38,
+      "error": null
+    },
+    {
+      "key": "@bosl2/nema_mount_mask",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.31,
+      "triangles": 1100,
+      "error": null
+    },
+    {
+      "key": "@bosl2/nema_stepper_motor",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.45,
+      "triangles": 700,
+      "error": null
+    },
+    {
+      "key": "@bosl2/npt_threaded_rod",
+      "status": "pass",
+      "start": "later example",
+      "seconds": 0.42,
+      "triangles": 8026,
+      "error": null
+    },
+    {
+      "key": "@bosl2/nut",
+      "status": "pass",
+      "start": "later example",
+      "seconds": 0.48,
+      "triangles": 760,
+      "error": null
+    },
+    {
+      "key": "@bosl2/nut_trap_inline",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.26,
+      "triangles": 20,
+      "error": null
+    },
+    {
+      "key": "@bosl2/nut_trap_side",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.37,
+      "triangles": 42,
+      "error": null
+    },
+    {
+      "key": "@bosl2/octagon",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.32,
+      "triangles": 28,
+      "error": null
+    },
+    {
+      "key": "@bosl2/octahedron",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.34,
+      "triangles": 8,
+      "error": null
+    },
+    {
+      "key": "@bosl2/offset_sweep",
+      "status": "pass",
+      "start": "later example",
+      "seconds": 0.35,
+      "triangles": 84,
+      "error": null
+    },
+    {
+      "key": "@bosl2/onion",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.34,
+      "triangles": 2640,
+      "error": null
+    },
+    {
+      "key": "@bosl2/partition_cut_mask",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.46,
+      "triangles": 436,
+      "error": null
+    },
+    {
+      "key": "@bosl2/partition_mask",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.3,
+      "triangles": 208,
+      "error": null
+    },
+    {
+      "key": "@bosl2/path_sweep",
+      "status": "pass",
+      "start": "later example",
+      "seconds": 0.6,
+      "triangles": 1180,
+      "error": null
+    },
+    {
+      "key": "@bosl2/path_sweep2d",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@bosl2/path_text",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@bosl2/pco1810_cap",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.47,
+      "triangles": 2004,
+      "error": null
+    },
+    {
+      "key": "@bosl2/pco1810_neck",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.67,
+      "triangles": 45486,
+      "error": null
+    },
+    {
+      "key": "@bosl2/pco1881_cap",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.48,
+      "triangles": 2068,
+      "error": null
+    },
+    {
+      "key": "@bosl2/pco1881_neck",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.49,
+      "triangles": 45106,
+      "error": null
+    },
+    {
+      "key": "@bosl2/pentagon",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.29,
+      "triangles": 16,
+      "error": null
+    },
+    {
+      "key": "@bosl2/phillips_mask",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.32,
+      "triangles": 176,
+      "error": null
+    },
+    {
+      "key": "@bosl2/pie_slice",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.23,
+      "triangles": 36,
+      "error": null
+    },
+    {
+      "key": "@bosl2/plot3d",
+      "status": "pass",
+      "start": "later example",
+      "seconds": 0.28,
+      "triangles": 3522,
+      "error": null
+    },
+    {
+      "key": "@bosl2/plot_revolution",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@bosl2/polygon_edge_mask",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.38,
+      "triangles": 28,
+      "error": null
+    },
+    {
+      "key": "@bosl2/prism_connector",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@bosl2/prismoid",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.22,
+      "triangles": 12,
+      "error": null
+    },
+    {
+      "key": "@bosl2/rabbit_clip",
+      "status": "pass",
+      "start": "later example",
+      "seconds": 1.23,
+      "triangles": 1452,
+      "error": null
+    },
+    {
+      "key": "@bosl2/rack",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.23,
+      "triangles": 652,
+      "error": null
+    },
+    {
+      "key": "@bosl2/rack2d",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.22,
+      "triangles": 652,
+      "error": null
+    },
+    {
+      "key": "@bosl2/rail",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.21,
+      "triangles": 52,
+      "error": null
+    },
+    {
+      "key": "@bosl2/rect",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.2,
+      "triangles": 12,
+      "error": null
+    },
+    {
+      "key": "@bosl2/rect_tube",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.24,
+      "triangles": 32,
+      "error": null
+    },
+    {
+      "key": "@bosl2/region",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.28,
+      "triangles": 136,
+      "error": null
+    },
+    {
+      "key": "@bosl2/regular_ngon",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.31,
+      "triangles": 16,
+      "error": null
+    },
+    {
+      "key": "@bosl2/regular_prism",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.25,
+      "triangles": 16,
+      "error": null
+    },
+    {
+      "key": "@bosl2/reuleaux_polygon",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.32,
+      "triangles": 224,
+      "error": null
+    },
+    {
+      "key": "@bosl2/right_triangle",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.32,
+      "triangles": 8,
+      "error": null
+    },
+    {
+      "key": "@bosl2/ring",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.24,
+      "triangles": 256,
+      "error": null
+    },
+    {
+      "key": "@bosl2/ring_gear",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.55,
+      "triangles": 6384,
+      "error": null
+    },
+    {
+      "key": "@bosl2/ring_gear2d",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@bosl2/ring_hook",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.41,
+      "triangles": 372,
+      "error": null
+    },
+    {
+      "key": "@bosl2/robertson_mask",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.32,
+      "triangles": 134,
+      "error": null
+    },
+    {
+      "key": "@bosl2/rotate_sweep",
+      "status": "pass",
+      "start": "later example",
+      "seconds": 1.64,
+      "triangles": 4824,
+      "error": null
+    },
+    {
+      "key": "@bosl2/round2d",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@bosl2/rounded_prism",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.78,
+      "triangles": 5776,
+      "error": null
+    },
+    {
+      "key": "@bosl2/rounding_corner_mask",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.4,
+      "triangles": 282,
+      "error": null
+    },
+    {
+      "key": "@bosl2/rounding_cylinder_mask",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@bosl2/rounding_edge_mask",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.3,
+      "triangles": 72,
+      "error": null
+    },
+    {
+      "key": "@bosl2/rounding_hole_mask",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.32,
+      "triangles": 2280,
+      "error": null
+    },
+    {
+      "key": "@bosl2/screw",
+      "status": "pass",
+      "start": "later example",
+      "seconds": 0.51,
+      "triangles": 3336,
+      "error": null
+    },
+    {
+      "key": "@bosl2/screw_head",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@bosl2/screw_hole",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@bosl2/semicircle",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.26,
+      "triangles": 120,
+      "error": null
+    },
+    {
+      "key": "@bosl2/shell2d",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@bosl2/shoulder_screw",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.64,
+      "triangles": 5066,
+      "error": null
+    },
+    {
+      "key": "@bosl2/show_plane",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@bosl2/skin",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.24,
+      "triangles": 1676,
+      "error": null
+    },
+    {
+      "key": "@bosl2/slider",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.51,
+      "triangles": 94,
+      "error": null
+    },
+    {
+      "key": "@bosl2/snap_lock",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.35,
+      "triangles": 892,
+      "error": null
+    },
+    {
+      "key": "@bosl2/snap_pin",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.44,
+      "triangles": 2552,
+      "error": null
+    },
+    {
+      "key": "@bosl2/snap_pin_socket",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.28,
+      "triangles": 1374,
+      "error": null
+    },
+    {
+      "key": "@bosl2/snap_socket",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.5,
+      "triangles": 1024,
+      "error": null
+    },
+    {
+      "key": "@bosl2/sp_cap",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.4,
+      "triangles": 3704,
+      "error": null
+    },
+    {
+      "key": "@bosl2/sp_neck",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.53,
+      "triangles": 4120,
+      "error": null
+    },
+    {
+      "key": "@bosl2/sparse_cuboid",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.32,
+      "triangles": 160,
+      "error": null
+    },
+    {
+      "key": "@bosl2/sparse_wall",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.23,
+      "triangles": 332,
+      "error": null
+    },
+    {
+      "key": "@bosl2/sparse_wall2d",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.69,
+      "triangles": 332,
+      "error": null
+    },
+    {
+      "key": "@bosl2/sphere",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.25,
+      "triangles": 3596,
+      "error": null
+    },
+    {
+      "key": "@bosl2/spheroid",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.39,
+      "triangles": 3480,
+      "error": null
+    },
+    {
+      "key": "@bosl2/spiral_sweep",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.32,
+      "triangles": 1806,
+      "error": null
+    },
+    {
+      "key": "@bosl2/spur_gear",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.49,
+      "triangles": 2368,
+      "error": null
+    },
+    {
+      "key": "@bosl2/spur_gear2d",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.3,
+      "triangles": 2368,
+      "error": null
+    },
+    {
+      "key": "@bosl2/square",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.28,
+      "triangles": 12,
+      "error": null
+    },
+    {
+      "key": "@bosl2/square_threaded_nut",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.58,
+      "triangles": 2872,
+      "error": null
+    },
+    {
+      "key": "@bosl2/square_threaded_rod",
+      "status": "pass",
+      "start": "later example",
+      "seconds": 0.38,
+      "triangles": 5040,
+      "error": null
+    },
+    {
+      "key": "@bosl2/squircle",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@bosl2/star",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.32,
+      "triangles": 36,
+      "error": null
+    },
+    {
+      "key": "@bosl2/stroke",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.26,
+      "triangles": 468,
+      "error": null
+    },
+    {
+      "key": "@bosl2/supershape",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.31,
+      "triangles": 2876,
+      "error": null
+    },
+    {
+      "key": "@bosl2/sweep",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@bosl2/teardrop",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.35,
+      "triangles": 164,
+      "error": null
+    },
+    {
+      "key": "@bosl2/teardrop2d",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.22,
+      "triangles": 164,
+      "error": null
+    },
+    {
+      "key": "@bosl2/teardrop_corner_mask",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.34,
+      "triangles": 296,
+      "error": null
+    },
+    {
+      "key": "@bosl2/teardrop_edge_mask",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.33,
+      "triangles": 44,
+      "error": null
+    },
+    {
+      "key": "@bosl2/text",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.32,
+      "triangles": 2800,
+      "error": null
+    },
+    {
+      "key": "@bosl2/text3d",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.33,
+      "triangles": 4372,
+      "error": null
+    },
+    {
+      "key": "@bosl2/textured_tile",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.29,
+      "triangles": 636,
+      "error": null
+    },
+    {
+      "key": "@bosl2/thinning_triangle",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.37,
+      "triangles": 142,
+      "error": null
+    },
+    {
+      "key": "@bosl2/thinning_wall",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.31,
+      "triangles": 44,
+      "error": null
+    },
+    {
+      "key": "@bosl2/threaded_nut",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.57,
+      "triangles": 3116,
+      "error": null
+    },
+    {
+      "key": "@bosl2/threaded_rod",
+      "status": "pass",
+      "start": "later example",
+      "seconds": 0.46,
+      "triangles": 5040,
+      "error": null
+    },
+    {
+      "key": "@bosl2/torus",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.22,
+      "triangles": 7200,
+      "error": null
+    },
+    {
+      "key": "@bosl2/torx_mask",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.27,
+      "triangles": 428,
+      "error": null
+    },
+    {
+      "key": "@bosl2/torx_mask2d",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.33,
+      "triangles": 428,
+      "error": null
+    },
+    {
+      "key": "@bosl2/trapezoid",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.25,
+      "triangles": 12,
+      "error": null
+    },
+    {
+      "key": "@bosl2/trapezoidal_threaded_nut",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.57,
+      "triangles": 2296,
+      "error": null
+    },
+    {
+      "key": "@bosl2/trapezoidal_threaded_rod",
+      "status": "pass",
+      "start": "later example",
+      "seconds": 0.41,
+      "triangles": 9840,
+      "error": null
+    },
+    {
+      "key": "@bosl2/tube",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.3,
+      "triangles": 480,
+      "error": null
+    },
+    {
+      "key": "@bosl2/vnf_polyhedron",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@bosl2/vnf_vertex_array",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@bosl2/wedge",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.33,
+      "triangles": 8,
+      "error": null
+    },
+    {
+      "key": "@bosl2/wire_bundle",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.96,
+      "triangles": 16848,
+      "error": null
+    },
+    {
+      "key": "@bosl2/worm",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 1.39,
+      "triangles": 44996,
+      "error": null
+    },
+    {
+      "key": "@bosl2/worm_gear",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 1.36,
+      "triangles": 24188,
+      "error": null
+    },
+    {
+      "key": "@bosl2/xcyl",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@bosl2/ycyl",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@bosl2/zcyl",
+      "status": "skipped",
+      "start": "needs input"
+    }
+  ]
+}

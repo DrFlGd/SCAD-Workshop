@@ -1,0 +1,202 @@
+skip  @bosl2/bezier_sweep                            needs input: ["shape","bezier","normal","closed","last_normal","caps","texture","tex_reps","tex_size","tex_samples","tex_extra","tex_skip"]
+skip  @bosl2/bezpath_sweep                           needs input: ["shape","bezpath","normal","closed","last_normal","caps","texture","tex_reps","tex_size","tex_samples","tex_extra","tex_skip"]
+skip  @bosl2/chamfer_cylinder_mask                   needs input: ["r","chamfer","d"]
+skip  @bosl2/contour                                 needs input: ["f","isovalue","bounding_box","pixel_size"]
+skip  @bosl2/dashed_stroke                           needs input: ["path"]
+skip  @bosl2/debug_bezier_patches                    needs input: ["size"]
+skip  @bosl2/debug_region                            needs input: ["region"]
+skip  @bosl2/egg                                     needs input: ["length","r1","r2","R","d1","d2","D"]
+skip  @bosl2/generic_threaded_nut                    needs input: ["nutwidth","id","h","pitch","profile","bevel","bevel1","bevel2","ibevel","ibevel1","ibevel2","id1","id2","height","thickness","length","l","blunt_start","blunt_start1","blunt_start2","lead_in","lead_in1","lead_in2","lead_in_ang","lead_in_ang1","lead_in_ang2","end_len","end_len1","end_len2","anchor","spin","orient"]
+skip  @bosl2/generic_threaded_rod                    needs input: ["d","l","pitch","profile","bevel","bevel1","bevel2","d1","d2","length","h","height","blunt_start","blunt_start1","blunt_start2","lead_in","lead_in1","lead_in2","lead_in_ang","lead_in_ang1","lead_in_ang2","end_len","end_len1","end_len2","anchor","spin","orient"]
+skip  @bosl2/hex_drive_mask                          needs input: ["size","length","l","h","height","anchor","spin","orient"]
+skip  @bosl2/hull_region                             needs input: ["region"]
+skip  @bosl2/jittered_poly                           needs input: ["path"]
+skip  @bosl2/knuckle_hinge                           needs input: ["length","segs","offset","pin_diam","pin_fn","teardrop","clip","tap_depth","screw_head","knuckle_clearance","orient","spin"]
+skip  @bosl2/path_sweep2d                            needs input: ["shape","path","caps"]
+skip  @bosl2/path_text                               needs input: ["path","text","font","size","thickness","lettersize","normal","top","height","h","language","script"]
+skip  @bosl2/plot_revolution                         needs input: ["f","angle","z","arclength","path","rclip","rspan","r1","r2","r","d1","d2","d"]
+skip  @bosl2/prism_connector                         needs input: ["profile","desc1","anchor1","desc2","anchor2","shift1","shift2","shift","fillet","fillet1","fillet2","overlap","overlap1","overlap2","k","k1","k2","n","n1","n2","uniform","uniform1","uniform2","smooth_normals","smooth_normals1","smooth_normals2","edge_r","edge_joint","edge_r1","edge_joint1","edge_k1","edge_r2","edge_joint2","edge_k2"]
+skip  @bosl2/ring_gear2d                             needs input: ["circ_pitch","teeth","backing","pressure_angle","helical","clearance","or","od","width","pitch","diam_pitch","mod"]
+skip  @bosl2/round2d                                 needs input: ["r","or","ir"]
+skip  @bosl2/rounding_cylinder_mask                  needs input: ["r","rounding","d"]
+skip  @bosl2/screw_head                              needs input: ["screw_info","flat_height"]
+skip  @bosl2/screw_hole                              needs input: ["spec","head","thread","oversize","hole_oversize","head_oversize","length","l","thread_len","counterbore","bevel","bevel1","bevel2","blunt_start","blunt_start1","blunt_start2"]
+skip  @bosl2/shell2d                                 needs input: ["thickness"]
+skip  @bosl2/show_plane                              needs input: ["plane","size"]
+skip  @bosl2/squircle                                needs input: ["size"]
+skip  @bosl2/sweep                                   needs input: ["shape","transforms","caps","texture","tex_reps","tex_size","tex_samples","tex_extra","tex_skip","normals"]
+skip  @bosl2/vnf_polyhedron                          needs input: ["vnf"]
+skip  @bosl2/vnf_vertex_array                        needs input: ["points","caps","cap1","cap2","texture","tex_reps","tex_size","tex_samples","tex_extra","tex_skip","sidecaps","sidecap1","sidecap2"]
+skip  @bosl2/xcyl                                    needs input: ["h","r","center","l","r1","r2","d","d1","d2","length","height","chamfer","chamfer1","chamfer2","chamfang","chamfang1","chamfang2","rounding","rounding1","rounding2","realign","from_end","from_end1","from_end2","texture","tex_reps","tex_counts","tex_scale","tex_depth","tex_samples","tex_taper","style","tex_style","extra","extra1","extra2"]
+skip  @bosl2/ycyl                                    needs input: ["h","r","center","l","r1","r2","d","d1","d2","length","height","chamfer","chamfer1","chamfer2","chamfang","chamfang1","chamfang2","rounding","rounding1","rounding2","realign","from_end","from_end1","from_end2","texture","tex_reps","tex_counts","tex_scale","tex_depth","tex_samples","tex_taper","style","tex_style","extra","extra1","extra2","anchor"]
+skip  @bosl2/zcyl                                    needs input: ["h","r","center","l","r1","r2","d","d1","d2","chamfer","chamfer1","chamfer2","chamfang","chamfang1","chamfang2","rounding","rounding1","rounding2","realign","from_end","from_end1","from_end2","texture","tex_reps","tex_counts","tex_scale","tex_depth","tex_samples","length","height","tex_taper","style","tex_style","extra","extra1","extra2","anchor"]
+pass  @bosl2/anchor_arrow                            first example    0.42s      214 tris 
+pass  @bosl2/acme_threaded_nut                       first example    0.44s     1978 tris 
+pass  @bosl2/acme_threaded_rod                       later example    0.46s     3264 tris 
+pass  @bosl2/arc                                     first example    0.32s       16 tris 
+pass  @bosl2/anchor_arrow2d                          first example     0.5s       24 tris 
+pass  @bosl2/ball_bearing                            first example    0.47s    12360 tris 
+pass  @bosl2/bent_cutout_mask                        first example    0.26s      100 tris 
+pass  @bosl2/ball_screw_rod                          later example    0.54s     3814 tris 
+pass  @bosl2/bottle_adapter_cap_to_cap               first example    0.48s     6160 tris 
+pass  @bosl2/bevel_gear                              first example    1.17s    12224 tris 
+pass  @bosl2/bottle_adapter_neck_to_cap              first example    0.83s    21140 tris 
+pass  @bosl2/bottle_adapter_neck_to_neck             first example    0.67s    35760 tris 
+pass  @bosl2/buttress_threaded_rod                   later example    0.35s     6364 tris 
+pass  @bosl2/buttress_threaded_nut                   first example    0.67s     3572 tris 
+pass  @bosl2/bspp_threaded_rod                       first example     0.8s    13950 tris 
+pass  @bosl2/chamfer_corner_mask                     first example    0.23s        8 tris 
+pass  @bosl2/chamfer_edge_mask                       first example    0.29s       12 tris 
+pass  @bosl2/circle                                  first example    0.32s      236 tris 
+pass  @bosl2/crown_gear                              first example    0.36s     3436 tris 
+pass  @bosl2/cube                                    first example    0.32s       12 tris 
+pass  @bosl2/cubetruss_clip                          first example    0.34s       96 tris 
+pass  @bosl2/cubetruss                               first example    0.48s     1676 tris 
+pass  @bosl2/corrugated_wall                         first example    0.36s     3248 tris 
+pass  @bosl2/cubetruss_foot                          first example    0.53s      180 tris 
+pass  @bosl2/cubetruss_corner                        first example    0.93s     4254 tris 
+pass  @bosl2/cubetruss_segment                       first example    0.25s      224 tris 
+pass  @bosl2/cubetruss_uclip                         first example    0.25s       60 tris 
+pass  @bosl2/cubetruss_support                       first example    0.33s      156 tris 
+pass  @bosl2/cubetruss_joiner                        first example    0.71s      390 tris 
+pass  @bosl2/cuboid                                  first example     0.3s       12 tris 
+pass  @bosl2/cyl                                     later example    0.34s     3840 tris 
+pass  @bosl2/cylinder                                later example    0.28s      236 tris 
+pass  @bosl2/debug_polygon                           first example    0.32s     6356 tris 
+pass  @bosl2/dovetail                                first example    0.24s       20 tris 
+pass  @bosl2/debug_bezier                            first example     0.7s     1076 tris 
+pass  @bosl2/ellipse                                 first example    0.23s      236 tris 
+pass  @bosl2/debug_nurbs                             first example    0.98s     3064 tris 
+pass  @bosl2/fillet                                  later example    0.24s       92 tris 
+pass  @bosl2/garden_hose_female                      no example       0.32s     3652 tris 
+pass  @bosl2/frame_ref                               first example    0.45s     1176 tris 
+pass  @bosl2/garden_hose_gasket                      first example    0.35s      720 tris 
+pass  @bosl2/garden_hose_male                        first example    0.49s     3662 tris 
+pass  @bosl2/garden_hose_threaded_rod                first example    0.48s     5674 tris 
+pass  @bosl2/generic_airplane                        first example    0.42s      932 tris 
+pass  @bosl2/enveloping_worm                         first example    1.69s     7196 tris 
+pass  @bosl2/glued_circles                           first example    0.31s      484 tris 
+pass  @bosl2/generic_bottle_cap                      first example    0.51s     3496 tris 
+pass  @bosl2/generic_bottle_neck                     first example    0.47s    17676 tris 
+pass  @bosl2/half_joiner                             first example    0.37s      136 tris 
+pass  @bosl2/half_joiner2                            first example    0.34s      172 tris 
+pass  @bosl2/half_joiner_clear                       first example    0.27s       28 tris 
+pass  @bosl2/hirth                                   first example    0.26s      512 tris 
+pass  @bosl2/hexagon                                 first example    0.33s       20 tris 
+pass  @bosl2/hex_panel                               first example    0.41s     1728 tris 
+pass  @bosl2/joiner                                  first example    0.36s      300 tris 
+pass  @bosl2/join_prism                              first example    0.42s     1796 tris 
+pass  @bosl2/isosurface                              later example     0.6s     3304 tris 
+pass  @bosl2/keyhole                                 first example    0.29s      336 tris 
+pass  @bosl2/joiner_clear                            first example    0.39s       68 tris 
+pass  @bosl2/linear_bearing                          first example    0.43s     2596 tris 
+pass  @bosl2/linear_bearing_housing                  first example    0.45s      604 tris 
+pass  @bosl2/linear_sweep                            later example     0.4s      716 tris 
+pass  @bosl2/living_hinge_mask                       first example    0.31s       12 tris 
+pass  @bosl2/lmXuu_housing                           first example    0.39s      612 tris 
+pass  @bosl2/lmXuu_bearing                           first example    0.44s     2736 tris 
+pass  @bosl2/mask2d_chamfer                          first example    0.23s       16 tris 
+pass  @bosl2/mask2d_cove                             first example    0.28s       72 tris 
+pass  @bosl2/mask2d_dovetail                         first example    0.23s       16 tris 
+pass  @bosl2/mask2d_ogee                             first example    0.29s      500 tris 
+pass  @bosl2/mask2d_rabbet                           first example    0.22s       12 tris 
+pass  @bosl2/mask2d_roundover                        first example    0.28s       72 tris 
+pass  @bosl2/mask2d_smooth                           first example    0.21s       76 tris 
+pass  @bosl2/mask2d_teardrop                         first example    0.22s       44 tris 
+pass  @bosl2/manfrotto_rc2_plate                     first example    1.46s      152 tris 
+pass  @bosl2/mason_cap                               first example    0.58s     5112 tris 
+pass  @bosl2/mason_neck                              first example    0.39s     4228 tris 
+pass  @bosl2/narrowing_strut                         first example    0.24s       38 tris 
+pass  @bosl2/metaballs2d                             later example    0.38s      380 tris 
+pass  @bosl2/nema_mount_mask                         first example    0.31s     1100 tris 
+pass  @bosl2/nema_stepper_motor                      first example    0.45s      700 tris 
+pass  @bosl2/npt_threaded_rod                        later example    0.42s     8026 tris 
+pass  @bosl2/nut_trap_inline                         first example    0.26s       20 tris 
+pass  @bosl2/nut                                     later example    0.48s      760 tris 
+pass  @bosl2/nut_trap_side                           first example    0.37s       42 tris 
+pass  @bosl2/octagon                                 first example    0.32s       28 tris 
+pass  @bosl2/octahedron                              first example    0.34s        8 tris 
+pass  @bosl2/offset_sweep                            later example    0.35s       84 tris 
+pass  @bosl2/onion                                   first example    0.34s     2640 tris 
+pass  @bosl2/partition_cut_mask                      first example    0.46s      436 tris 
+pass  @bosl2/partition_mask                          first example     0.3s      208 tris 
+pass  @bosl2/path_sweep                              later example     0.6s     1180 tris 
+pass  @bosl2/pco1810_cap                             first example    0.47s     2004 tris 
+pass  @bosl2/pco1881_cap                             first example    0.48s     2068 tris 
+pass  @bosl2/pco1810_neck                            first example    0.67s    45486 tris 
+pass  @bosl2/pentagon                                first example    0.29s       16 tris 
+pass  @bosl2/pco1881_neck                            first example    0.49s    45106 tris 
+pass  @bosl2/pie_slice                               first example    0.23s       36 tris 
+pass  @bosl2/phillips_mask                           no example       0.32s      176 tris 
+pass  @bosl2/plot3d                                  later example    0.28s     3522 tris 
+pass  @bosl2/polygon_edge_mask                       first example    0.38s       28 tris 
+pass  @bosl2/prismoid                                first example    0.22s       12 tris 
+pass  @bosl2/rack                                    first example    0.23s      652 tris 
+pass  @bosl2/rack2d                                  first example    0.22s      652 tris 
+pass  @bosl2/rail                                    first example    0.21s       52 tris 
+pass  @bosl2/rect                                    first example     0.2s       12 tris 
+pass  @bosl2/metaballs                               later example    5.97s    16408 tris 
+pass  @bosl2/rect_tube                               first example    0.24s       32 tris 
+pass  @bosl2/rabbit_clip                             later example    1.23s     1452 tris 
+pass  @bosl2/region                                  first example    0.28s      136 tris 
+pass  @bosl2/regular_ngon                            first example    0.31s       16 tris 
+pass  @bosl2/regular_prism                           first example    0.25s       16 tris 
+pass  @bosl2/reuleaux_polygon                        first example    0.32s      224 tris 
+pass  @bosl2/ring                                    first example    0.24s      256 tris 
+pass  @bosl2/right_triangle                          first example    0.32s        8 tris 
+pass  @bosl2/ring_gear                               first example    0.55s     6384 tris 
+pass  @bosl2/robertson_mask                          first example    0.32s      134 tris 
+pass  @bosl2/ring_hook                               first example    0.41s      372 tris 
+pass  @bosl2/rounding_corner_mask                    first example     0.4s      282 tris 
+pass  @bosl2/rounding_edge_mask                      first example     0.3s       72 tris 
+pass  @bosl2/rounded_prism                           first example    0.78s     5776 tris 
+pass  @bosl2/rounding_hole_mask                      first example    0.32s     2280 tris 
+pass  @bosl2/screw                                   later example    0.51s     3336 tris 
+pass  @bosl2/semicircle                              first example    0.26s      120 tris 
+pass  @bosl2/skin                                    first example    0.24s     1676 tris 
+pass  @bosl2/rotate_sweep                            later example    1.64s     4824 tris 
+pass  @bosl2/shoulder_screw                          first example    0.64s     5066 tris 
+pass  @bosl2/snap_lock                               first example    0.35s      892 tris 
+pass  @bosl2/slider                                  first example    0.51s       94 tris 
+pass  @bosl2/snap_pin_socket                         first example    0.28s     1374 tris 
+pass  @bosl2/snap_pin                                first example    0.44s     2552 tris 
+pass  @bosl2/snap_socket                             first example     0.5s     1024 tris 
+pass  @bosl2/sp_cap                                  first example     0.4s     3704 tris 
+pass  @bosl2/sparse_cuboid                           first example    0.32s      160 tris 
+pass  @bosl2/sparse_wall                             first example    0.23s      332 tris 
+pass  @bosl2/sp_neck                                 first example    0.53s     4120 tris 
+pass  @bosl2/sphere                                  first example    0.25s     3596 tris 
+pass  @bosl2/spheroid                                first example    0.39s     3480 tris 
+pass  @bosl2/spiral_sweep                            first example    0.32s     1806 tris 
+pass  @bosl2/sparse_wall2d                           first example    0.69s      332 tris 
+pass  @bosl2/spur_gear2d                             first example     0.3s     2368 tris 
+pass  @bosl2/spur_gear                               first example    0.49s     2368 tris 
+pass  @bosl2/square                                  first example    0.28s       12 tris 
+pass  @bosl2/square_threaded_rod                     later example    0.38s     5040 tris 
+pass  @bosl2/star                                    first example    0.32s       36 tris 
+pass  @bosl2/square_threaded_nut                     first example    0.58s     2872 tris 
+pass  @bosl2/stroke                                  first example    0.26s      468 tris 
+pass  @bosl2/supershape                              first example    0.31s     2876 tris 
+pass  @bosl2/teardrop2d                              first example    0.22s      164 tris 
+pass  @bosl2/teardrop                                first example    0.35s      164 tris 
+pass  @bosl2/teardrop_corner_mask                    first example    0.34s      296 tris 
+pass  @bosl2/teardrop_edge_mask                      first example    0.33s       44 tris 
+pass  @bosl2/text                                    first example    0.32s     2800 tris 
+pass  @bosl2/text3d                                  first example    0.33s     4372 tris 
+pass  @bosl2/textured_tile                           first example    0.29s      636 tris 
+pass  @bosl2/thinning_triangle                       first example    0.37s      142 tris 
+pass  @bosl2/thinning_wall                           first example    0.31s       44 tris 
+pass  @bosl2/torus                                   first example    0.22s     7200 tris 
+pass  @bosl2/threaded_nut                            first example    0.57s     3116 tris 
+pass  @bosl2/threaded_rod                            later example    0.46s     5040 tris 
+pass  @bosl2/torx_mask                               first example    0.27s      428 tris 
+pass  @bosl2/trapezoid                               first example    0.25s       12 tris 
+pass  @bosl2/torx_mask2d                             first example    0.33s      428 tris 
+pass  @bosl2/tube                                    first example     0.3s      480 tris 
+pass  @bosl2/trapezoidal_threaded_rod                later example    0.41s     9840 tris 
+pass  @bosl2/trapezoidal_threaded_nut                first example    0.57s     2296 tris 
+pass  @bosl2/wedge                                   first example    0.33s        8 tris 
+pass  @bosl2/wire_bundle                             first example    0.96s    16848 tris 
+pass  @bosl2/worm                                    first example    1.39s    44996 tris 
+pass  @bosl2/worm_gear                               first example    1.36s    24188 tris 
+{"first example":{"pass":146,"fail":0},"later example":{"pass":21,"fail":0},"suggested":{"pass":0,"fail":0},"guessed":{"pass":0,"fail":0},"no example":{"pass":2,"fail":0},"needs input":32}

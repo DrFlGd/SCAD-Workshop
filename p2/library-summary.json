@@ -1,0 +1,3055 @@
+{
+ "sources": [
+  {
+   "id": "anylid",
+   "kind": "bundled",
+   "version": "bundle-351790471289",
+   "name": "Gridfinity Anylid",
+   "models": 1,
+   "parts": 0,
+   "license": "NOASSERTION",
+   "icon": null
+  },
+  {
+   "id": "cullenect-label",
+   "kind": "github",
+   "version": "d6dc0bb2a649",
+   "name": "Cullenect Label",
+   "models": 1,
+   "parts": 3,
+   "license": "MIT",
+   "icon": null
+  },
+  {
+   "id": "folder-drop-test",
+   "kind": "folder",
+   "version": "copy-bc1c509668ef",
+   "name": "Drop test",
+   "models": 0,
+   "parts": 5,
+   "license": null,
+   "icon": null
+  },
+  {
+   "id": "folder-pictures-and-content",
+   "kind": "folder",
+   "version": "copy-a62ca77f4769",
+   "name": "Pictures and content",
+   "models": 1,
+   "parts": 0,
+   "license": null,
+   "icon": true
+  },
+  {
+   "id": "folder-settings-cases",
+   "kind": "folder",
+   "version": "copy-b4152ecad798",
+   "name": "Settings cases",
+   "models": 2,
+   "parts": 0,
+   "license": null,
+   "icon": null
+  },
+  {
+   "id": "folder-sign-plate",
+   "kind": "folder",
+   "version": "copy-5d34d717370d",
+   "name": "Sign Plate",
+   "models": 1,
+   "parts": 0,
+   "license": null,
+   "icon": null
+  },
+  {
+   "id": "folder-single-knob",
+   "kind": "folder",
+   "version": "copy-379ab823f8c4",
+   "name": "Single Knob",
+   "models": 1,
+   "parts": 0,
+   "license": null,
+   "icon": null
+  },
+  {
+   "id": "github-belfryscad-bosl2",
+   "kind": "github",
+   "version": "9eb555a08f38",
+   "name": "BOSL2",
+   "models": 0,
+   "parts": 0,
+   "license": "BSD-2-Clause",
+   "icon": null
+  },
+  {
+   "id": "github-cfinke-lego-scad",
+   "kind": "github",
+   "version": "d717ca8e29db",
+   "name": "LEGO.scad",
+   "models": 182,
+   "parts": 0,
+   "license": "MIT",
+   "icon": null
+  },
+  {
+   "id": "github-chrisspen-gears",
+   "kind": "github",
+   "version": "a15177fb116c",
+   "name": "Gears",
+   "models": 19,
+   "parts": 0,
+   "license": "CC-BY-NC-SA-3.0",
+   "icon": null
+  },
+  {
+   "id": "github-vector76-gridfinity-openscad",
+   "kind": "github",
+   "version": "0e7308cd8fc7",
+   "name": "Gridfinity openscad",
+   "models": 8,
+   "parts": 24,
+   "license": "CC-BY-SA-4.0",
+   "icon": true
+  },
+  {
+   "id": "gridfinity-basket",
+   "kind": "github",
+   "version": "549dc4015e45",
+   "name": "Gridfinity Basket",
+   "models": 1,
+   "parts": 0,
+   "license": "MIT",
+   "icon": null
+  },
+  {
+   "id": "gridfinity-extended",
+   "kind": "github",
+   "version": "94d5a3e2d39e",
+   "name": "Gridfinity Extended",
+   "models": 16,
+   "parts": 26,
+   "license": "GPL-3.0-only",
+   "icon": null
+  },
+  {
+   "id": "gridfinity-kitchen",
+   "kind": "bundled",
+   "version": "bundle-b2f506c7117d",
+   "name": "Gridfinity Kitchen",
+   "models": 4,
+   "parts": 0,
+   "license": "MIT",
+   "icon": null
+  },
+  {
+   "id": "gridfinity-rebuilt",
+   "kind": "github",
+   "version": "910e22d8607f",
+   "name": "Gridfinity Rebuilt",
+   "models": 3,
+   "parts": 0,
+   "license": "MIT",
+   "icon": null
+  },
+  {
+   "id": "gridfinity-rugged-box",
+   "kind": "bundled",
+   "version": "bundle-3640d65f7e99",
+   "name": "Gridfinity Rugged Box",
+   "models": 1,
+   "parts": 0,
+   "license": "CC-BY-SA-4.0 AND MIT",
+   "icon": null
+  },
+  {
+   "id": "gridflock",
+   "kind": "bundled",
+   "version": "bundle-7f254f312221",
+   "name": "GridFlock",
+   "models": 1,
+   "parts": 0,
+   "license": "MIT AND CC-BY-4.0",
+   "icon": null
+  },
+  {
+   "id": "hsw",
+   "kind": "bundled",
+   "version": "bundle-21613734a40b",
+   "name": "Honeycomb Storage Wall",
+   "models": 2,
+   "parts": 0,
+   "license": "CC-BY-4.0",
+   "icon": null
+  },
+  {
+   "id": "just-fit-base-grid",
+   "kind": "bundled",
+   "version": "bundle-c93fa9f49790",
+   "name": "Just Fit Base Grid",
+   "models": 1,
+   "parts": 0,
+   "license": "NOASSERTION",
+   "icon": null
+  },
+  {
+   "id": "kevenaar-box-label",
+   "kind": "bundled",
+   "version": "bundle-669e2779fe5e",
+   "name": "Gridfinity Storage Box Label",
+   "models": 1,
+   "parts": 0,
+   "license": "CC-BY-4.0",
+   "icon": null
+  },
+  {
+   "id": "label-generator-gridfinity",
+   "kind": "github",
+   "version": "350b406dde44",
+   "name": "Label Generator for Gridfinity",
+   "models": 2,
+   "parts": 0,
+   "license": "GPL-3.0-only",
+   "icon": null
+  },
+  {
+   "id": "linked-linked-shelf",
+   "kind": "linked",
+   "version": "live-667e433bbaf5",
+   "name": "Linked shelf",
+   "models": 1,
+   "parts": 0,
+   "license": "NOASSERTION",
+   "icon": null
+  },
+  {
+   "id": "local-bevel",
+   "kind": "local",
+   "version": "live-ee8fb2b43e9c",
+   "name": "Bevel",
+   "models": 1,
+   "parts": 0,
+   "license": "NOASSERTION",
+   "icon": null
+  },
+  {
+   "id": "local-blocks",
+   "kind": "local",
+   "version": "live-dfe105f5bf0f",
+   "name": "Blocks",
+   "models": 23,
+   "parts": 1,
+   "license": "NOASSERTION",
+   "icon": null
+  },
+  {
+   "id": "local-bricks",
+   "kind": "local",
+   "version": "live-d25208fde725",
+   "name": "Bricks",
+   "models": 2,
+   "parts": 0,
+   "license": "NOASSERTION",
+   "icon": null
+  },
+  {
+   "id": "local-colours",
+   "kind": "local",
+   "version": "live-18722a83dad8",
+   "name": "Colours",
+   "models": 1,
+   "parts": 0,
+   "license": "NOASSERTION",
+   "icon": null
+  },
+  {
+   "id": "local-made-parts",
+   "kind": "local",
+   "version": "live-33d3560aa3e8",
+   "name": "Made parts",
+   "models": 0,
+   "parts": 5,
+   "license": "NOASSERTION",
+   "icon": null
+  },
+  {
+   "id": "local-near",
+   "kind": "local",
+   "version": "live-7383b5635c60",
+   "name": "Near",
+   "models": 0,
+   "parts": 2,
+   "license": "NOASSERTION",
+   "icon": null
+  },
+  {
+   "id": "minimalist-kitchen-gridfinity",
+   "kind": "bundled",
+   "version": "bundle-ee8e633710eb",
+   "name": "Modular Minimalist Kitchen",
+   "models": 1,
+   "parts": 0,
+   "license": "NOASSERTION",
+   "icon": null
+  },
+  {
+   "id": "opengrid",
+   "kind": "bundled",
+   "version": "bundle-4731d8f48ea9",
+   "name": "openGrid",
+   "models": 3,
+   "parts": 0,
+   "license": "CC-BY-NC-SA-4.0",
+   "icon": null
+  },
+  {
+   "id": "opengrid-official",
+   "kind": "bundled",
+   "version": "bundle-7a043d2e93ec",
+   "name": "openGrid parts",
+   "models": 0,
+   "parts": 44,
+   "license": "CC-BY-4.0",
+   "icon": null
+  },
+  {
+   "id": "opengrid-shelf",
+   "kind": "bundled",
+   "version": "bundle-f3975858a935",
+   "name": "openGrid Shelf",
+   "models": 1,
+   "parts": 0,
+   "license": "NOASSERTION",
+   "icon": null
+  },
+  {
+   "id": "pinned",
+   "kind": "pinned",
+   "version": "pins",
+   "name": "Pinned components",
+   "models": 1,
+   "parts": 0,
+   "license": null,
+   "icon": null
+  },
+  {
+   "id": "pred-label-bin",
+   "kind": "bundled",
+   "version": "bundle-23281b232a91",
+   "name": "Gridfinity Bin for Pred Labels",
+   "models": 1,
+   "parts": 0,
+   "license": "CC-BY-NC-SA-4.0",
+   "icon": null
+  },
+  {
+   "id": "santalla-screw-label",
+   "kind": "bundled",
+   "version": "bundle-6431f57cb989",
+   "name": "Gridfinity Screw Label",
+   "models": 1,
+   "parts": 0,
+   "license": "GPL-3.0-or-later",
+   "icon": null
+  },
+  {
+   "id": "underware",
+   "kind": "github",
+   "version": "fa601de311e3",
+   "name": "Underware for openGrid",
+   "models": 17,
+   "parts": 0,
+   "license": "NOASSERTION",
+   "icon": null
+  },
+  {
+   "id": "zip-damaged",
+   "kind": "zip",
+   "version": "zip-2a9aa988e68d",
+   "name": "Damaged",
+   "models": 0,
+   "parts": 1,
+   "license": null,
+   "icon": null
+  },
+  {
+   "id": "zip-opengrid",
+   "kind": "zip",
+   "version": "zip-cdecf3445fad",
+   "name": "openGrid - Wall/Desk mounting framework and ecosystem",
+   "models": 0,
+   "parts": 1,
+   "license": "CC-BY-4.0",
+   "icon": null
+  },
+  {
+   "id": "zip-pegs",
+   "kind": "zip",
+   "version": "zip-e9a3b154b171",
+   "name": "Pegs",
+   "models": 2,
+   "parts": 0,
+   "license": null,
+   "icon": null
+  }
+ ],
+ "models": [
+  {
+   "key": "anylid/lid",
+   "name": "Lid",
+   "license": "NOASSERTION",
+   "category": "gridfinity",
+   "tags": [
+    "lids",
+    "stacking",
+    "magnets"
+   ],
+   "settings": 21
+  },
+  {
+   "key": "cullenect-label/label",
+   "name": "Label",
+   "license": "MIT",
+   "category": "labels",
+   "tags": [
+    "labels",
+    "icons",
+    "fasteners"
+   ],
+   "settings": 31
+  },
+  {
+   "key": "folder-pictures-and-content/box",
+   "name": "Box",
+   "license": "NOASSERTION",
+   "category": "carrying",
+   "tags": [],
+   "settings": 1
+  },
+  {
+   "key": "folder-settings-cases/bad",
+   "name": "Bad",
+   "license": "NOASSERTION",
+   "category": "enclosures",
+   "tags": [],
+   "settings": 1
+  },
+  {
+   "key": "folder-settings-cases/box",
+   "name": "Box",
+   "license": "NOASSERTION",
+   "category": "enclosures",
+   "tags": [],
+   "settings": 2
+  },
+  {
+   "key": "folder-sign-plate/sign-plate",
+   "name": "Sign Plate",
+   "license": "NOASSERTION",
+   "category": "labels",
+   "tags": [],
+   "settings": 2
+  },
+  {
+   "key": "folder-single-knob/single-knob",
+   "name": "Single Knob",
+   "license": "NOASSERTION",
+   "category": "other",
+   "tags": [],
+   "settings": 1
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-10202",
+   "name": "10202",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 4
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-11169",
+   "name": "11169",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 8
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-11170",
+   "name": "11170",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 7
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-11212",
+   "name": "11212",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 3
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-1126",
+   "name": "1126",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 4
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-11344",
+   "name": "11344",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 8
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-14181",
+   "name": "14181",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 8
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-14716",
+   "name": "14716",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 3
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-14721",
+   "name": "14721",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 5
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-14769",
+   "name": "14769",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 5
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-1751",
+   "name": "1751",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 4
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-22886",
+   "name": "22886",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 3
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-2291",
+   "name": "2291",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 4
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-2300",
+   "name": "2300",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 4
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-2301",
+   "name": "2301",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 7
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-2302",
+   "name": "2302",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 7
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-23949",
+   "name": "23949",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 3
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-2419",
+   "name": "2419",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 7
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-24299",
+   "name": "24299",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 6
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-24307",
+   "name": "24307",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 6
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-2431",
+   "name": "2431",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 4
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-2445",
+   "name": "2445",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 3
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-2450",
+   "name": "2450",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 7
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-2453",
+   "name": "2453",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 4
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-2454",
+   "name": "2454",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 4
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-2456",
+   "name": "2456",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 2
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-2465",
+   "name": "2465",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 2
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-25549",
+   "name": "25549",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 5
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-26603",
+   "name": "26603",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 4
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-3001",
+   "name": "3001",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 2
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-3002",
+   "name": "3002",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 2
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-3003",
+   "name": "3003",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 2
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-3004",
+   "name": "3004",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 2
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-3005",
+   "name": "3005",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 2
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-3006",
+   "name": "3006",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 2
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-3007",
+   "name": "3007",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 2
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-3008",
+   "name": "3008",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 2
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-3009",
+   "name": "3009",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 2
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-3010",
+   "name": "3010",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 2
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-3011",
+   "name": "3011",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 4
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-30145",
+   "name": "30145",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 3
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-3020",
+   "name": "3020",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 3
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-3021",
+   "name": "3021",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 3
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-3022",
+   "name": "3022",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 3
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-3023",
+   "name": "3023",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 3
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-3024",
+   "name": "3024",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 3
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-30249",
+   "name": "30249",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 6
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-3027",
+   "name": "3027",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 3
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-3028",
+   "name": "3028",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 3
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-3029",
+   "name": "3029",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 3
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-3030",
+   "name": "3030",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 3
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-3031",
+   "name": "3031",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 3
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-3032",
+   "name": "3032",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 3
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-3033",
+   "name": "3033",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 3
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-3034",
+   "name": "3034",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 3
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-3035",
+   "name": "3035",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 3
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-30355",
+   "name": "30355",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 8
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-30356",
+   "name": "30356",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 8
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-3036",
+   "name": "3036",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 3
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-30363",
+   "name": "30363",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 3
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-3037",
+   "name": "3037",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 3
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-3038",
+   "name": "3038",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 3
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-3039",
+   "name": "3039",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 3
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-3040",
+   "name": "3040",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 3
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-30503",
+   "name": "30503",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 7
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-30504",
+   "name": "30504",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 7
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-3062",
+   "name": "3062",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 4
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-3068",
+   "name": "3068",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 4
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-3069",
+   "name": "3069",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 4
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-3070",
+   "name": "3070",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 4
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-31110",
+   "name": "31110",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 5
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-32064",
+   "name": "32064",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 4
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-3254",
+   "name": "3254",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 3
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-3297",
+   "name": "3297",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 3
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-3298",
+   "name": "3298",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 3
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-33243",
+   "name": "33243",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 6
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-33909",
+   "name": "33909",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 5
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-3437",
+   "name": "3437",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 4
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-3456",
+   "name": "3456",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 3
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-3460",
+   "name": "3460",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 3
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-35114",
+   "name": "35114",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 4
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-3544",
+   "name": "3544",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 8
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-3545",
+   "name": "3545",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 8
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-35480",
+   "name": "35480",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 5
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-3622",
+   "name": "3622",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 2
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-3623",
+   "name": "3623",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 3
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-3666",
+   "name": "3666",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 3
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-3678",
+   "name": "3678",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 4
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-3702",
+   "name": "3702",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 4
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-3709",
+   "name": "3709",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 6
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-3710",
+   "name": "3710",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 3
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-3766",
+   "name": "3766",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 5
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-3795",
+   "name": "3795",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 3
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-3811",
+   "name": "3811",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 3
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-3832",
+   "name": "3832",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 3
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-3857",
+   "name": "3857",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 3
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-3958",
+   "name": "3958",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 3
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-4032",
+   "name": "4032",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 7
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-40666",
+   "name": "40666",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 5
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-41539",
+   "name": "41539",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 3
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-4161",
+   "name": "4161",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 3
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-4162",
+   "name": "4162",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 4
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-41740",
+   "name": "41740",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 5
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-41769",
+   "name": "41769",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 8
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-41770",
+   "name": "41770",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 8
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-4186",
+   "name": "4186",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 3
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-4196",
+   "name": "4196",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 5
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-4199",
+   "name": "4199",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 4
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-42022",
+   "name": "42022",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 6
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-4268",
+   "name": "4268",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 4
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-4282",
+   "name": "4282",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 3
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-4286",
+   "name": "4286",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 3
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-43722",
+   "name": "43722",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 8
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-43723",
+   "name": "43723",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 8
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-44126",
+   "name": "44126",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 6
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-4445",
+   "name": "4445",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 3
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-44524",
+   "name": "44524",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 5
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-4460",
+   "name": "4460",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 5
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-4477",
+   "name": "4477",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 3
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-4672",
+   "name": "4672",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 5
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-47397",
+   "name": "47397",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 8
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-47398",
+   "name": "47398",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 8
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-48205",
+   "name": "48205",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 8
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-48208",
+   "name": "48208",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 8
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-49311",
+   "name": "49311",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 3
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-49570",
+   "name": "49570",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 5
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-49618",
+   "name": "49618",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 4
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-50303",
+   "name": "50303",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 8
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-50304",
+   "name": "50304",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 8
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-50305",
+   "name": "50305",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 8
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-51262",
+   "name": "51262",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 5
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-51739",
+   "name": "51739",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 8
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-54200",
+   "name": "54200",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 4
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-54383",
+   "name": "54383",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 8
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-54384",
+   "name": "54384",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 8
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-60477",
+   "name": "60477",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 3
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-60479",
+   "name": "60479",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 3
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-60481",
+   "name": "60481",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 4
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-6106",
+   "name": "6106",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 8
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-6111",
+   "name": "6111",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 2
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-6112",
+   "name": "6112",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 2
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-6141",
+   "name": "6141",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 4
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-6178",
+   "name": "6178",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 5
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-6179",
+   "name": "6179",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 5
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-6180",
+   "name": "6180",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 5
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-6205",
+   "name": "6205",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 5
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-63864",
+   "name": "63864",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 4
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-63871",
+   "name": "63871",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 5
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-6474",
+   "name": "6474",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 5
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-6490",
+   "name": "6490",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 5
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-65140",
+   "name": "65140",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 6
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-65474",
+   "name": "65474",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 5
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-65734",
+   "name": "65734",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 5
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-6636",
+   "name": "6636",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 4
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-66857",
+   "name": "66857",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 5
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-67095",
+   "name": "67095",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 5
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-68869",
+   "name": "68869",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 6
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-69729",
+   "name": "69729",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 4
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-70676",
+   "name": "70676",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 5
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-76371",
+   "name": "76371",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 5
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-77850",
+   "name": "77850",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 5
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-78329",
+   "name": "78329",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 3
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-78443",
+   "name": "78443",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 8
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-78444",
+   "name": "78444",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 8
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-85861",
+   "name": "85861",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 5
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-85984",
+   "name": "85984",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 4
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-86996",
+   "name": "86996",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 4
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-87074",
+   "name": "87074",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 4
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-87079",
+   "name": "87079",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 4
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-88646",
+   "name": "88646",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 5
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-90498",
+   "name": "90498",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 4
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-91405",
+   "name": "91405",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 3
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-91988",
+   "name": "91988",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 3
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-92438",
+   "name": "92438",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 3
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-98138",
+   "name": "98138",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 4
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-98222",
+   "name": "98222",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 7
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-98225",
+   "name": "98225",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 7
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-98233",
+   "name": "98233",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 5
+  },
+  {
+   "key": "github-cfinke-lego-scad/examples-98560",
+   "name": "98560",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 4
+  },
+  {
+   "key": "github-cfinke-lego-scad/lego",
+   "name": "LEGO",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 42
+  },
+  {
+   "key": "github-cfinke-lego-scad/lego-examples",
+   "name": "LEGO Examples",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 0
+  },
+  {
+   "key": "github-cfinke-lego-scad/scripts-lego-angle-plate",
+   "name": "LEGO Angle Plate",
+   "license": "MIT",
+   "category": "other",
+   "tags": [],
+   "settings": 0
+  },
+  {
+   "key": "github-chrisspen-gears/examples-bevel-gear",
+   "name": "Bevel gear",
+   "license": "CC-BY-NC-SA-3.0",
+   "category": "garden-tools",
+   "tags": [
+    "a-very-long-tag-name-that-keeps-going",
+    "another-long-tag-for-wrapping",
+    "yet-another-tag-so-it-needs-three-lines",
+    "edited-from-library-settings"
+   ],
+   "settings": 7
+  },
+  {
+   "key": "github-chrisspen-gears/examples-bevel-gear-pair",
+   "name": "Bevel gear pair",
+   "license": "CC-BY-NC-SA-3.0",
+   "category": "mechanical",
+   "tags": [
+    "a-very-long-tag-name-that-keeps-going",
+    "another-long-tag-for-wrapping",
+    "yet-another-tag-so-it-needs-three-lines",
+    "edited-from-library-settings"
+   ],
+   "settings": 10
+  },
+  {
+   "key": "github-chrisspen-gears/examples-bevel-herringbone-gear",
+   "name": "Bevel herringbone gear",
+   "license": "CC-BY-NC-SA-3.0",
+   "category": "mechanical",
+   "tags": [
+    "a-very-long-tag-name-that-keeps-going",
+    "another-long-tag-for-wrapping",
+    "yet-another-tag-so-it-needs-three-lines",
+    "edited-from-library-settings"
+   ],
+   "settings": 7
+  },
+  {
+   "key": "github-chrisspen-gears/examples-bevel-herringbone-gear-pair",
+   "name": "Bevel herringbone gear pair",
+   "license": "CC-BY-NC-SA-3.0",
+   "category": "mechanical",
+   "tags": [
+    "a-very-long-tag-name-that-keeps-going",
+    "another-long-tag-for-wrapping",
+    "yet-another-tag-so-it-needs-three-lines",
+    "edited-from-library-settings"
+   ],
+   "settings": 10
+  },
+  {
+   "key": "github-chrisspen-gears/examples-demo",
+   "name": "Demo",
+   "license": "CC-BY-NC-SA-3.0",
+   "category": "mechanical",
+   "tags": [
+    "a-very-long-tag-name-that-keeps-going",
+    "another-long-tag-for-wrapping",
+    "yet-another-tag-so-it-needs-three-lines",
+    "edited-from-library-settings"
+   ],
+   "settings": 11
+  },
+  {
+   "key": "github-chrisspen-gears/examples-herringbone-gear",
+   "name": "Herringbone gear",
+   "license": "CC-BY-NC-SA-3.0",
+   "category": "mechanical",
+   "tags": [
+    "a-very-long-tag-name-that-keeps-going",
+    "another-long-tag-for-wrapping",
+    "yet-another-tag-so-it-needs-three-lines",
+    "edited-from-library-settings"
+   ],
+   "settings": 7
+  },
+  {
+   "key": "github-chrisspen-gears/examples-herringbone-rack",
+   "name": "Herringbone rack",
+   "license": "CC-BY-NC-SA-3.0",
+   "category": "mechanical",
+   "tags": [
+    "a-very-long-tag-name-that-keeps-going",
+    "another-long-tag-for-wrapping",
+    "yet-another-tag-so-it-needs-three-lines",
+    "edited-from-library-settings"
+   ],
+   "settings": 6
+  },
+  {
+   "key": "github-chrisspen-gears/examples-herringbone-ring-gear",
+   "name": "Herringbone ring gear",
+   "license": "CC-BY-NC-SA-3.0",
+   "category": "mechanical",
+   "tags": [
+    "a-very-long-tag-name-that-keeps-going",
+    "another-long-tag-for-wrapping",
+    "yet-another-tag-so-it-needs-three-lines",
+    "edited-from-library-settings"
+   ],
+   "settings": 6
+  },
+  {
+   "key": "github-chrisspen-gears/examples-mountable-herringbone-rack",
+   "name": "Mountable herringbone rack",
+   "license": "CC-BY-NC-SA-3.0",
+   "category": "mechanical",
+   "tags": [
+    "a-very-long-tag-name-that-keeps-going",
+    "another-long-tag-for-wrapping",
+    "yet-another-tag-so-it-needs-three-lines",
+    "edited-from-library-settings"
+   ],
+   "settings": 9
+  },
+  {
+   "key": "github-chrisspen-gears/examples-mountable-rack",
+   "name": "Mountable rack",
+   "license": "CC-BY-NC-SA-3.0",
+   "category": "mechanical",
+   "tags": [
+    "a-very-long-tag-name-that-keeps-going",
+    "another-long-tag-for-wrapping",
+    "yet-another-tag-so-it-needs-three-lines",
+    "edited-from-library-settings"
+   ],
+   "settings": 9
+  },
+  {
+   "key": "github-chrisspen-gears/examples-planetary-gear",
+   "name": "Planetary gear",
+   "license": "CC-BY-NC-SA-3.0",
+   "category": "mechanical",
+   "tags": [
+    "a-very-long-tag-name-that-keeps-going",
+    "another-long-tag-for-wrapping",
+    "yet-another-tag-so-it-needs-three-lines",
+    "edited-from-library-settings"
+   ],
+   "settings": 22
+  },
+  {
+   "key": "github-chrisspen-gears/examples-rack",
+   "name": "Rack",
+   "license": "CC-BY-NC-SA-3.0",
+   "category": "mechanical",
+   "tags": [
+    "a-very-long-tag-name-that-keeps-going",
+    "another-long-tag-for-wrapping",
+    "yet-another-tag-so-it-needs-three-lines",
+    "edited-from-library-settings"
+   ],
+   "settings": 6
+  },
+  {
+   "key": "github-chrisspen-gears/examples-rack-and-pinion",
+   "name": "Rack and pinion",
+   "license": "CC-BY-NC-SA-3.0",
+   "category": "mechanical",
+   "tags": [
+    "a-very-long-tag-name-that-keeps-going",
+    "another-long-tag-for-wrapping",
+    "yet-another-tag-so-it-needs-three-lines",
+    "edited-from-library-settings"
+   ],
+   "settings": 10
+  },
+  {
+   "key": "github-chrisspen-gears/examples-ring",
+   "name": "Ring",
+   "license": "CC-BY-NC-SA-3.0",
+   "category": "mechanical",
+   "tags": [
+    "a-very-long-tag-name-that-keeps-going",
+    "another-long-tag-for-wrapping",
+    "yet-another-tag-so-it-needs-three-lines",
+    "edited-from-library-settings"
+   ],
+   "settings": 8
+  },
+  {
+   "key": "github-chrisspen-gears/examples-ring-gear",
+   "name": "Ring gear",
+   "license": "CC-BY-NC-SA-3.0",
+   "category": "mechanical",
+   "tags": [
+    "a-very-long-tag-name-that-keeps-going",
+    "another-long-tag-for-wrapping",
+    "yet-another-tag-so-it-needs-three-lines",
+    "edited-from-library-settings"
+   ],
+   "settings": 6
+  },
+  {
+   "key": "github-chrisspen-gears/examples-spur-gear",
+   "name": "Spur gear",
+   "license": "CC-BY-NC-SA-3.0",
+   "category": "mechanical",
+   "tags": [
+    "a-very-long-tag-name-that-keeps-going",
+    "another-long-tag-for-wrapping",
+    "yet-another-tag-so-it-needs-three-lines",
+    "edited-from-library-settings"
+   ],
+   "settings": 7
+  },
+  {
+   "key": "github-chrisspen-gears/examples-worm",
+   "name": "Worm",
+   "license": "CC-BY-NC-SA-3.0",
+   "category": "mechanical",
+   "tags": [
+    "a-very-long-tag-name-that-keeps-going",
+    "another-long-tag-for-wrapping",
+    "yet-another-tag-so-it-needs-three-lines",
+    "edited-from-library-settings"
+   ],
+   "settings": 7
+  },
+  {
+   "key": "github-chrisspen-gears/examples-worm-gear",
+   "name": "Worm gear",
+   "license": "CC-BY-NC-SA-3.0",
+   "category": "mechanical",
+   "tags": [
+    "a-very-long-tag-name-that-keeps-going",
+    "another-long-tag-for-wrapping",
+    "yet-another-tag-so-it-needs-three-lines",
+    "edited-from-library-settings"
+   ],
+   "settings": 13
+  },
+  {
+   "key": "github-chrisspen-gears/scan-extra",
+   "name": "Scan extra",
+   "license": "CC-BY-NC-SA-3.0",
+   "category": "mechanical",
+   "tags": [
+    "a-very-long-tag-name-that-keeps-going",
+    "another-long-tag-for-wrapping",
+    "yet-another-tag-so-it-needs-three-lines",
+    "edited-from-library-settings"
+   ],
+   "settings": 1
+  },
+  {
+   "key": "github-vector76-gridfinity-openscad/gridfinity-baseplate",
+   "name": "Gridfinity baseplate",
+   "license": "MIT",
+   "category": "gridfinity",
+   "tags": [],
+   "settings": 4
+  },
+  {
+   "key": "github-vector76-gridfinity-openscad/gridfinity-basic-cup",
+   "name": "My cup",
+   "license": "CC-BY-SA-4.0",
+   "category": "gridfinity",
+   "tags": [],
+   "settings": 18
+  },
+  {
+   "key": "github-vector76-gridfinity-openscad/gridfinity-chess",
+   "name": "Gridfinity chess",
+   "license": "CC-BY-SA-4.0",
+   "category": "gridfinity",
+   "tags": [],
+   "settings": 1
+  },
+  {
+   "key": "github-vector76-gridfinity-openscad/gridfinity-cup-modules",
+   "name": "Gridfinity cup modules",
+   "license": "CC-BY-SA-4.0",
+   "category": "gridfinity",
+   "tags": [],
+   "settings": 13
+  },
+  {
+   "key": "github-vector76-gridfinity-openscad/gridfinity-flsun-q5",
+   "name": "Gridfinity flsun q5",
+   "license": "CC-BY-SA-4.0",
+   "category": "gridfinity",
+   "tags": [],
+   "settings": 4
+  },
+  {
+   "key": "github-vector76-gridfinity-openscad/gridfinity-glue-stick",
+   "name": "Gridfinity glue stick",
+   "license": "CC-BY-SA-4.0",
+   "category": "gridfinity",
+   "tags": [],
+   "settings": 4
+  },
+  {
+   "key": "github-vector76-gridfinity-openscad/gridfinity-silverware",
+   "name": "Gridfinity silverware",
+   "license": "CC-BY-SA-4.0",
+   "category": "gridfinity",
+   "tags": [],
+   "settings": 49
+  },
+  {
+   "key": "github-vector76-gridfinity-openscad/gridfinity-socket-holder",
+   "name": "Gridfinity socket holder",
+   "license": "CC-BY-SA-4.0",
+   "category": "gridfinity",
+   "tags": [],
+   "settings": 1
+  },
+  {
+   "key": "gridfinity-basket/basket",
+   "name": "Basket",
+   "license": "MIT",
+   "category": "carrying",
+   "tags": [
+    "baskets",
+    "handles",
+    "stacking"
+   ],
+   "settings": 26
+  },
+  {
+   "key": "gridfinity-extended/baseplate",
+   "name": "Baseplate",
+   "license": "GPL-3.0-only",
+   "category": "gridfinity",
+   "tags": [
+    "bins",
+    "baseplates",
+    "dividers",
+    "lids",
+    "drawers",
+    "holders"
+   ],
+   "settings": 48
+  },
+  {
+   "key": "gridfinity-extended/bin",
+   "name": "Basic Bin",
+   "license": "GPL-3.0-only",
+   "category": "gridfinity",
+   "tags": [
+    "bins",
+    "baseplates",
+    "dividers",
+    "lids",
+    "drawers",
+    "holders"
+   ],
+   "settings": 157
+  },
+  {
+   "key": "gridfinity-extended/chess",
+   "name": "Chess Set",
+   "license": "GPL-3.0-only",
+   "category": "gridfinity",
+   "tags": [
+    "bins",
+    "baseplates",
+    "dividers",
+    "lids",
+    "drawers",
+    "holders"
+   ],
+   "settings": 4
+  },
+  {
+   "key": "gridfinity-extended/connector-clips",
+   "name": "Connector Clips",
+   "license": "GPL-3.0-only",
+   "category": "gridfinity",
+   "tags": [
+    "bins",
+    "baseplates",
+    "dividers",
+    "lids",
+    "drawers",
+    "holders"
+   ],
+   "settings": 48
+  },
+  {
+   "key": "gridfinity-extended/drawers",
+   "name": "Drawers",
+   "license": "GPL-3.0-only",
+   "category": "gridfinity",
+   "tags": [
+    "bins",
+    "baseplates",
+    "dividers",
+    "lids",
+    "drawers",
+    "holders"
+   ],
+   "settings": 57
+  },
+  {
+   "key": "gridfinity-extended/glue-stick",
+   "name": "Glue Stick Holder",
+   "license": "GPL-3.0-only",
+   "category": "gridfinity",
+   "tags": [
+    "bins",
+    "baseplates",
+    "dividers",
+    "lids",
+    "drawers",
+    "holders"
+   ],
+   "settings": 4
+  },
+  {
+   "key": "gridfinity-extended/item-holder",
+   "name": "Item Holder",
+   "license": "GPL-3.0-only",
+   "category": "gridfinity",
+   "tags": [
+    "bins",
+    "baseplates",
+    "dividers",
+    "lids",
+    "drawers",
+    "holders"
+   ],
+   "settings": 137
+  },
+  {
+   "key": "gridfinity-extended/lid",
+   "name": "Lid",
+   "license": "GPL-3.0-only",
+   "category": "gridfinity",
+   "tags": [
+    "bins",
+    "baseplates",
+    "dividers",
+    "lids",
+    "drawers",
+    "holders"
+   ],
+   "settings": 20
+  },
+  {
+   "key": "gridfinity-extended/marble",
+   "name": "Marble Run",
+   "license": "GPL-3.0-only",
+   "category": "gridfinity",
+   "tags": [
+    "bins",
+    "baseplates",
+    "dividers",
+    "lids",
+    "drawers",
+    "holders"
+   ],
+   "settings": 56
+  },
+  {
+   "key": "gridfinity-extended/removable-walls",
+   "name": "Bin with Removable Walls",
+   "license": "GPL-3.0-only",
+   "category": "gridfinity",
+   "tags": [
+    "bins",
+    "baseplates",
+    "dividers",
+    "lids",
+    "drawers",
+    "holders"
+   ],
+   "settings": 138
+  },
+  {
+   "key": "gridfinity-extended/sieve",
+   "name": "Sieve",
+   "license": "GPL-3.0-only",
+   "category": "gridfinity",
+   "tags": [
+    "bins",
+    "baseplates",
+    "dividers",
+    "lids",
+    "drawers",
+    "holders"
+   ],
+   "settings": 34
+  },
+  {
+   "key": "gridfinity-extended/silverware",
+   "name": "Silverware Holder",
+   "license": "GPL-3.0-only",
+   "category": "gridfinity",
+   "tags": [
+    "bins",
+    "baseplates",
+    "dividers",
+    "lids",
+    "drawers",
+    "holders"
+   ],
+   "settings": 118
+  },
+  {
+   "key": "gridfinity-extended/sliding-lid",
+   "name": "Sliding Lid",
+   "license": "GPL-3.0-only",
+   "category": "gridfinity",
+   "tags": [
+    "bins",
+    "baseplates",
+    "dividers",
+    "lids",
+    "drawers",
+    "holders"
+   ],
+   "settings": 138
+  },
+  {
+   "key": "gridfinity-extended/socket-holder",
+   "name": "Socket Holder",
+   "license": "GPL-3.0-only",
+   "category": "gridfinity",
+   "tags": [
+    "bins",
+    "baseplates",
+    "dividers",
+    "lids",
+    "drawers",
+    "holders"
+   ],
+   "settings": 1
+  },
+  {
+   "key": "gridfinity-extended/tray",
+   "name": "Tray",
+   "license": "GPL-3.0-only",
+   "category": "gridfinity",
+   "tags": [
+    "bins",
+    "baseplates",
+    "dividers",
+    "lids",
+    "drawers",
+    "holders"
+   ],
+   "settings": 110
+  },
+  {
+   "key": "gridfinity-extended/vertical-divider",
+   "name": "Vertical Divider",
+   "license": "GPL-3.0-only",
+   "category": "gridfinity",
+   "tags": [
+    "bins",
+    "baseplates",
+    "dividers",
+    "lids",
+    "drawers",
+    "holders"
+   ],
+   "settings": 56
+  },
+  {
+   "key": "gridfinity-kitchen/edge-cutout",
+   "name": "Edge Cutout Bin",
+   "license": "MIT",
+   "category": "gridfinity",
+   "tags": [
+    "kitchen",
+    "bins",
+    "cutout",
+    "utensils",
+    "drawer",
+    "spacer"
+   ],
+   "settings": 87
+  },
+  {
+   "key": "gridfinity-kitchen/full-cutout",
+   "name": "Full Cutout Bin",
+   "license": "MIT",
+   "category": "gridfinity",
+   "tags": [
+    "kitchen",
+    "bins",
+    "cutout",
+    "utensils",
+    "drawer",
+    "spacer"
+   ],
+   "settings": 87
+  },
+  {
+   "key": "gridfinity-kitchen/spacer",
+   "name": "Spacer",
+   "license": "MIT",
+   "category": "gridfinity",
+   "tags": [
+    "kitchen",
+    "bins",
+    "cutout",
+    "utensils",
+    "drawer",
+    "spacer"
+   ],
+   "settings": 86
+  },
+  {
+   "key": "gridfinity-kitchen/spacer-with-walls",
+   "name": "Spacer with Walls",
+   "license": "MIT",
+   "category": "gridfinity",
+   "tags": [
+    "kitchen",
+    "bins",
+    "cutout",
+    "utensils",
+    "drawer",
+    "spacer"
+   ],
+   "settings": 83
+  },
+  {
+   "key": "gridfinity-rebuilt/baseplate",
+   "name": "Baseplate",
+   "license": "MIT",
+   "category": "gridfinity",
+   "tags": [
+    "bins",
+    "baseplates",
+    "vase-mode"
+   ],
+   "settings": 15
+  },
+  {
+   "key": "gridfinity-rebuilt/bin",
+   "name": "Basic Bin",
+   "license": "MIT",
+   "category": "gridfinity",
+   "tags": [
+    "bins",
+    "baseplates",
+    "vase-mode"
+   ],
+   "settings": 25
+  },
+  {
+   "key": "gridfinity-rebuilt/vase-bin",
+   "name": "Vase Mode Bin",
+   "license": "MIT",
+   "category": "gridfinity",
+   "tags": [
+    "bins",
+    "baseplates",
+    "vase-mode"
+   ],
+   "settings": 21
+  },
+  {
+   "key": "gridfinity-rugged-box/box",
+   "name": "Rugged Box",
+   "license": "CC-BY-SA-4.0 AND MIT",
+   "category": "carrying",
+   "tags": [
+    "boxes",
+    "latches",
+    "handles",
+    "hinges"
+   ],
+   "settings": 24
+  },
+  {
+   "key": "gridflock/baseplate",
+   "name": "Baseplate",
+   "license": "MIT AND CC-BY-4.0",
+   "category": "gridfinity",
+   "tags": [
+    "baseplates",
+    "drawer-fit",
+    "puzzle",
+    "magnets"
+   ],
+   "settings": 96
+  },
+  {
+   "key": "hsw/grid",
+   "name": "Grid",
+   "license": "CC-BY-4.0",
+   "category": "wall",
+   "tags": [
+    "wall",
+    "honeycomb"
+   ],
+   "settings": 13
+  },
+  {
+   "key": "hsw/grid-v2-3",
+   "name": "Grid (v2.3 columns)",
+   "license": "CC-BY-4.0",
+   "category": "wall",
+   "tags": [
+    "wall",
+    "honeycomb"
+   ],
+   "settings": 13
+  },
+  {
+   "key": "just-fit-base-grid/baseplate",
+   "name": "Skeleton Baseplate",
+   "license": "NOASSERTION",
+   "category": "gridfinity",
+   "tags": [
+    "baseplates",
+    "skeleton",
+    "drawer-fit",
+    "half cells",
+    "inches",
+    "centimetres"
+   ],
+   "settings": 27
+  },
+  {
+   "key": "kevenaar-box-label/label",
+   "name": "Box Label",
+   "license": "CC-BY-4.0",
+   "category": "labels",
+   "tags": [
+    "labels",
+    "storage boxes",
+    "text"
+   ],
+   "settings": 16
+  },
+  {
+   "key": "label-generator-gridfinity/bin-label",
+   "name": "Bin Label",
+   "license": "GPL-3.0-only",
+   "category": "labels",
+   "tags": [
+    "labels",
+    "bins",
+    "storage boxes",
+    "bolts",
+    "nuts",
+    "washers",
+    "inserts"
+   ],
+   "settings": 14
+  },
+  {
+   "key": "label-generator-gridfinity/box-label",
+   "name": "Storage Box Label",
+   "license": "GPL-3.0-only",
+   "category": "labels",
+   "tags": [
+    "labels",
+    "bins",
+    "storage boxes",
+    "bolts",
+    "nuts",
+    "washers",
+    "inserts"
+   ],
+   "settings": 24
+  },
+  {
+   "key": "linked-linked-shelf/shelf",
+   "name": "Shelf",
+   "license": "NOASSERTION",
+   "category": "other",
+   "tags": [],
+   "settings": 1
+  },
+  {
+   "key": "local-bevel/bevel-gear",
+   "name": "Bevel gear",
+   "license": "NOASSERTION",
+   "category": "other",
+   "tags": [],
+   "settings": 2
+  },
+  {
+   "key": "local-blocks/plate",
+   "name": "Plate",
+   "license": "NOASSERTION",
+   "category": "other",
+   "tags": [],
+   "settings": 1
+  },
+  {
+   "key": "local-bricks/brick",
+   "name": "Brick",
+   "license": "NOASSERTION",
+   "category": "other",
+   "tags": [],
+   "settings": 4
+  },
+  {
+   "key": "local-bricks/examples-plate",
+   "name": "Plate",
+   "license": "NOASSERTION",
+   "category": "other",
+   "tags": [],
+   "settings": 4
+  },
+  {
+   "key": "local-colours/label",
+   "name": "Label",
+   "license": "NOASSERTION",
+   "category": "labels",
+   "tags": [],
+   "settings": 1
+  },
+  {
+   "key": "minimalist-kitchen-gridfinity/bin",
+   "name": "Scoop Bin",
+   "license": "NOASSERTION",
+   "category": "gridfinity",
+   "tags": [
+    "bins",
+    "kitchen",
+    "scoop",
+    "utensils",
+    "compartments"
+   ],
+   "settings": 10
+  },
+  {
+   "key": "opengrid-shelf/shelf",
+   "name": "Shelf",
+   "license": "NOASSERTION",
+   "category": "wall",
+   "tags": [
+    "shelves",
+    "opengrid",
+    "snaps"
+   ],
+   "settings": 4
+  },
+  {
+   "key": "opengrid/border",
+   "name": "Border",
+   "license": "CC-BY-NC-SA-4.0",
+   "category": "wall",
+   "tags": [
+    "wall",
+    "tiles",
+    "snaps",
+    "borders"
+   ],
+   "settings": 16
+  },
+  {
+   "key": "opengrid/snap",
+   "name": "Snap",
+   "license": "CC-BY-NC-SA-4.0",
+   "category": "wall",
+   "tags": [
+    "wall",
+    "tiles",
+    "snaps",
+    "borders"
+   ],
+   "settings": 4
+  },
+  {
+   "key": "opengrid/tile",
+   "name": "Grid",
+   "license": "CC-BY-NC-SA-4.0",
+   "category": "wall",
+   "tags": [
+    "wall",
+    "tiles",
+    "snaps",
+    "borders"
+   ],
+   "settings": 39
+  },
+  {
+   "key": "pinned/bevel-gear-24t",
+   "name": "Bevel gear 24T",
+   "license": "BSD-2-Clause",
+   "category": "mechanical",
+   "tags": [
+    "Gears",
+    "Parts"
+   ],
+   "settings": 7
+  },
+  {
+   "key": "pred-label-bin/bin",
+   "name": "Bin",
+   "license": "CC-BY-NC-SA-4.0",
+   "category": "gridfinity",
+   "tags": [
+    "bins",
+    "labels",
+    "pred",
+    "label holder",
+    "compartments"
+   ],
+   "settings": 13
+  },
+  {
+   "key": "santalla-screw-label/label",
+   "name": "Screw Label",
+   "license": "GPL-3.0-or-later",
+   "category": "labels",
+   "tags": [
+    "labels",
+    "bins",
+    "screws",
+    "bolts"
+   ],
+   "settings": 7
+  },
+  {
+   "key": "underware/bridge-channel",
+   "name": "Bridge Channel",
+   "license": "NOASSERTION",
+   "category": "wall",
+   "tags": [
+    "cable-management",
+    "channels",
+    "opengrid"
+   ],
+   "settings": 28
+  },
+  {
+   "key": "underware/cable-winder",
+   "name": "Cable Winder",
+   "license": "NOASSERTION",
+   "category": "wall",
+   "tags": [
+    "cable-management",
+    "channels",
+    "opengrid"
+   ],
+   "settings": 28
+  },
+  {
+   "key": "underware/diagonal-channel",
+   "name": "Diagonal Channel",
+   "license": "NOASSERTION",
+   "category": "wall",
+   "tags": [
+    "cable-management",
+    "channels",
+    "opengrid"
+   ],
+   "settings": 28
+  },
+  {
+   "key": "underware/i-bridge-channel",
+   "name": "I Bridge Channel",
+   "license": "NOASSERTION",
+   "category": "wall",
+   "tags": [
+    "cable-management",
+    "channels",
+    "opengrid"
+   ],
+   "settings": 27
+  },
+  {
+   "key": "underware/i-channel",
+   "name": "I Channel",
+   "license": "NOASSERTION",
+   "category": "wall",
+   "tags": [
+    "cable-management",
+    "channels",
+    "opengrid"
+   ],
+   "settings": 31
+  },
+  {
+   "key": "underware/i-channel-hok",
+   "name": "I Channel (HOK)",
+   "license": "NOASSERTION",
+   "category": "wall",
+   "tags": [
+    "cable-management",
+    "channels",
+    "opengrid"
+   ],
+   "settings": 29
+  },
+  {
+   "key": "underware/i-channel-leaf",
+   "name": "I Channel (leaf texture)",
+   "license": "NOASSERTION",
+   "category": "wall",
+   "tags": [
+    "cable-management",
+    "channels",
+    "opengrid"
+   ],
+   "settings": 27
+  },
+  {
+   "key": "underware/i-channel-tex",
+   "name": "I Channel (textured)",
+   "license": "NOASSERTION",
+   "category": "wall",
+   "tags": [
+    "cable-management",
+    "channels",
+    "opengrid"
+   ],
+   "settings": 27
+  },
+  {
+   "key": "underware/i-channel-wood",
+   "name": "I Channel (wood texture)",
+   "license": "NOASSERTION",
+   "category": "wall",
+   "tags": [
+    "cable-management",
+    "channels",
+    "opengrid"
+   ],
+   "settings": 27
+  },
+  {
+   "key": "underware/i-height-change-channel",
+   "name": "I Channel, height change",
+   "license": "NOASSERTION",
+   "category": "wall",
+   "tags": [
+    "cable-management",
+    "channels",
+    "opengrid"
+   ],
+   "settings": 26
+  },
+  {
+   "key": "underware/i-width-change-channel",
+   "name": "I Channel, width change",
+   "license": "NOASSERTION",
+   "category": "wall",
+   "tags": [
+    "cable-management",
+    "channels",
+    "opengrid"
+   ],
+   "settings": 26
+  },
+  {
+   "key": "underware/l-channel",
+   "name": "L Channel",
+   "license": "NOASSERTION",
+   "category": "wall",
+   "tags": [
+    "cable-management",
+    "channels",
+    "opengrid"
+   ],
+   "settings": 28
+  },
+  {
+   "key": "underware/mitre-channel",
+   "name": "Mitre Channel",
+   "license": "NOASSERTION",
+   "category": "wall",
+   "tags": [
+    "cable-management",
+    "channels",
+    "opengrid"
+   ],
+   "settings": 28
+  },
+  {
+   "key": "underware/s-channel",
+   "name": "S Channel",
+   "license": "NOASSERTION",
+   "category": "wall",
+   "tags": [
+    "cable-management",
+    "channels",
+    "opengrid"
+   ],
+   "settings": 28
+  },
+  {
+   "key": "underware/t-channel",
+   "name": "T Channel",
+   "license": "NOASSERTION",
+   "category": "wall",
+   "tags": [
+    "cable-management",
+    "channels",
+    "opengrid"
+   ],
+   "settings": 28
+  },
+  {
+   "key": "underware/text-label",
+   "name": "Label",
+   "license": "NOASSERTION",
+   "category": "wall",
+   "tags": [
+    "cable-management",
+    "channels",
+    "opengrid"
+   ],
+   "settings": 15
+  },
+  {
+   "key": "underware/x-channel",
+   "name": "X Channel",
+   "license": "NOASSERTION",
+   "category": "wall",
+   "tags": [
+    "cable-management",
+    "channels",
+    "opengrid"
+   ],
+   "settings": 27
+  },
+  {
+   "key": "zip-pegs/hook",
+   "name": "Hook",
+   "license": "NOASSERTION",
+   "category": "other",
+   "tags": [],
+   "settings": 1
+  },
+  {
+   "key": "zip-pegs/peg",
+   "name": "Peg",
+   "license": "NOASSERTION",
+   "category": "other",
+   "tags": [],
+   "settings": 1
+  }
+ ],
+ "parts": 134,
+ "blobs": 997
+}

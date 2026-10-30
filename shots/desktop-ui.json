@@ -1,0 +1,83 @@
+{
+ "report": {
+  "engine": "OpenSCAD 2026.10.02, native",
+  "platform": "desktop",
+  "library": {
+   "generators": 58,
+   "thumbnails": 58,
+   "first_row_loaded": true
+  },
+  "search_channel": "18 items \u00b7 16 ms",
+  "library_sources": 19,
+  "added_from_github": 18,
+  "gridfinity-rebuilt/bin": "Preview matches your settings.",
+  "underware/t-channel": "Preview matches your settings.",
+  "minimalist-kitchen-gridfinity/bin": "Preview matches your settings. Made in 0.2 s on this device.",
+  "kitchen_status": "Preview matches your settings. Made in 0.2 s on this device.",
+  "gridfinity-extended/bin": "Preview matches your settings.",
+  "extended_bin_1": {
+   "status": "Preview matches your settings.",
+   "engine": "native"
+  },
+  "extended_bin_2": {
+   "status": "Preview matches your settings.",
+   "engine": "native"
+  },
+  "saved_files": [
+   "CI four wide"
+  ],
+  "settings_text": "AppearancePrinter profileDownloadsLibraryEngineAboutAppearanceThe skin is the app's look: its colours, lettering, shapes and icons. Each skin has light and dark colours, chosen by the theme.Skin Drafting Sheet Parts Bin Layer Line Classic (the look before skins)Theme Follow the system Light Dark Night (dim, warm, for a dark workshop)Printer profileModels that ask for these start with your values instead of the author's. Leave a value empty to keep the defaults. Magnet and tolerance settings aren't linked: each project measures them differently.Print bed size (mm)width (X)depth (Y)Used by Gridf",
+  "version": "SCAD Workshop 0.4.29. All releases and what changed",
+  "library_settings_projects": 20,
+  "part_dims": "25.2 \u00d7 25.2 \u00d7 6.8 mm1236 triangles",
+  "components": {
+   "count": 796,
+   "menu": [
+    "Parametric Models",
+    "Components",
+    "Parts Library"
+   ]
+  },
+  "@bosl2/bevel_gear": "Preview matches your settings.",
+  "side_viewer": {
+   "code": "// BOSL2 bevel_gear() made with SCAD Workshopinclude <BOSL2/std.scad>include <BO",
+   "readme": true,
+   "pdf_viewer": true
+  },
+  "side_tabs": [
+   [
+    "code",
+    34,
+    75
+   ],
+   [
+    "readme",
+    34,
+    99
+   ]
+  ],
+  "@threads-scad/MetricBolt": "Preview matches your settings.",
+  "libraries": [
+   "BOSL2:bundled",
+   "MCAD:bundled",
+   "NopSCADlib:bundled",
+   "Round-Anything:bundled",
+   "threads-scad:bundled"
+  ],
+  "tabs": [
+   "gridfinity-rebuilt/bin",
+   "underware/t-channel",
+   "minimalist-kitchen-gridfinity/bin",
+   "gridfinity-extended/bin",
+   "@bosl2/bevel_gear",
+   "@threads-scad/MetricBolt"
+  ],
+  "skin": [
+   "drafting",
+   true,
+   "color(srgb 0.082353 0.137255 0.176471 / 0.2)"
+  ],
+  "theme": "night"
+ },
+ "failures": []
+}

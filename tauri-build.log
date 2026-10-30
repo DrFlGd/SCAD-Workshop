@@ -1,0 +1,20 @@
+        Info Looking up installed tauri packages to check mismatched versions...
+   Compiling mitcad-dump v0.0.0 (/home/runner/work/SCAD-Workshop/SCAD-Workshop/desktop/core/mitcad/dump)
+   Compiling scad-workshop v0.4.29 (/home/runner/work/SCAD-Workshop/SCAD-Workshop/desktop/src-tauri)
+   Compiling mitcad-f3d-names v0.0.0 (/home/runner/work/SCAD-Workshop/SCAD-Workshop/desktop/core/mitcad/f3d-names)
+   Compiling mitcad-f3d-decode v0.0.0 (/home/runner/work/SCAD-Workshop/SCAD-Workshop/desktop/core/mitcad/f3d-decode)
+   Compiling mitcad-f3d-design v0.0.0 (/home/runner/work/SCAD-Workshop/SCAD-Workshop/desktop/core/mitcad/f3d-design)
+   Compiling workshop-core v0.4.29 (/home/runner/work/SCAD-Workshop/SCAD-Workshop/desktop/core)
+    Finished `release` profile [optimized] target(s) in 1m 35s
+       Built application at: /home/runner/work/SCAD-Workshop/SCAD-Workshop/desktop/target/release/scad-workshop
+        Info Patching /home/runner/work/SCAD-Workshop/SCAD-Workshop/desktop/target/release/scad-workshop with bundle type information: appimage
+ Downloading https://github.com/tauri-apps/binary-releases/releases/download/apprun-old/AppRun-x86_64
+ Downloading https://github.com/tauri-apps/binary-releases/releases/download/linuxdeploy-07333c6/linuxdeploy-x86_64.AppImage
+ Downloading https://github.com/linuxdeploy/linuxdeploy-plugin-appimage/releases/download/continuous/linuxdeploy-plugin-appimage-x86_64.AppImage
+    Bundling SCAD Workshop_0.4.29_amd64.AppImage (/home/runner/work/SCAD-Workshop/SCAD-Workshop/desktop/target/release/bundle/appimage/SCAD Workshop_0.4.29_amd64.AppImage)
+        Info Patching /home/runner/work/SCAD-Workshop/SCAD-Workshop/desktop/target/release/scad-workshop with bundle type information: deb
+    Bundling SCAD Workshop_0.4.29_amd64.deb (/home/runner/work/SCAD-Workshop/SCAD-Workshop/desktop/target/release/bundle/deb/SCAD Workshop_0.4.29_amd64.deb)
+    Finished 2 bundles at:
+        /home/runner/work/SCAD-Workshop/SCAD-Workshop/desktop/target/release/bundle/appimage/SCAD Workshop_0.4.29_amd64.AppImage (170.80 MiB)
+        /home/runner/work/SCAD-Workshop/SCAD-Workshop/desktop/target/release/bundle/deb/SCAD Workshop_0.4.29_amd64.deb (97.09 MiB)
+

@@ -1,0 +1,5342 @@
+{
+  "summary": {
+    "first example": {
+      "pass": 146,
+      "fail": 0
+    },
+    "later example": {
+      "pass": 21,
+      "fail": 0
+    },
+    "suggested": {
+      "pass": 29,
+      "fail": 0
+    },
+    "guessed": {
+      "pass": 85,
+      "fail": 0
+    },
+    "no example": {
+      "pass": 157,
+      "fail": 7
+    },
+    "needs input": 351
+  },
+  "results": [
+    {
+      "key": "@bosl2/acme_threaded_nut",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.62,
+      "triangles": 1978,
+      "error": null
+    },
+    {
+      "key": "@bosl2/acme_threaded_rod",
+      "status": "pass",
+      "start": "later example",
+      "seconds": 0.41,
+      "triangles": 3264,
+      "error": null
+    },
+    {
+      "key": "@bosl2/anchor_arrow",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.49,
+      "triangles": 214,
+      "error": null
+    },
+    {
+      "key": "@bosl2/anchor_arrow2d",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.57,
+      "triangles": 24,
+      "error": null
+    },
+    {
+      "key": "@bosl2/arc",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.27,
+      "triangles": 16,
+      "error": null
+    },
+    {
+      "key": "@bosl2/ball_bearing",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.5,
+      "triangles": 12360,
+      "error": null
+    },
+    {
+      "key": "@bosl2/ball_screw_rod",
+      "status": "pass",
+      "start": "later example",
+      "seconds": 0.44,
+      "triangles": 3814,
+      "error": null
+    },
+    {
+      "key": "@bosl2/bent_cutout_mask",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.31,
+      "triangles": 100,
+      "error": null
+    },
+    {
+      "key": "@bosl2/bevel_gear",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 1.22,
+      "triangles": 12224,
+      "error": null
+    },
+    {
+      "key": "@bosl2/bezier_sweep",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@bosl2/bezpath_sweep",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@bosl2/bottle_adapter_cap_to_cap",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.91,
+      "triangles": 6160,
+      "error": null
+    },
+    {
+      "key": "@bosl2/bottle_adapter_neck_to_cap",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.58,
+      "triangles": 21140,
+      "error": null
+    },
+    {
+      "key": "@bosl2/bottle_adapter_neck_to_neck",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.69,
+      "triangles": 35760,
+      "error": null
+    },
+    {
+      "key": "@bosl2/bspp_threaded_rod",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.71,
+      "triangles": 13950,
+      "error": null
+    },
+    {
+      "key": "@bosl2/buttress_threaded_nut",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.57,
+      "triangles": 3572,
+      "error": null
+    },
+    {
+      "key": "@bosl2/buttress_threaded_rod",
+      "status": "pass",
+      "start": "later example",
+      "seconds": 0.46,
+      "triangles": 6364,
+      "error": null
+    },
+    {
+      "key": "@bosl2/chamfer_corner_mask",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.25,
+      "triangles": 8,
+      "error": null
+    },
+    {
+      "key": "@bosl2/chamfer_cylinder_mask",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@bosl2/chamfer_edge_mask",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.26,
+      "triangles": 12,
+      "error": null
+    },
+    {
+      "key": "@bosl2/circle",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.34,
+      "triangles": 236,
+      "error": null
+    },
+    {
+      "key": "@bosl2/contour",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@bosl2/corrugated_wall",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.38,
+      "triangles": 3248,
+      "error": null
+    },
+    {
+      "key": "@bosl2/crown_gear",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.36,
+      "triangles": 3436,
+      "error": null
+    },
+    {
+      "key": "@bosl2/cube",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.32,
+      "triangles": 12,
+      "error": null
+    },
+    {
+      "key": "@bosl2/cubetruss",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.47,
+      "triangles": 1676,
+      "error": null
+    },
+    {
+      "key": "@bosl2/cubetruss_clip",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.45,
+      "triangles": 96,
+      "error": null
+    },
+    {
+      "key": "@bosl2/cubetruss_corner",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.98,
+      "triangles": 4254,
+      "error": null
+    },
+    {
+      "key": "@bosl2/cubetruss_foot",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.39,
+      "triangles": 180,
+      "error": null
+    },
+    {
+      "key": "@bosl2/cubetruss_joiner",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.71,
+      "triangles": 390,
+      "error": null
+    },
+    {
+      "key": "@bosl2/cubetruss_segment",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.31,
+      "triangles": 224,
+      "error": null
+    },
+    {
+      "key": "@bosl2/cubetruss_support",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.26,
+      "triangles": 156,
+      "error": null
+    },
+    {
+      "key": "@bosl2/cubetruss_uclip",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.32,
+      "triangles": 60,
+      "error": null
+    },
+    {
+      "key": "@bosl2/cuboid",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.31,
+      "triangles": 12,
+      "error": null
+    },
+    {
+      "key": "@bosl2/cyl",
+      "status": "pass",
+      "start": "later example",
+      "seconds": 0.34,
+      "triangles": 3840,
+      "error": null
+    },
+    {
+      "key": "@bosl2/cylinder",
+      "status": "pass",
+      "start": "later example",
+      "seconds": 0.27,
+      "triangles": 236,
+      "error": null
+    },
+    {
+      "key": "@bosl2/dashed_stroke",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@bosl2/debug_bezier",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.6,
+      "triangles": 1076,
+      "error": null
+    },
+    {
+      "key": "@bosl2/debug_bezier_patches",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@bosl2/debug_nurbs",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.98,
+      "triangles": 3064,
+      "error": null
+    },
+    {
+      "key": "@bosl2/debug_polygon",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.36,
+      "triangles": 6356,
+      "error": null
+    },
+    {
+      "key": "@bosl2/debug_region",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@bosl2/dovetail",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.29,
+      "triangles": 20,
+      "error": null
+    },
+    {
+      "key": "@bosl2/egg",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@bosl2/ellipse",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.22,
+      "triangles": 236,
+      "error": null
+    },
+    {
+      "key": "@bosl2/enveloping_worm",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 1.84,
+      "triangles": 7196,
+      "error": null
+    },
+    {
+      "key": "@bosl2/fillet",
+      "status": "pass",
+      "start": "later example",
+      "seconds": 0.23,
+      "triangles": 92,
+      "error": null
+    },
+    {
+      "key": "@bosl2/frame_ref",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.45,
+      "triangles": 1176,
+      "error": null
+    },
+    {
+      "key": "@bosl2/garden_hose_female",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.34,
+      "triangles": 3652,
+      "error": null
+    },
+    {
+      "key": "@bosl2/garden_hose_gasket",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.25,
+      "triangles": 720,
+      "error": null
+    },
+    {
+      "key": "@bosl2/garden_hose_male",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.44,
+      "triangles": 3662,
+      "error": null
+    },
+    {
+      "key": "@bosl2/garden_hose_threaded_rod",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.35,
+      "triangles": 5674,
+      "error": null
+    },
+    {
+      "key": "@bosl2/generic_airplane",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.46,
+      "triangles": 932,
+      "error": null
+    },
+    {
+      "key": "@bosl2/generic_bottle_cap",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.51,
+      "triangles": 3496,
+      "error": null
+    },
+    {
+      "key": "@bosl2/generic_bottle_neck",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.48,
+      "triangles": 17676,
+      "error": null
+    },
+    {
+      "key": "@bosl2/generic_threaded_nut",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@bosl2/generic_threaded_rod",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@bosl2/glued_circles",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.33,
+      "triangles": 484,
+      "error": null
+    },
+    {
+      "key": "@bosl2/half_joiner",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.32,
+      "triangles": 136,
+      "error": null
+    },
+    {
+      "key": "@bosl2/half_joiner2",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.35,
+      "triangles": 172,
+      "error": null
+    },
+    {
+      "key": "@bosl2/half_joiner_clear",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.31,
+      "triangles": 28,
+      "error": null
+    },
+    {
+      "key": "@bosl2/hex_drive_mask",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@bosl2/hex_panel",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.41,
+      "triangles": 1728,
+      "error": null
+    },
+    {
+      "key": "@bosl2/hexagon",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.25,
+      "triangles": 20,
+      "error": null
+    },
+    {
+      "key": "@bosl2/hirth",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.35,
+      "triangles": 512,
+      "error": null
+    },
+    {
+      "key": "@bosl2/hull_region",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@bosl2/isosurface",
+      "status": "pass",
+      "start": "later example",
+      "seconds": 0.84,
+      "triangles": 3304,
+      "error": null
+    },
+    {
+      "key": "@bosl2/jittered_poly",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@bosl2/join_prism",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.29,
+      "triangles": 1796,
+      "error": null
+    },
+    {
+      "key": "@bosl2/joiner",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.23,
+      "triangles": 300,
+      "error": null
+    },
+    {
+      "key": "@bosl2/joiner_clear",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.48,
+      "triangles": 68,
+      "error": null
+    },
+    {
+      "key": "@bosl2/keyhole",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.23,
+      "triangles": 336,
+      "error": null
+    },
+    {
+      "key": "@bosl2/knuckle_hinge",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@bosl2/linear_bearing",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.4,
+      "triangles": 2596,
+      "error": null
+    },
+    {
+      "key": "@bosl2/linear_bearing_housing",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.53,
+      "triangles": 604,
+      "error": null
+    },
+    {
+      "key": "@bosl2/linear_sweep",
+      "status": "pass",
+      "start": "later example",
+      "seconds": 0.38,
+      "triangles": 716,
+      "error": null
+    },
+    {
+      "key": "@bosl2/living_hinge_mask",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.32,
+      "triangles": 12,
+      "error": null
+    },
+    {
+      "key": "@bosl2/lmXuu_bearing",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.35,
+      "triangles": 2736,
+      "error": null
+    },
+    {
+      "key": "@bosl2/lmXuu_housing",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.59,
+      "triangles": 612,
+      "error": null
+    },
+    {
+      "key": "@bosl2/manfrotto_rc2_plate",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 1.34,
+      "triangles": 152,
+      "error": null
+    },
+    {
+      "key": "@bosl2/mask2d_chamfer",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.2,
+      "triangles": 16,
+      "error": null
+    },
+    {
+      "key": "@bosl2/mask2d_cove",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.26,
+      "triangles": 72,
+      "error": null
+    },
+    {
+      "key": "@bosl2/mask2d_dovetail",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.28,
+      "triangles": 16,
+      "error": null
+    },
+    {
+      "key": "@bosl2/mask2d_ogee",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.24,
+      "triangles": 500,
+      "error": null
+    },
+    {
+      "key": "@bosl2/mask2d_rabbet",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.21,
+      "triangles": 12,
+      "error": null
+    },
+    {
+      "key": "@bosl2/mask2d_roundover",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.28,
+      "triangles": 72,
+      "error": null
+    },
+    {
+      "key": "@bosl2/mask2d_smooth",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.31,
+      "triangles": 76,
+      "error": null
+    },
+    {
+      "key": "@bosl2/mask2d_teardrop",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.33,
+      "triangles": 44,
+      "error": null
+    },
+    {
+      "key": "@bosl2/mason_cap",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.46,
+      "triangles": 5112,
+      "error": null
+    },
+    {
+      "key": "@bosl2/mason_neck",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.57,
+      "triangles": 4228,
+      "error": null
+    },
+    {
+      "key": "@bosl2/metaballs",
+      "status": "pass",
+      "start": "later example",
+      "seconds": 5.64,
+      "triangles": 16408,
+      "error": null
+    },
+    {
+      "key": "@bosl2/metaballs2d",
+      "status": "pass",
+      "start": "later example",
+      "seconds": 0.3,
+      "triangles": 380,
+      "error": null
+    },
+    {
+      "key": "@bosl2/narrowing_strut",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.29,
+      "triangles": 38,
+      "error": null
+    },
+    {
+      "key": "@bosl2/nema_mount_mask",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.31,
+      "triangles": 1100,
+      "error": null
+    },
+    {
+      "key": "@bosl2/nema_stepper_motor",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.45,
+      "triangles": 700,
+      "error": null
+    },
+    {
+      "key": "@bosl2/npt_threaded_rod",
+      "status": "pass",
+      "start": "later example",
+      "seconds": 0.45,
+      "triangles": 8026,
+      "error": null
+    },
+    {
+      "key": "@bosl2/nut",
+      "status": "pass",
+      "start": "later example",
+      "seconds": 0.49,
+      "triangles": 760,
+      "error": null
+    },
+    {
+      "key": "@bosl2/nut_trap_inline",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.26,
+      "triangles": 20,
+      "error": null
+    },
+    {
+      "key": "@bosl2/nut_trap_side",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.26,
+      "triangles": 42,
+      "error": null
+    },
+    {
+      "key": "@bosl2/octagon",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.3,
+      "triangles": 28,
+      "error": null
+    },
+    {
+      "key": "@bosl2/octahedron",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.32,
+      "triangles": 8,
+      "error": null
+    },
+    {
+      "key": "@bosl2/offset_sweep",
+      "status": "pass",
+      "start": "later example",
+      "seconds": 0.35,
+      "triangles": 84,
+      "error": null
+    },
+    {
+      "key": "@bosl2/onion",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.29,
+      "triangles": 2640,
+      "error": null
+    },
+    {
+      "key": "@bosl2/partition_cut_mask",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.45,
+      "triangles": 436,
+      "error": null
+    },
+    {
+      "key": "@bosl2/partition_mask",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.33,
+      "triangles": 208,
+      "error": null
+    },
+    {
+      "key": "@bosl2/path_sweep",
+      "status": "pass",
+      "start": "later example",
+      "seconds": 0.57,
+      "triangles": 1180,
+      "error": null
+    },
+    {
+      "key": "@bosl2/path_sweep2d",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@bosl2/path_text",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@bosl2/pco1810_cap",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.42,
+      "triangles": 2004,
+      "error": null
+    },
+    {
+      "key": "@bosl2/pco1810_neck",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.64,
+      "triangles": 45486,
+      "error": null
+    },
+    {
+      "key": "@bosl2/pco1881_cap",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.45,
+      "triangles": 2068,
+      "error": null
+    },
+    {
+      "key": "@bosl2/pco1881_neck",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.49,
+      "triangles": 45106,
+      "error": null
+    },
+    {
+      "key": "@bosl2/pentagon",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.28,
+      "triangles": 16,
+      "error": null
+    },
+    {
+      "key": "@bosl2/phillips_mask",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.32,
+      "triangles": 176,
+      "error": null
+    },
+    {
+      "key": "@bosl2/pie_slice",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.34,
+      "triangles": 36,
+      "error": null
+    },
+    {
+      "key": "@bosl2/plot3d",
+      "status": "pass",
+      "start": "later example",
+      "seconds": 0.41,
+      "triangles": 3522,
+      "error": null
+    },
+    {
+      "key": "@bosl2/plot_revolution",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@bosl2/polygon_edge_mask",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.38,
+      "triangles": 28,
+      "error": null
+    },
+    {
+      "key": "@bosl2/prism_connector",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@bosl2/prismoid",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.31,
+      "triangles": 12,
+      "error": null
+    },
+    {
+      "key": "@bosl2/rabbit_clip",
+      "status": "pass",
+      "start": "later example",
+      "seconds": 1.26,
+      "triangles": 1452,
+      "error": null
+    },
+    {
+      "key": "@bosl2/rack",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.32,
+      "triangles": 652,
+      "error": null
+    },
+    {
+      "key": "@bosl2/rack2d",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.24,
+      "triangles": 652,
+      "error": null
+    },
+    {
+      "key": "@bosl2/rail",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.29,
+      "triangles": 52,
+      "error": null
+    },
+    {
+      "key": "@bosl2/rect",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.22,
+      "triangles": 12,
+      "error": null
+    },
+    {
+      "key": "@bosl2/rect_tube",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.32,
+      "triangles": 32,
+      "error": null
+    },
+    {
+      "key": "@bosl2/region",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.23,
+      "triangles": 136,
+      "error": null
+    },
+    {
+      "key": "@bosl2/regular_ngon",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.32,
+      "triangles": 16,
+      "error": null
+    },
+    {
+      "key": "@bosl2/regular_prism",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.28,
+      "triangles": 16,
+      "error": null
+    },
+    {
+      "key": "@bosl2/reuleaux_polygon",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.29,
+      "triangles": 224,
+      "error": null
+    },
+    {
+      "key": "@bosl2/right_triangle",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.27,
+      "triangles": 8,
+      "error": null
+    },
+    {
+      "key": "@bosl2/ring",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.34,
+      "triangles": 256,
+      "error": null
+    },
+    {
+      "key": "@bosl2/ring_gear",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.56,
+      "triangles": 6384,
+      "error": null
+    },
+    {
+      "key": "@bosl2/ring_gear2d",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@bosl2/ring_hook",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.41,
+      "triangles": 372,
+      "error": null
+    },
+    {
+      "key": "@bosl2/robertson_mask",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.31,
+      "triangles": 134,
+      "error": null
+    },
+    {
+      "key": "@bosl2/rotate_sweep",
+      "status": "pass",
+      "start": "later example",
+      "seconds": 1.88,
+      "triangles": 4824,
+      "error": null
+    },
+    {
+      "key": "@bosl2/round2d",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@bosl2/rounded_prism",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.79,
+      "triangles": 5776,
+      "error": null
+    },
+    {
+      "key": "@bosl2/rounding_corner_mask",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.27,
+      "triangles": 282,
+      "error": null
+    },
+    {
+      "key": "@bosl2/rounding_cylinder_mask",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@bosl2/rounding_edge_mask",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.22,
+      "triangles": 72,
+      "error": null
+    },
+    {
+      "key": "@bosl2/rounding_hole_mask",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.21,
+      "triangles": 2280,
+      "error": null
+    },
+    {
+      "key": "@bosl2/screw",
+      "status": "pass",
+      "start": "later example",
+      "seconds": 0.34,
+      "triangles": 3336,
+      "error": null
+    },
+    {
+      "key": "@bosl2/screw_head",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@bosl2/screw_hole",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@bosl2/semicircle",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.29,
+      "triangles": 120,
+      "error": null
+    },
+    {
+      "key": "@bosl2/shell2d",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@bosl2/shoulder_screw",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.69,
+      "triangles": 5066,
+      "error": null
+    },
+    {
+      "key": "@bosl2/show_plane",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@bosl2/skin",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.37,
+      "triangles": 1676,
+      "error": null
+    },
+    {
+      "key": "@bosl2/slider",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.65,
+      "triangles": 94,
+      "error": null
+    },
+    {
+      "key": "@bosl2/snap_lock",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.37,
+      "triangles": 892,
+      "error": null
+    },
+    {
+      "key": "@bosl2/snap_pin",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.29,
+      "triangles": 2552,
+      "error": null
+    },
+    {
+      "key": "@bosl2/snap_pin_socket",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.29,
+      "triangles": 1374,
+      "error": null
+    },
+    {
+      "key": "@bosl2/snap_socket",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.53,
+      "triangles": 1024,
+      "error": null
+    },
+    {
+      "key": "@bosl2/sp_cap",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.58,
+      "triangles": 3704,
+      "error": null
+    },
+    {
+      "key": "@bosl2/sp_neck",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.38,
+      "triangles": 4120,
+      "error": null
+    },
+    {
+      "key": "@bosl2/sparse_cuboid",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.35,
+      "triangles": 160,
+      "error": null
+    },
+    {
+      "key": "@bosl2/sparse_wall",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.36,
+      "triangles": 332,
+      "error": null
+    },
+    {
+      "key": "@bosl2/sparse_wall2d",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.48,
+      "triangles": 332,
+      "error": null
+    },
+    {
+      "key": "@bosl2/sphere",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.32,
+      "triangles": 3596,
+      "error": null
+    },
+    {
+      "key": "@bosl2/spheroid",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.38,
+      "triangles": 3480,
+      "error": null
+    },
+    {
+      "key": "@bosl2/spiral_sweep",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.33,
+      "triangles": 1806,
+      "error": null
+    },
+    {
+      "key": "@bosl2/spur_gear",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.45,
+      "triangles": 2368,
+      "error": null
+    },
+    {
+      "key": "@bosl2/spur_gear2d",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.44,
+      "triangles": 2368,
+      "error": null
+    },
+    {
+      "key": "@bosl2/square",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.2,
+      "triangles": 12,
+      "error": null
+    },
+    {
+      "key": "@bosl2/square_threaded_nut",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.42,
+      "triangles": 2872,
+      "error": null
+    },
+    {
+      "key": "@bosl2/square_threaded_rod",
+      "status": "pass",
+      "start": "later example",
+      "seconds": 0.54,
+      "triangles": 5040,
+      "error": null
+    },
+    {
+      "key": "@bosl2/squircle",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@bosl2/star",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.31,
+      "triangles": 36,
+      "error": null
+    },
+    {
+      "key": "@bosl2/stroke",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.31,
+      "triangles": 468,
+      "error": null
+    },
+    {
+      "key": "@bosl2/supershape",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.25,
+      "triangles": 2876,
+      "error": null
+    },
+    {
+      "key": "@bosl2/sweep",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@bosl2/teardrop",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.34,
+      "triangles": 164,
+      "error": null
+    },
+    {
+      "key": "@bosl2/teardrop2d",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.22,
+      "triangles": 164,
+      "error": null
+    },
+    {
+      "key": "@bosl2/teardrop_corner_mask",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.32,
+      "triangles": 296,
+      "error": null
+    },
+    {
+      "key": "@bosl2/teardrop_edge_mask",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.37,
+      "triangles": 44,
+      "error": null
+    },
+    {
+      "key": "@bosl2/text",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.27,
+      "triangles": 2800,
+      "error": null
+    },
+    {
+      "key": "@bosl2/text3d",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.33,
+      "triangles": 4372,
+      "error": null
+    },
+    {
+      "key": "@bosl2/textured_tile",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.37,
+      "triangles": 636,
+      "error": null
+    },
+    {
+      "key": "@bosl2/thinning_triangle",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.25,
+      "triangles": 142,
+      "error": null
+    },
+    {
+      "key": "@bosl2/thinning_wall",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.31,
+      "triangles": 44,
+      "error": null
+    },
+    {
+      "key": "@bosl2/threaded_nut",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.41,
+      "triangles": 3116,
+      "error": null
+    },
+    {
+      "key": "@bosl2/threaded_rod",
+      "status": "pass",
+      "start": "later example",
+      "seconds": 0.49,
+      "triangles": 5040,
+      "error": null
+    },
+    {
+      "key": "@bosl2/torus",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.31,
+      "triangles": 7200,
+      "error": null
+    },
+    {
+      "key": "@bosl2/torx_mask",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.27,
+      "triangles": 428,
+      "error": null
+    },
+    {
+      "key": "@bosl2/torx_mask2d",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.36,
+      "triangles": 428,
+      "error": null
+    },
+    {
+      "key": "@bosl2/trapezoid",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.32,
+      "triangles": 12,
+      "error": null
+    },
+    {
+      "key": "@bosl2/trapezoidal_threaded_nut",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.41,
+      "triangles": 2296,
+      "error": null
+    },
+    {
+      "key": "@bosl2/trapezoidal_threaded_rod",
+      "status": "pass",
+      "start": "later example",
+      "seconds": 0.62,
+      "triangles": 9840,
+      "error": null
+    },
+    {
+      "key": "@bosl2/tube",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.34,
+      "triangles": 480,
+      "error": null
+    },
+    {
+      "key": "@bosl2/vnf_polyhedron",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@bosl2/vnf_vertex_array",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@bosl2/wedge",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 0.23,
+      "triangles": 8,
+      "error": null
+    },
+    {
+      "key": "@bosl2/wire_bundle",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 1.24,
+      "triangles": 16848,
+      "error": null
+    },
+    {
+      "key": "@bosl2/worm",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 1.02,
+      "triangles": 44996,
+      "error": null
+    },
+    {
+      "key": "@bosl2/worm_gear",
+      "status": "pass",
+      "start": "first example",
+      "seconds": 1.76,
+      "triangles": 24188,
+      "error": null
+    },
+    {
+      "key": "@bosl2/xcyl",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@bosl2/ycyl",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@bosl2/zcyl",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/12ptStar",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/3dtri_draw",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/3dtri_rnd_draw",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/8bit_char",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/8bit_str",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/a_triangle",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.05,
+      "triangles": 8,
+      "error": null
+    },
+    {
+      "key": "@mcad/alignds420",
+      "status": "pass",
+      "start": "suggested",
+      "seconds": 0.07,
+      "triangles": 286,
+      "error": null
+    },
+    {
+      "key": "@mcad/auger",
+      "status": "pass",
+      "start": "suggested",
+      "seconds": 0.32,
+      "triangles": 80374,
+      "error": null
+    },
+    {
+      "key": "@mcad/axle",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.06,
+      "triangles": 44,
+      "error": null
+    },
+    {
+      "key": "@mcad/backBoard",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/ball_groove",
+      "status": "pass",
+      "start": "suggested",
+      "seconds": 0.15,
+      "triangles": 20196,
+      "error": null
+    },
+    {
+      "key": "@mcad/ball_groove2",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 5.65,
+      "triangles": 42304,
+      "error": null
+    },
+    {
+      "key": "@mcad/ball_screw",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/bearing",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.09,
+      "triangles": 1440,
+      "error": null
+    },
+    {
+      "key": "@mcad/bevel_gear",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.08,
+      "triangles": 216,
+      "error": null
+    },
+    {
+      "key": "@mcad/bevel_gear_pair",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.13,
+      "triangles": 1208,
+      "error": null
+    },
+    {
+      "key": "@mcad/bitmap",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/block",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.54,
+      "triangles": 49612,
+      "error": null
+    },
+    {
+      "key": "@mcad/bold_2d",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/bolt",
+      "status": "pass",
+      "start": "suggested",
+      "seconds": 0.07,
+      "triangles": 362,
+      "error": null
+    },
+    {
+      "key": "@mcad/boltHole",
+      "status": "pass",
+      "start": "suggested",
+      "seconds": 0.09,
+      "triangles": 212,
+      "error": null
+    },
+    {
+      "key": "@mcad/bottomShelf",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/box",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.07,
+      "triangles": 12,
+      "error": null
+    },
+    {
+      "key": "@mcad/braille_ascii_spec800",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/cap_bolt",
+      "status": "pass",
+      "start": "suggested",
+      "seconds": 0.07,
+      "triangles": 188,
+      "error": null
+    },
+    {
+      "key": "@mcad/chamfer",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.05,
+      "triangles": 72,
+      "error": null
+    },
+    {
+      "key": "@mcad/complexRoundSquare",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/cone",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.04,
+      "triangles": 118,
+      "error": null
+    },
+    {
+      "key": "@mcad/connect_squares",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/cornerpyramid",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/csk_bolt",
+      "status": "pass",
+      "start": "suggested",
+      "seconds": 0.05,
+      "triangles": 186,
+      "error": null
+    },
+    {
+      "key": "@mcad/cylinder_chamfer",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/cylinder_tube",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.07,
+      "triangles": 480,
+      "error": null
+    },
+    {
+      "key": "@mcad/decagon",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.09,
+      "triangles": 36,
+      "error": null
+    },
+    {
+      "key": "@mcad/decagon_prism",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.05,
+      "triangles": 36,
+      "error": null
+    },
+    {
+      "key": "@mcad/dislocateBox",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.05,
+      "triangles": 12,
+      "error": null
+    },
+    {
+      "key": "@mcad/dodecagon",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.09,
+      "triangles": 44,
+      "error": null
+    },
+    {
+      "key": "@mcad/dodecagon_prism",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.05,
+      "triangles": 44,
+      "error": null
+    },
+    {
+      "key": "@mcad/donutSlice",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/egg",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/egg_outline",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.05,
+      "triangles": 236,
+      "error": null
+    },
+    {
+      "key": "@mcad/ellipse",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.05,
+      "triangles": 236,
+      "error": null
+    },
+    {
+      "key": "@mcad/ellipsePart",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/ellipsoid",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.05,
+      "triangles": 3596,
+      "error": null
+    },
+    {
+      "key": "@mcad/ellipticalCylinder",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.05,
+      "triangles": 236,
+      "error": null
+    },
+    {
+      "key": "@mcad/epitrochoid",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/epitrochoidLinear",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/epitrochoidWBore",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/epitrochoidWBoreLinear",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/eqlprism",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/eqlpyramid",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/equiTriangle",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/flat_nut",
+      "status": "pass",
+      "start": "suggested",
+      "seconds": 0.06,
+      "triangles": 292,
+      "error": null
+    },
+    {
+      "key": "@mcad/flat_teardrop",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.06,
+      "triangles": 208,
+      "error": null
+    },
+    {
+      "key": "@mcad/frontBoard",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/futabas3003",
+      "status": "pass",
+      "start": "suggested",
+      "seconds": 0.06,
+      "triangles": 676,
+      "error": null
+    },
+    {
+      "key": "@mcad/gear",
+      "status": "pass",
+      "start": "suggested",
+      "seconds": 0.04,
+      "triangles": 636,
+      "error": null
+    },
+    {
+      "key": "@mcad/gear_shape",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/grid",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/hendecagon",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.1,
+      "triangles": 40,
+      "error": null
+    },
+    {
+      "key": "@mcad/hendecagon_prism",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.04,
+      "triangles": 40,
+      "error": null
+    },
+    {
+      "key": "@mcad/heptagon",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.11,
+      "triangles": 24,
+      "error": null
+    },
+    {
+      "key": "@mcad/heptagon_prism",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.05,
+      "triangles": 24,
+      "error": null
+    },
+    {
+      "key": "@mcad/heptagon_tube",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.05,
+      "triangles": 56,
+      "error": null
+    },
+    {
+      "key": "@mcad/hexagon",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/hexagon_prism",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/hexagon_tube",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.05,
+      "triangles": 48,
+      "error": null
+    },
+    {
+      "key": "@mcad/hexagram",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/hypotrochoid",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/hypotrochoidLinear",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/hypotrochoidWBore",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/hypotrochoidWBoreLinear",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/involute_bevel_gear_tooth",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/involute_gear_tooth",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/letter",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/linearBearing",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.16,
+      "triangles": 4000,
+      "error": null
+    },
+    {
+      "key": "@mcad/list",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/meshing_double_helix",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.31,
+      "triangles": 10948,
+      "error": null
+    },
+    {
+      "key": "@mcad/motor",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.13,
+      "triangles": 1608,
+      "error": null
+    },
+    {
+      "key": "@mcad/name_tag",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.11,
+      "triangles": 964,
+      "error": null
+    },
+    {
+      "key": "@mcad/ngon",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.04,
+      "triangles": 20,
+      "error": null
+    },
+    {
+      "key": "@mcad/nonagon",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.09,
+      "triangles": 32,
+      "error": null
+    },
+    {
+      "key": "@mcad/nonagon_prism",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.05,
+      "triangles": 32,
+      "error": null
+    },
+    {
+      "key": "@mcad/nut",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/nutHole",
+      "status": "pass",
+      "start": "suggested",
+      "seconds": 0.05,
+      "triangles": 20,
+      "error": null
+    },
+    {
+      "key": "@mcad/octagon",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.09,
+      "triangles": 28,
+      "error": null
+    },
+    {
+      "key": "@mcad/octagon_prism",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.05,
+      "triangles": 28,
+      "error": null
+    },
+    {
+      "key": "@mcad/octagon_tube",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.05,
+      "triangles": 64,
+      "error": null
+    },
+    {
+      "key": "@mcad/outline_2d",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/oval_prism",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/oval_torus",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/oval_tube",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/ovalTube",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/part",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/pentagon",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.1,
+      "triangles": 16,
+      "error": null
+    },
+    {
+      "key": "@mcad/pentagon_prism",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.05,
+      "triangles": 16,
+      "error": null
+    },
+    {
+      "key": "@mcad/pentagon_tube",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.05,
+      "triangles": 40,
+      "error": null
+    },
+    {
+      "key": "@mcad/pieSlice",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/polyhole",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/polytext",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/post",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.05,
+      "triangles": 288,
+      "error": null
+    },
+    {
+      "key": "@mcad/profile_8020_fractional_1010",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.1,
+      "triangles": 240,
+      "error": null
+    },
+    {
+      "key": "@mcad/profile_angle_equal",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/profile_angle_unequal",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.04,
+      "triangles": 20,
+      "error": null
+    },
+    {
+      "key": "@mcad/profile_channel",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/profile_makerbeam",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.09,
+      "triangles": 124,
+      "error": null
+    },
+    {
+      "key": "@mcad/profile_misumi_metric_2020",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.09,
+      "triangles": 240,
+      "error": null
+    },
+    {
+      "key": "@mcad/profile_rect_tube",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.05,
+      "triangles": 32,
+      "error": null
+    },
+    {
+      "key": "@mcad/profile_square_tube",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/profile_tslot_generic",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/rack",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.13,
+      "triangles": 12,
+      "error": null
+    },
+    {
+      "key": "@mcad/reg_polygon",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.09,
+      "triangles": 20,
+      "error": null
+    },
+    {
+      "key": "@mcad/regular_polygon",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.05,
+      "triangles": 20,
+      "error": null
+    },
+    {
+      "key": "@mcad/reinforcement",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.05,
+      "triangles": 44,
+      "error": null
+    },
+    {
+      "key": "@mcad/rightprism",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/rightpyramid",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/rightTriangle",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/ring",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.05,
+      "triangles": 480,
+      "error": null
+    },
+    {
+      "key": "@mcad/rod",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/rodnut",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/rodwasher",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.05,
+      "triangles": 288,
+      "error": null
+    },
+    {
+      "key": "@mcad/roundedBox",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/roundedCube",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/roundedSquare",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.09,
+      "triangles": 108,
+      "error": null
+    },
+    {
+      "key": "@mcad/screw",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/square_pyramid",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/stepper_motor_mount",
+      "status": "pass",
+      "start": "suggested",
+      "seconds": 0.1,
+      "triangles": 572,
+      "error": null
+    },
+    {
+      "key": "@mcad/teardrop",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.06,
+      "triangles": 274,
+      "error": null
+    },
+    {
+      "key": "@mcad/topShelf",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/torus",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/torus2",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/towerprosg90",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.06,
+      "triangles": 572,
+      "error": null
+    },
+    {
+      "key": "@mcad/translateBeam",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/triangle",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.05,
+      "triangles": 8,
+      "error": null
+    },
+    {
+      "key": "@mcad/triangle_prism",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.05,
+      "triangles": 8,
+      "error": null
+    },
+    {
+      "key": "@mcad/triangle_pyramid",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/triangle_tube",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.05,
+      "triangles": 24,
+      "error": null
+    },
+    {
+      "key": "@mcad/tube",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.06,
+      "triangles": 1268,
+      "error": null
+    },
+    {
+      "key": "@mcad/tube2",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/washer",
+      "status": "pass",
+      "start": "suggested",
+      "seconds": 0.05,
+      "triangles": 288,
+      "error": null
+    },
+    {
+      "key": "@mcad/xBeam",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.15,
+      "triangles": 4928,
+      "error": null
+    },
+    {
+      "key": "@mcad/xBolt",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/yBeam",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.15,
+      "triangles": 4928,
+      "error": null
+    },
+    {
+      "key": "@mcad/yBolt",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@mcad/zBeam",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.13,
+      "triangles": 4928,
+      "error": null
+    },
+    {
+      "key": "@mcad/zBolt",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/2screw_block_assembly",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.22,
+      "triangles": 4838,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/7_segment_digit",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.17,
+      "triangles": 1508,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/7_segment_digits",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/al_clad_resistor",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/al_clad_resistor_holes",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.17,
+      "triangles": 136,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/antenna",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/arrow",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/atx_psu_cutout",
+      "status": "fail",
+      "start": "no example",
+      "seconds": 0.19,
+      "triangles": 0,
+      "error": "OpenSCAD stopped with code 1."
+    },
+    {
+      "key": "@nopscadlib/ax_diode",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/ax_res",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/ball_bearing",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.25,
+      "triangles": 4360,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/barrel_jack",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.24,
+      "triangles": 1246,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/battery",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.18,
+      "triangles": 2454,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/battery_contact",
+      "status": "fail",
+      "start": "no example",
+      "seconds": 0.14,
+      "triangles": 0,
+      "error": "ERROR: Assertion '(r < (min(size.x, size.y) / 2))' failed in file ../../trees/165769a8e394758977ba6873/libraries/NopSCADlib/utils/core/rounded_rectangle.scad, line 25"
+    },
+    {
+      "key": "@nopscadlib/bbox_back",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/bbox_back_blank",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/bbox_base",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/bbox_base_blank",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/bbox_front",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/bbox_front_blank",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/bbox_left",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/bbox_left_blank",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/bbox_right",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/bbox_right_blank",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/bbox_shelf_blank",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/bbox_top",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/bbox_top_blank",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/bearing_ball",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.1,
+      "triangles": 16640,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/belt",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/bezier_cable_strip",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/BLDC",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.19,
+      "triangles": 2594,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/block",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/blower",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.17,
+      "triangles": 7704,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/blower_square",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.12,
+      "triangles": 1084,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/box",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/box_back",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/box_back_blank",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/box_base",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/box_base_blank",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/box_bezel",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/box_bezel_section",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/box_corner_profile",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/box_corner_profile_2D",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/box_corner_profile_section",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/box_corner_profile_sections",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/box_front",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/box_front_blank",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/box_header",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.09,
+      "triangles": 138,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/box_left",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/box_left_blank",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/box_right",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/box_right_blank",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/box_shelf_blank",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/box_shelf_bracket",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/box_top",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/box_top_blank",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/bulldog",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.09,
+      "triangles": 652,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/buzzer",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/cable",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/cable_clip",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/cable_clip_assembly",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/cable_strip",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/cable_tie",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.09,
+      "triangles": 520,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/cable_tie_holes",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.11,
+      "triangles": 136,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/camera",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/camera_assembly",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/camera_back",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/camera_bracket",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/camera_lens",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.2,
+      "triangles": 556,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/carriage",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.14,
+      "triangles": 188,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/chamfer_hole",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/chip",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/circle4n",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.08,
+      "triangles": 236,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/comp_spring",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.18,
+      "triangles": 8988,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/coreXY",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/coreXY_belts",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/corner_block_assembly",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.17,
+      "triangles": 6348,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/d_hole",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.23,
+      "triangles": 176,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/d_pillar",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.12,
+      "triangles": 270,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/d_plug_D",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.2,
+      "triangles": 236,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/d_socket",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/dimension",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/dimension_x",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/dimension_y",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/dimension_z",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/dip",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/display",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.46,
+      "triangles": 4686,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/display_aperture",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/dogbone_rectangle",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/dogbone_rectangle_x",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/dogbone_rectangle_y",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/dogbone_square",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/door_hinge",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.11,
+      "triangles": 368,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/door_hinge_assembly",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/door_hinge_parts_stl",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.17,
+      "triangles": 860,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/door_hinge_stat_stl",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.12,
+      "triangles": 480,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/door_hinge_static_assembly",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/door_latch_assembly",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.2,
+      "triangles": 3974,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/door_latch_stl",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.15,
+      "triangles": 640,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/drag_chain_assembly",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/drag_chain_link",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/drill",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/dxf",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/ellipse",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/ESP12F_carrier_stl",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.1,
+      "triangles": 660,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/extrusion",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/extrusion_corner_bracket",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.14,
+      "triangles": 104,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/extrusion_corner_bracket_3D",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/extrusion_corner_bracket_assembly",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/extrusion_inner_corner_bracket",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.15,
+      "triangles": 1770,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/fack2spm",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.1,
+      "triangles": 686,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/fack2spm_holes",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.2,
+      "triangles": 332,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/fan",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.11,
+      "triangles": 1946,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/fan_assembly",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/fan_guard",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/fan_holes",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.15,
+      "triangles": 588,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/fastened_fixing_block_assembly",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.21,
+      "triangles": 10448,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/fastened_insert_foot_assembly",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.16,
+      "triangles": 5390,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/female_metric_thread",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.17,
+      "triangles": 5116,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/fillet",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.15,
+      "triangles": 64,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/fixing_block",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.11,
+      "triangles": 472,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/fixing_block_assembly",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.14,
+      "triangles": 5222,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/flat_flex",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.19,
+      "triangles": 48,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/flex",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.19,
+      "triangles": 92,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/foot",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.11,
+      "triangles": 2556,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/foot_assembly",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.11,
+      "triangles": 2556,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/fuseholder",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.14,
+      "triangles": 2350,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/fuseholder_hole",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.08,
+      "triangles": 196,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/geared_stepper",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/green_terminal",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/gridfinity_bin",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/gridfinity_partition",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/grill",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.09,
+      "triangles": 248,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/handle_assembly",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.16,
+      "triangles": 4882,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/handle_fastened_assembly",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.17,
+      "triangles": 8518,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/handle_holes",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.1,
+      "triangles": 216,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/handle_stl",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.12,
+      "triangles": 1726,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/hdmi",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.17,
+      "triangles": 146,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/hinge_both",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/hinge_fastened_assembly",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/hinge_female",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/hinge_male",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/horicylinder",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.2,
+      "triangles": 9100,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/horihole",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.12,
+      "triangles": 10868,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/hot_end",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/ht_cap",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.08,
+      "triangles": 716,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/ht_pipe",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.1,
+      "triangles": 1744,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/ht_tpipe",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.11,
+      "triangles": 1920,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/hygrometer",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.16,
+      "triangles": 4912,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/hygrometer_hole",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.08,
+      "triangles": 572,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/idc_transition",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.09,
+      "triangles": 616,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/iec",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.1,
+      "triangles": 778,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/iec_assembly",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/iec_holes",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.08,
+      "triangles": 172,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/iec_inserts",
+      "status": "fail",
+      "start": "no example",
+      "seconds": 0.09,
+      "triangles": 0,
+      "error": "OpenSCAD stopped with code 1."
+    },
+    {
+      "key": "@nopscadlib/insert",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.07,
+      "triangles": 1664,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/insert_boss",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/insert_foot",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.11,
+      "triangles": 2096,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/insert_foot_assembly",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.12,
+      "triangles": 3648,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/insert_hole",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.08,
+      "triangles": 20,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/insert_lug",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/internal_circlip",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.09,
+      "triangles": 1100,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/involute_gear_profile",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/involute_rack_profile",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/jack",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.18,
+      "triangles": 440,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/jack_4mm",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/jack_4mm_plastic",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/jack_4mm_shielded",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/jhead_hot_end_assembly",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/jst_xh_header",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/knob",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/knob_assembly",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/kp_pillow_block",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.15,
+      "triangles": 8164,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/kp_pillow_block_assembly",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.19,
+      "triangles": 12352,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/label",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/LDR",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.1,
+      "triangles": 1028,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/leadnut",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.1,
+      "triangles": 1904,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/leadnuthousing",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.1,
+      "triangles": 220,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/leadscrew",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/led",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.1,
+      "triangles": 380,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/led_bezel",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/led_bezel_assembly",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/led_bezel_fastened_assembly",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/led_bezel_retainer",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/light_strip_clip",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/linear_bearing",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.1,
+      "triangles": 768,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/magnet",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.08,
+      "triangles": 1224,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/mains_socket",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.09,
+      "triangles": 1074,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/mains_socket_holes",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.15,
+      "triangles": 996,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/male_metric_thread",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.21,
+      "triangles": 9928,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/meter",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.13,
+      "triangles": 3116,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/meter_assembly",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.14,
+      "triangles": 3768,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/meter_bezel",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.1,
+      "triangles": 628,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/meter_bezel_hole",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.08,
+      "triangles": 204,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/microswitch",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.08,
+      "triangles": 228,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/microview",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.2,
+      "triangles": 27386,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/mod",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.1,
+      "triangles": 2280,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/module_assembly",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/molex_254",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/molex_254_housing",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/molex_usb_Ax1",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/molex_usb_Ax2",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/motor_faceplate",
+      "status": "fail",
+      "start": "no example",
+      "seconds": 0.08,
+      "triangles": 0,
+      "error": "ERROR: Assertion '(r < (min(size.x, size.y) / 2))' failed in file ../../trees/40a2a83d8a4eb332024da552/libraries/NopSCADlib/utils/core/rounded_rectangle.scad, line 25"
+    },
+    {
+      "key": "@nopscadlib/motor_shaft",
+      "status": "fail",
+      "start": "no example",
+      "seconds": 0.08,
+      "triangles": 0,
+      "error": "OpenSCAD stopped with code 1."
+    },
+    {
+      "key": "@nopscadlib/mouse_grommet",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.1,
+      "triangles": 604,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/mouse_grommet_hole",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.08,
+      "triangles": 128,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/mouse_hole",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/MT3608_carrier_stl",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.08,
+      "triangles": 198,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/multiwatt11",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/NEMA",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.13,
+      "triangles": 1388,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/NEMA_outline",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.17,
+      "triangles": 12,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/NEMA_screws",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/nut",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.08,
+      "triangles": 128,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/nut_and_washer",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/nut_square",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.08,
+      "triangles": 68,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/nut_trap",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/O_ring",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/opengrab",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.23,
+      "triangles": 5586,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/opengrab_target",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.16,
+      "triangles": 580,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/panel_meter",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.18,
+      "triangles": 382,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/panel_meter_button",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.16,
+      "triangles": 48,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/panel_meter_cutout",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.3,
+      "triangles": 252,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/panel_USBA",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.14,
+      "triangles": 2748,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/panel_USBA_holes",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.1,
+      "triangles": 236,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/pbox",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/pbox_base",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/pbox_base_screws",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/pbox_inserts",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/pbox_outer_shape",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/pcb",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.23,
+      "triangles": 5928,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/pcb_assembly",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/pcb_base",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/pcb_component",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/pcb_components",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.2,
+      "triangles": 2292,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/pcb_cutouts",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.19,
+      "triangles": 516,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/pcb_grid_components",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/pcb_mount",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/pcb_mount_assembly",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/pcb_mount_holes",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/pcb_mount_washer_stl",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.17,
+      "triangles": 216,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/pcb_spacer",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/pdip",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/pdip_pin",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/photo_interrupter",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.1,
+      "triangles": 984,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/pi_cutout",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.09,
+      "triangles": 214,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/pi_pcb",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.08,
+      "triangles": 532,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/pillar",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.09,
+      "triangles": 546,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/pin",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.08,
+      "triangles": 28,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/pin_header",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/pin_socket",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/pocket_handle",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/pocket_handle_assembly",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/pocket_handle_holes",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/poly_circle",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.07,
+      "triangles": 156,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/poly_cylinder",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/poly_drill",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/poly_ring",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/poly_tube",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/post_4mm_hole",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.1,
+      "triangles": 200,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/pot_nut",
+      "status": "fail",
+      "start": "no example",
+      "seconds": 0.08,
+      "triangles": 0,
+      "error": "OpenSCAD stopped with code 1."
+    },
+    {
+      "key": "@nopscadlib/potentiometer",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.09,
+      "triangles": 708,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/power_jack",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.14,
+      "triangles": 3128,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/press_fit_peg",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.1,
+      "triangles": 156,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/press_fit_socket",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.07,
+      "triangles": 12,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/printed_pulley",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/printed_pulley_assembly",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/printed_pulley_teeth",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/printed_washer",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.08,
+      "triangles": 96,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/psu",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.33,
+      "triangles": 15734,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/psu_shroud",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/psu_shroud_assembly",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/psu_shroud_fastened_assembly",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/psu_shroud_holes",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/pulley_assembly",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.12,
+      "triangles": 2402,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/quadrant",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.15,
+      "triangles": 72,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/rail",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/rail_assembly",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/rail_screws",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/rd_box_cap",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/rd_cm_choke",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/rd_coil",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/rd_disc",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/rd_electrolytic",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/rd_module",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/rd_transistor",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/rd_xtal",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/rectangular_tube",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/resistor",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.12,
+      "triangles": 1452,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/ribbon_cable",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/ribbon_clamp",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/ribbon_clamp_assembly",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/ribbon_clamp_fastened_assembly",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/ribbon_clamp_holes",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/ribbon_grommet",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/ribbon_grommet_hole",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/right_trapezoid",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/right_triangle",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.14,
+      "triangles": 8,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/ring",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/ring_terminal_assembly",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/ring_terminal_hole",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.15,
+      "triangles": 80,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/rj45",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.18,
+      "triangles": 112,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/rocker",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/rocker_hole",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.16,
+      "triangles": 76,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/rod",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.08,
+      "triangles": 476,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/rod_end_bearing",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.13,
+      "triangles": 3322,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/round_grommet_bottom",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.09,
+      "triangles": 720,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/round_grommet_hole",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.08,
+      "triangles": 236,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/round_grommet_top",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.1,
+      "triangles": 1408,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/rounded_corner",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/rounded_cube_xy",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/rounded_cube_xz",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/rounded_cube_yz",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/rounded_cylinder",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/rounded_polygon",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/rounded_rectangle",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/rounded_right_triangle",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/rounded_square",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/rounded_top_rectangle",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/rpi_camera_focus_ring_stl",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.17,
+      "triangles": 710,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/sbr_bearing_block",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.15,
+      "triangles": 622,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/sbr_bearing_block_assembly",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/sbr_rail",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/screw_and_washer",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/screw_countersink",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/screw_keyhole",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.15,
+      "triangles": 144,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/screw_knob",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/screw_knob_assembly",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/screw_lug",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/screw_polysink",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/screw_tearsink",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/scs_bearing_block",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.19,
+      "triangles": 4408,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/scs_bearing_block_assembly",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/sealing_strip",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.09,
+      "triangles": 128,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/sector",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/semi_circle",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.14,
+      "triangles": 120,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/semi_teardrop",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.08,
+      "triangles": 68,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/servo_motor",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.14,
+      "triangles": 4814,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/sheet",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/sheet_2D",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/show_path",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/sk_bracket",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.11,
+      "triangles": 1544,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/sk_bracket_assembly",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.14,
+      "triangles": 5708,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/sleeved_resistor",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/sliding_ball_t_nut",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/sliding_t_nut",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.08,
+      "triangles": 840,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/slot",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/smd_250V_fuse",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/smd_capacitor",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/smd_coax",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/smd_diode",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/smd_inductor",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/smd_led",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/smd_pot",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/smd_qfp",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/smd_resistor",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/smd_soic",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/smd_sot",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/smd_tant",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/socket_box",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/socket_box_assembly",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/socket_box_fastened_assembly",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/solder",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/solder_meniscus",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.08,
+      "triangles": 768,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/spade",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.09,
+      "triangles": 68,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/sphere",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.08,
+      "triangles": 288,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/spool",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.08,
+      "triangles": 960,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/spring_washer",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.08,
+      "triangles": 324,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/square_button",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.09,
+      "triangles": 408,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/ssr",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.09,
+      "triangles": 548,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/ssr_assembly",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/ssr_shroud",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/ssr_shroud_assembly",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/ssr_shroud_fastened_assembly",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/ssr_shroud_holes",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/standoff",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/star_washer",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.08,
+      "triangles": 468,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/stl",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/strap",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/strap_assembly",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/strap_holes",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.09,
+      "triangles": 504,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/studding",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.08,
+      "triangles": 476,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/svg",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/sweep",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/swiss_clip",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.11,
+      "triangles": 2518,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/swiss_clip_hole",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/teardrop",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.07,
+      "triangles": 184,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/teardrop_plus",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.07,
+      "triangles": 184,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/tearslot",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.07,
+      "triangles": 188,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/terminal_35",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/terminal_block",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/threaded_insert",
+      "status": "fail",
+      "start": "no example",
+      "seconds": 0.08,
+      "triangles": 0,
+      "error": "ERROR: Assertion '(norm(binormal) > tiny)' failed: \"all points are colinear\" in file ../../trees/3761999570276327e05fa0ab/libraries/NopSCADlib/utils/sweep.scad, line 58"
+    },
+    {
+      "key": "@nopscadlib/toggle",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/toggle_hole",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.08,
+      "triangles": 156,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/TP4056_carrier_stl",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.09,
+      "triangles": 132,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/transformer",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.08,
+      "triangles": 484,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/ttrack",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/tube",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/tubing",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.09,
+      "triangles": 256,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/usb_Ax1",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.18,
+      "triangles": 118,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/usb_Ax2",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.19,
+      "triangles": 164,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/usb_B",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.17,
+      "triangles": 94,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/usb_C",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.19,
+      "triangles": 252,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/usb_miniA",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.18,
+      "triangles": 152,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/usb_uA",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.2,
+      "triangles": 176,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/usb_vAx1",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.18,
+      "triangles": 64,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/uSD",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/use_dxf",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/use_stl",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/use_svg",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/variac",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.14,
+      "triangles": 7456,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/variac_dial",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.08,
+      "triangles": 676,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/variac_holes",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.09,
+      "triangles": 416,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/vero_cutouts",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/vero_mounting_holes",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/vero_pin",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.18,
+      "triangles": 488,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/veroboard",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/veroboard_assembly",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/veroboard_base",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/veroboard_fastened_assembly",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/veroboard_fasteners",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/vertical_tearslot",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.08,
+      "triangles": 192,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/vitamin",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/washer",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.07,
+      "triangles": 348,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/weld_nut",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.08,
+      "triangles": 248,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/wingnut",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.09,
+      "triangles": 660,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/wire",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/wire_link",
+      "status": "pass",
+      "start": "guessed",
+      "seconds": 0.09,
+      "triangles": 1620,
+      "error": null
+    },
+    {
+      "key": "@nopscadlib/woven_tube",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@nopscadlib/ziptie",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.09,
+      "triangles": 560,
+      "error": null
+    },
+    {
+      "key": "@round-anything/gridpattern",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.08,
+      "triangles": 10544,
+      "error": null
+    },
+    {
+      "key": "@round-anything/internalSq",
+      "status": "pass",
+      "start": "suggested",
+      "seconds": 0.05,
+      "triangles": 284,
+      "error": null
+    },
+    {
+      "key": "@round-anything/isosphere",
+      "status": "pass",
+      "start": "suggested",
+      "seconds": 0.05,
+      "triangles": 136,
+      "error": null
+    },
+    {
+      "key": "@round-anything/line",
+      "status": "pass",
+      "start": "suggested",
+      "seconds": 0.1,
+      "triangles": 108,
+      "error": null
+    },
+    {
+      "key": "@round-anything/polyline",
+      "status": "pass",
+      "start": "suggested",
+      "seconds": 0.1,
+      "triangles": 124,
+      "error": null
+    },
+    {
+      "key": "@round-anything/polyRoundExtrude",
+      "status": "pass",
+      "start": "suggested",
+      "seconds": 0.13,
+      "triangles": 1932,
+      "error": null
+    },
+    {
+      "key": "@round-anything/shell2d",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@round-anything/unionRoundMask",
+      "status": "pass",
+      "start": "no example",
+      "seconds": 0.11,
+      "triangles": 136,
+      "error": null
+    },
+    {
+      "key": "@threads-scad/AugerThread",
+      "status": "pass",
+      "start": "suggested",
+      "seconds": 0.24,
+      "triangles": 10112,
+      "error": null
+    },
+    {
+      "key": "@threads-scad/ClosePoints",
+      "status": "skipped",
+      "start": "needs input"
+    },
+    {
+      "key": "@threads-scad/MetricBolt",
+      "status": "pass",
+      "start": "suggested",
+      "seconds": 0.33,
+      "triangles": 14504,
+      "error": null
+    },
+    {
+      "key": "@threads-scad/MetricBoltSet",
+      "status": "pass",
+      "start": "suggested",
+      "seconds": 0.39,
+      "triangles": 16504,
+      "error": null
+    },
+    {
+      "key": "@threads-scad/MetricCountersunkBolt",
+      "status": "pass",
+      "start": "suggested",
+      "seconds": 0.24,
+      "triangles": 12034,
+      "error": null
+    },
+    {
+      "key": "@threads-scad/MetricNut",
+      "status": "pass",
+      "start": "suggested",
+      "seconds": 0.19,
+      "triangles": 6188,
+      "error": null
+    },
+    {
+      "key": "@threads-scad/MetricWasher",
+      "status": "pass",
+      "start": "suggested",
+      "seconds": 0.06,
+      "triangles": 1152,
+      "error": null
+    },
+    {
+      "key": "@threads-scad/MetricWoodScrew",
+      "status": "pass",
+      "start": "suggested",
+      "seconds": 0.44,
+      "triangles": 18594,
+      "error": null
+    },
+    {
+      "key": "@threads-scad/RodEnd",
+      "status": "pass",
+      "start": "suggested",
+      "seconds": 0.3,
+      "triangles": 13572,
+      "error": null
+    },
+    {
+      "key": "@threads-scad/RodExtender",
+      "status": "pass",
+      "start": "suggested",
+      "seconds": 0.48,
+      "triangles": 23926,
+      "error": null
+    },
+    {
+      "key": "@threads-scad/RodStart",
+      "status": "pass",
+      "start": "suggested",
+      "seconds": 0.26,
+      "triangles": 12390,
+      "error": null
+    },
+    {
+      "key": "@threads-scad/ScrewThread",
+      "status": "pass",
+      "start": "suggested",
+      "seconds": 0.19,
+      "triangles": 9216,
+      "error": null
+    }
+  ]
+}
