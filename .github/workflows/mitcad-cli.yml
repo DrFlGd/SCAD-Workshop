@@ -21,16 +21,12 @@ on:
 permissions:
   contents: write
 
-concurrency:
-  group: mitcad-cli-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
   windows:
     runs-on: windows-2022
     timeout-minutes: 350
     env:
-      VCPKG_ROOT: C:\v
+      # (VCPKG_ROOT is set after the MSVC environment, which points it at Visual Studio's vcpkg)
       VCPKG_DEFAULT_BINARY_CACHE: C:\vb
       MITCAD_RENDER_DEPS: C:\r
       MITCAD_RENDER_JOBS: "4"
@@ -73,6 +69,8 @@ jobs:
           arch: x64
       - name: vcpkg
         run: |
+          $env:VCPKG_ROOT = 'C:\v'
+          "VCPKG_ROOT=C:\v" >> $env:GITHUB_ENV
           git clone --quiet https://github.com/microsoft/vcpkg $env:VCPKG_ROOT
           git -C $env:VCPKG_ROOT checkout --quiet ${{ steps.pin.outputs.vcpkg_commit }}
           & "$env:VCPKG_ROOT\bootstrap-vcpkg.bat" -disableMetrics
