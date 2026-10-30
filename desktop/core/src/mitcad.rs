@@ -78,6 +78,27 @@ pub struct Release {
     pub size: u64,
     pub sha256: String,
     pub cli: String,
+    /// Our build of the fork's `mitcad-cli` (PIN.json `cli`; 0.4.30), laid over the release's.
+    pub overlay: Option<Overlay>,
+}
+
+/// Our build of `mitcad-cli` from the fork our reader comes from (the mitcad-cli workflow's
+/// prerelease): the official release's runs MitCad's own import, which doesn't follow what the
+/// fork's reader adds (where projected sketch curves come from). An archive holding the program
+/// alone (a ZIP on Windows, a .tar.gz on Linux), its size and SHA-256.
+pub struct Overlay {
+    pub tag: String,
+    pub url: String,
+    pub size: u64,
+    pub sha256: String,
+    pub program: String,
+}
+
+impl Release {
+    /// The file beside the unpacked release that says our `mitcad-cli` is laid over it.
+    fn stamp(&self) -> Option<String> {
+        self.overlay.as_ref().map(|o| format!(".{}", o.tag))
+    }
 }
 
 const PIN: &str = include_str!("../mitcad/PIN.json");
@@ -97,6 +118,17 @@ pub fn pinned_release() -> Option<Release> {
         _ => return None,
     };
     let a = &r["assets"][platform];
+    let o = &pin["cli"]["assets"][platform];
+    let overlay = (|| {
+        Some(Overlay {
+            tag: pin["cli"]["tag"].as_str()?.into(),
+            // `WORKSHOP_MITCAD_CLI_DOWNLOAD_URL` stands in for its address (tests serve it locally)
+            url: std::env::var("WORKSHOP_MITCAD_CLI_DOWNLOAD_URL").unwrap_or_else(|_| o["url"].as_str().unwrap_or_default().into()),
+            size: o["size"].as_u64()?,
+            sha256: o["sha256"].as_str()?.into(),
+            program: o["program"].as_str()?.into(),
+        })
+    })();
     Some(Release {
         tag: r["tag"].as_str()?.into(),
         version: r["version"].as_str()?.into(),
@@ -105,13 +137,120 @@ pub fn pinned_release() -> Option<Release> {
         size: a["size"].as_u64()?,
         sha256: a["sha256"].as_str()?.into(),
         cli: a["cli"].as_str()?.into(),
+        overlay,
     })
 }
 
-/// The downloaded copy of the pinned release under `root` (the app's `mitcad/` folder), if there.
+/// The downloaded copy of the pinned release under `root` (the app's `mitcad/` folder), if there,
+/// with our `mitcad-cli` laid over it where PIN.json pins one.
 pub fn downloaded(root: &Path) -> Option<PathBuf> {
     let r = pinned_release()?;
-    Some(root.join(&r.version).join(&r.cli)).filter(|p| p.is_file())
+    let dir = root.join(&r.version);
+    if r.stamp().is_some_and(|s| !dir.join(s).is_file()) {
+        return None;
+    }
+    Some(dir.join(&r.cli)).filter(|p| p.is_file())
+}
+
+/// Download `url` into `part`, checking its size and SHA-256; `progress` and `cancelled` as for
+/// [`install`]. `part` is removed when it fails.
+fn fetch(url: &str, size: u64, sha256: &str, part: &Path, what: &str, progress: &impl Fn(String), cancelled: &impl Fn() -> bool) -> anyhow::Result<()> {
+    use anyhow::Context;
+    use sha2::Digest;
+    use std::io::{Read, Write};
+    let agent = ureq::AgentBuilder::new()
+        .timeout_connect(std::time::Duration::from_secs(20))
+        .timeout_read(std::time::Duration::from_secs(120))
+        // (a local address, as tests serve, goes direct)
+        .try_proxy_from_env(!url.starts_with("http://127.0.0.1:"))
+        .user_agent(&format!("SCAD-Workshop/{}", crate::VERSION))
+        .build();
+    let resp = agent.get(url).call().map_err(|e| anyhow::anyhow!("Couldn't download {what}: {e}"))?;
+    let mut reader = resp.into_reader().take(size + 1);
+    let mut f = std::fs::File::create(part).with_context(|| format!("couldn't create {}", part.display()))?;
+    let (mut hash, mut done, mut buf) = (sha2::Sha256::new(), 0u64, vec![0u8; 1 << 20]);
+    let mut shown = 0u64;
+    let fail = |e: anyhow::Error| {
+        let _ = std::fs::remove_file(part);
+        e
+    };
+    loop {
+        if cancelled() {
+            drop(f);
+            return Err(fail(anyhow::anyhow!("Stopped.")));
+        }
+        let n = reader.read(&mut buf).map_err(|e| fail(anyhow::anyhow!("The download of {what} broke off: {e}")))?;
+        if n == 0 {
+            break;
+        }
+        f.write_all(&buf[..n]).map_err(|e| fail(e.into()))?;
+        hash.update(&buf[..n]);
+        done += n as u64;
+        if done - shown >= 4 << 20 {
+            progress(format!("{} of {} MB", done >> 20, size >> 20));
+            shown = done;
+        }
+    }
+    drop(f);
+    if done != size || hex::encode(hash.finalize()) != sha256 {
+        return Err(fail(anyhow::anyhow!("The {what} download didn't match ({done} of {size} bytes, or a different file). Try again.")));
+    }
+    Ok(())
+}
+
+/// Lay our `mitcad-cli` (`r.overlay`) over the release unpacked in `dir`: download its archive, take
+/// the program out, put it where the release's is, and leave the stamp [`downloaded`] looks for.
+fn lay_over(r: &Release, dir: &Path, progress: &impl Fn(String), cancelled: &impl Fn() -> bool) -> anyhow::Result<()> {
+    use anyhow::{bail, Context};
+    let (Some(o), Some(stamp)) = (&r.overlay, r.stamp()) else { return Ok(()) };
+    let part = dir.join(format!(".download-cli-{}", std::process::id()));
+    progress("Downloading SCAD Workshop's build of MitCad".into());
+    fetch(&o.url, o.size, &o.sha256, &part, "SCAD Workshop's build of MitCad", progress, cancelled)?;
+    let program = dir.join(format!(".cli-{}", std::process::id()));
+    let took = (|| -> anyhow::Result<bool> {
+        let file = std::fs::File::open(&part)?;
+        let mut out = std::fs::File::create(&program).with_context(|| format!("couldn't create {}", program.display()))?;
+        if o.url.to_lowercase().ends_with(".zip") {
+            let mut zip = zip::ZipArchive::new(file).context("SCAD Workshop's build of MitCad isn't a ZIP")?;
+            let Ok(mut e) = zip.by_name(&o.program) else { return Ok(false) };
+            std::io::copy(&mut e, &mut out)?;
+        } else {
+            let mut tar = tar::Archive::new(flate2::read::GzDecoder::new(file));
+            let mut found = false;
+            for e in tar.entries()? {
+                let mut e = e?;
+                if e.path()?.file_name().is_some_and(|n| n == o.program.as_str()) {
+                    std::io::copy(&mut e, &mut out)?;
+                    found = true;
+                    break;
+                }
+            }
+            if !found {
+                return Ok(false);
+            }
+        }
+        Ok(true)
+    })();
+    let _ = std::fs::remove_file(&part);
+    if !took.inspect_err(|_| { let _ = std::fs::remove_file(&program); })? {
+        let _ = std::fs::remove_file(&program);
+        bail!("SCAD Workshop's build of MitCad has no {} in it.", o.program);
+    }
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        std::fs::set_permissions(&program, std::fs::Permissions::from_mode(0o755))?;
+    }
+    let cli = dir.join(&r.cli);
+    std::fs::rename(&program, &cli).with_context(|| format!("couldn't put MitCad's program at {}", cli.display()))?;
+    // stamps of builds laid over before
+    for e in std::fs::read_dir(dir).into_iter().flatten().flatten() {
+        if e.file_name().to_string_lossy().starts_with(".mitcad-cli-") {
+            let _ = std::fs::remove_file(e.path());
+        }
+    }
+    std::fs::write(dir.join(stamp), &o.url)?;
+    Ok(())
 }
 
 /// Find `mitcad-cli`: the configured path (a file, or a folder holding it) first, then the app's
@@ -141,52 +280,21 @@ pub fn locate(configured: Option<&Path>, root: Option<&Path>) -> Result<MitCad, 
 /// Blocking.
 pub fn install(root: &Path, progress: impl Fn(String), cancelled: impl Fn() -> bool) -> anyhow::Result<PathBuf> {
     use anyhow::{bail, Context};
-    use sha2::Digest;
-    use std::io::{Read, Write};
     let r = pinned_release().context("There's no MitCad download for this system: install it from MitCad's releases page and choose it here.")?;
     if let Some(p) = downloaded(root) {
         return Ok(p);
     }
+    // the release is there, our build of mitcad-cli isn't (yet, or an older one)
+    let target = root.join(&r.version);
+    if target.join(&r.cli).is_file() {
+        lay_over(&r, &target, &progress, &cancelled)?;
+        return Ok(target.join(&r.cli));
+    }
     std::fs::create_dir_all(root).with_context(|| format!("couldn't create {}", root.display()))?;
     let part = root.join(format!(".download-{}-{}", r.version, std::process::id()));
-    let agent = ureq::AgentBuilder::new()
-        .timeout_connect(std::time::Duration::from_secs(20))
-        .timeout_read(std::time::Duration::from_secs(120))
-        .try_proxy_from_env(true)
-        .user_agent(&format!("SCAD-Workshop/{}", crate::VERSION))
-        .build();
     // `WORKSHOP_MITCAD_DOWNLOAD_URL` stands in for the release's address (tests serve it locally)
     let url = std::env::var("WORKSHOP_MITCAD_DOWNLOAD_URL").unwrap_or_else(|_| r.url.clone());
-    let resp = agent.get(&url).call().map_err(|e| anyhow::anyhow!("Couldn't download MitCad {}: {e}", r.version))?;
-    let mut reader = resp.into_reader().take(r.size + 1);
-    let mut f = std::fs::File::create(&part).with_context(|| format!("couldn't create {}", part.display()))?;
-    let (mut hash, mut done, mut buf) = (sha2::Sha256::new(), 0u64, vec![0u8; 1 << 20]);
-    let mut shown = 0u64;
-    let fail = |e: anyhow::Error| {
-        let _ = std::fs::remove_file(&part);
-        e
-    };
-    loop {
-        if cancelled() {
-            drop(f);
-            return Err(fail(anyhow::anyhow!("Stopped.")));
-        }
-        let n = reader.read(&mut buf).map_err(|e| fail(anyhow::anyhow!("The download of MitCad broke off: {e}")))?;
-        if n == 0 {
-            break;
-        }
-        f.write_all(&buf[..n]).map_err(|e| fail(e.into()))?;
-        hash.update(&buf[..n]);
-        done += n as u64;
-        if done - shown >= 4 << 20 {
-            progress(format!("{} of {} MB", done >> 20, r.size >> 20));
-            shown = done;
-        }
-    }
-    drop(f);
-    if done != r.size || hex::encode(hash.finalize()) != r.sha256 {
-        return Err(fail(anyhow::anyhow!("The MitCad download didn't match the release ({done} of {} bytes, or a different file). Try again.", r.size)));
-    }
+    fetch(&url, r.size, &r.sha256, &part, &format!("MitCad {}", r.version), &progress, &cancelled)?;
     progress("Unpacking".into());
     let unpack = root.join(format!(".unpack-{}-{}", r.version, std::process::id()));
     let _ = std::fs::remove_dir_all(&unpack);
@@ -226,7 +334,9 @@ pub fn install(root: &Path, progress: impl Fn(String), cancelled: impl Fn() -> b
         let _ = std::fs::remove_dir_all(&unpack);
         bail!("The MitCad download has no {} where expected ({}).", exe_name(), r.cli);
     }
-    let target = root.join(&r.version);
+    lay_over(&r, &unpack, &progress, &cancelled).inspect_err(|_| {
+        let _ = std::fs::remove_dir_all(&unpack);
+    })?;
     let _ = std::fs::remove_dir_all(&target);
     std::fs::rename(&unpack, &target).with_context(|| format!("couldn't move MitCad into {}", target.display()))?;
     // earlier versions the app downloaded: no longer used
@@ -703,6 +813,62 @@ mod tests {
         assert_eq!(std::fs::read(dest.join("mitcad-9.9.9-windows-x64/bin/mitcad-cli.exe")).unwrap(), b"MZ");
         assert!(!dir.join("outside.txt").exists());
         assert!(!unzip(&zip_path, &dir.join("stopped"), &|| true).unwrap());
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    /// Our build of mitcad-cli goes where the release's is, once, and leaves the stamp `downloaded`
+    /// looks for; a release with an older stamp gets the new build.
+    #[test]
+    fn lays_our_cli_over_the_release() {
+        use sha2::Digest;
+        use std::io::{Read, Write};
+        let dir = std::env::temp_dir().join(format!("workshop-mitcad-overlay-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(dir.join("bin")).unwrap();
+        std::fs::write(dir.join("bin/mitcad-cli"), b"official").unwrap();
+        std::fs::write(dir.join(".mitcad-cli-v0-old"), b"").unwrap();
+        let mut archive = tar::Builder::new(flate2::write::GzEncoder::new(Vec::new(), flate2::Compression::fast()));
+        let mut h = tar::Header::new_gnu();
+        h.set_size(4);
+        h.set_mode(0o755);
+        h.set_cksum();
+        archive.append_data(&mut h, "mitcad-cli", &b"ours"[..]).unwrap();
+        let body = archive.into_inner().unwrap().finish().unwrap();
+        let server = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+        let port = server.local_addr().unwrap().port();
+        let served = body.clone();
+        std::thread::spawn(move || {
+            let (mut c, _) = server.accept().unwrap();
+            let mut req = [0u8; 1024];
+            let _ = c.read(&mut req);
+            write!(c, "HTTP/1.1 200 OK\r\nContent-Length: {}\r\nConnection: close\r\n\r\n", served.len()).unwrap();
+            c.write_all(&served).unwrap();
+        });
+        let r = Release {
+            tag: "v0".into(),
+            version: "0".into(),
+            page: String::new(),
+            url: String::new(),
+            size: 0,
+            sha256: String::new(),
+            cli: "bin/mitcad-cli".into(),
+            overlay: Some(Overlay {
+                tag: "mitcad-cli-v0-new".into(),
+                url: format!("http://127.0.0.1:{port}/mitcad-cli-linux-x64.tar.gz"),
+                size: body.len() as u64,
+                sha256: hex::encode(sha2::Sha256::digest(&body)),
+                program: "mitcad-cli".into(),
+            }),
+        };
+        lay_over(&r, &dir, &|_| {}, &|| false).unwrap();
+        assert_eq!(std::fs::read(dir.join("bin/mitcad-cli")).unwrap(), b"ours");
+        assert!(dir.join(".mitcad-cli-v0-new").is_file());
+        assert!(!dir.join(".mitcad-cli-v0-old").exists());
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            assert_eq!(std::fs::metadata(dir.join("bin/mitcad-cli")).unwrap().permissions().mode() & 0o111, 0o111);
+        }
         let _ = std::fs::remove_dir_all(&dir);
     }
 

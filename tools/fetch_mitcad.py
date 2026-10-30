@@ -4,7 +4,9 @@
     python3 tools/fetch_mitcad.py                      # at the pinned commit (desktop/core/mitcad/PIN.json)
     python3 tools/fetch_mitcad.py --commit <sha>       # move the pin
     python3 tools/fetch_mitcad.py --from-git ~/Mitcad  # from a local clone instead of GitHub
-    python3 tools/fetch_mitcad.py --commit <sha> --release v0.35.0   # and the release the app downloads
+    python3 tools/fetch_mitcad.py --commit <sha> --release v0.36.0   # and the release the app downloads
+    python3 tools/fetch_mitcad.py --repo drflgd/Mitcad --commit <sha>  # from a fork (0.4.30)
+    python3 tools/fetch_mitcad.py --cli mitcad-cli-v0.36.0-<sha7>     # and our build of mitcad-cli from it
 
 MitCad (https://github.com/mitcad/Mitcad, MIT) reads Fusion 360's `.f3d` files
 in pure Rust. The app uses its reader crates to list an `.f3d`'s user parameters
@@ -20,6 +22,14 @@ workspace keys MitCad inherits become explicit), applies the patches in
 desktop/core/mitcad/patches/ (fixes waiting to go upstream), and records the
 commit and the content hash in PIN.json. A build without the hash matching
 isn't checked: PIN.json is for people and the next refresh.
+
+`--repo` (0.4.30) takes the reader from a fork, kept in PIN.json: ours,
+DrFlGd/Mitcad, has the reader and import fixes waiting to go upstream (its
+`f3d-sketch-projections` branch). `--cli <tag>` then records our build of that
+fork's `mitcad-cli` (the mitcad-cli workflow publishes it as a prerelease of
+this repository, `mitcad-cli-<release tag>-<commit>`), which the app lays over
+the official release's download: the official one runs MitCad's own import,
+which doesn't use what the fork's reader adds.
 
 `--release <tag>` (0.4.28) also records the MitCad release made from that commit,
 which Settings › Engine › Download MitCad installs: its Windows ZIP and Linux
@@ -43,7 +53,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 DEST = ROOT / "desktop" / "core" / "mitcad"
 PIN = DEST / "PIN.json"
-REPO = "mitcad/Mitcad"
+# the official releases the app downloads; the reader may come from a fork (`--repo`)
+RELEASES = "mitcad/Mitcad"
+# where the mitcad-cli workflow publishes our builds of the fork's mitcad-cli (`--cli`)
+CLI_RELEASES = "drflgd/scad-workshop"
 # the reader (core/f3d-design and what it pulls in); the facade crate `core/f3d` (the inspection
 # tool and the corpus tests) and the expression crate aren't needed
 CRATES = ["vec3", "zip", "asm", "dump", "f3d-names", "f3d-file", "f3d-decode", "f3d-design"]
@@ -56,7 +69,7 @@ DEPS = {
 }
 
 
-def fetch_tree(commit, from_git):
+def fetch_tree(repo, commit, from_git):
     """The repository's `core/` tree at the commit, as {relative path: bytes}."""
     files = {}
     if from_git:
@@ -64,7 +77,7 @@ def fetch_tree(commit, from_git):
         tf = tarfile.open(fileobj=io.BytesIO(out))
         prefix = ""
     else:
-        url = f"https://github.com/{REPO}/archive/{commit}.tar.gz"
+        url = f"https://github.com/{repo}/archive/{commit}.tar.gz"
         print(f"downloading {url}")
         data = urllib.request.urlopen(url, timeout=120).read()
         tf = tarfile.open(fileobj=io.BytesIO(data), mode="r:gz")
@@ -111,7 +124,7 @@ def rewrite_manifest(text, name):
 def release_assets(tag):
     """The release's Windows ZIP and Linux AppImage: URL, size, SHA-256 and where mitcad-cli is unpacked."""
     version = tag.lstrip("v")
-    base = f"https://github.com/{REPO}/releases/download/{tag}"
+    base = f"https://github.com/{RELEASES}/releases/download/{tag}"
     wanted = {
         "windows-x64": (f"mitcad-{version}-windows-x64.zip", f"mitcad-{version}-windows-x64/bin/mitcad-cli.exe"),
         # `--appimage-extract` unpacks into squashfs-root/
@@ -132,7 +145,30 @@ def release_assets(tag):
         manifest = json.loads(r.read())["manifest"]["assets"]
     if manifest.get("linux-x64", {}).get("sha256") not in (None, out["linux-x64"]["sha256"]):
         sys.exit("the AppImage's hash differs from the release's update-manifest.json")
-    return {"tag": tag, "version": version, "page": f"https://github.com/{REPO}/releases/tag/{tag}", "assets": out}
+    return {"tag": tag, "version": version, "page": f"https://github.com/{RELEASES}/releases/tag/{tag}", "assets": out}
+
+
+def hashed(url):
+    print(f"downloading {url.rsplit('/', 1)[-1]} to hash it")
+    h, size = hashlib.sha256(), 0
+    with urllib.request.urlopen(url, timeout=120) as r:
+        while chunk := r.read(1 << 20):
+            h.update(chunk)
+            size += len(chunk)
+    return size, h.hexdigest()
+
+
+def cli_assets(tag):
+    """Our build of the fork's mitcad-cli (the mitcad-cli workflow's prerelease `tag`): per platform the
+    archive (a ZIP on Windows, a .tar.gz on Linux, holding the program alone), its size and SHA-256, and
+    the program's name in it; the app puts it where the official release's `cli` is."""
+    base = f"https://github.com/{CLI_RELEASES}/releases/download/{tag}"
+    out = {}
+    for platform, (name, program) in {"windows-x64": ("mitcad-cli-windows-x64.zip", "mitcad-cli.exe"),
+                                      "linux-x64": ("mitcad-cli-linux-x64.tar.gz", "mitcad-cli")}.items():
+        size, sha = hashed(f"{base}/{name}")
+        out[platform] = {"url": f"{base}/{name}", "size": size, "sha256": sha, "program": program}
+    return {"tag": tag, "page": f"https://github.com/{CLI_RELEASES}/releases/tag/{tag}", "assets": out}
 
 
 def content_hash(dest):
@@ -147,14 +183,17 @@ def content_hash(dest):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--commit", help="the commit to pin (default: PIN.json's)")
+    ap.add_argument("--repo", help="the GitHub repository to take the reader from, owner/name (default: PIN.json's, else mitcad/Mitcad)")
+    ap.add_argument("--cli", help="the tag of our mitcad-cli build of the pinned commit (the mitcad-cli workflow's prerelease); kept from PIN.json while the commit stays")
     ap.add_argument("--from-git", help="a local clone of MitCad to take the files from")
     ap.add_argument("--release", help="the MitCad release tag made from the commit (the app downloads it); kept from PIN.json when left out")
     a = ap.parse_args()
     old = json.loads(PIN.read_text()) if PIN.is_file() else {}
     commit = a.commit or old.get("commit")
+    repo = a.repo or old.get("repository", "https://github.com/mitcad/Mitcad").removeprefix("https://github.com/")
     if not commit:
         sys.exit("no commit: give --commit or keep desktop/core/mitcad/PIN.json")
-    files = fetch_tree(commit, a.from_git)
+    files = fetch_tree(repo, commit, a.from_git)
     if not files:
         sys.exit("nothing fetched: is the commit right?")
     patches = sorted((DEST / "patches").glob("*.patch")) if (DEST / "patches").is_dir() else []
@@ -187,14 +226,19 @@ def main():
     for d in list(DEST.rglob("*")):
         if d.is_dir() and not any(d.iterdir()):
             d.rmdir()
-    pin = {"repository": f"https://github.com/{REPO}", "commit": commit, "crates": CRATES, "content_sha256": content_hash(DEST),
+    pin = {"repository": f"https://github.com/{repo}", "commit": commit, "crates": CRATES, "content_sha256": content_hash(DEST),
            "patches": [p.name for p in patches]}
     if a.release:
         pin["release"] = release_assets(a.release)
-    elif old.get("release") and old.get("commit") == commit:
-        pin["release"] = old["release"]
     elif old.get("release"):
-        print(f"note: the pin moved, so the release ({old['release']['tag']}) is dropped; give --release")
+        # a fork's commit isn't the release's: the release stays until --release moves it
+        pin["release"] = old["release"]
+    if a.cli:
+        pin["cli"] = cli_assets(a.cli)
+    elif old.get("cli") and old.get("commit") == commit:
+        pin["cli"] = old["cli"]
+    elif old.get("cli"):
+        print(f"note: the pin moved, so our mitcad-cli build ({old['cli']['tag']}) is dropped: run the mitcad-cli workflow, then give --cli")
     PIN.write_text(json.dumps(pin, indent=2) + "\n")
     print(f"pinned {commit[:12]} ({pin['content_sha256'][:12]}…)")
 
