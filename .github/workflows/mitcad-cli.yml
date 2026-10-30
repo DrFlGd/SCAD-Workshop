@@ -112,20 +112,23 @@ jobs:
           path: C:\vb
           key: vcpkg-win-${{ steps.pin.outputs.vcpkg_key }}-${{ github.run_id }}
       - name: Check it runs inside the official release
+        id: check
         run: |
           New-Item -ItemType Directory -Force C:\o | Out-Null
           curl.exe -fsSL -o C:\o\release.zip "${{ steps.pin.outputs.zip }}"
           Expand-Archive C:\o\release.zip -DestinationPath C:\o
           $cli = Join-Path C:\o "${{ steps.pin.outputs.cli }}"
-          Copy-Item -Force C:\m\build\windows-release\tools\cli\mitcad-cli.exe $cli
-          & $cli version
-          if ($LASTEXITCODE -ne 0) { throw "mitcad-cli version failed ($LASTEXITCODE)" }
+          $built = (Get-ChildItem -Recurse -File C:\m\build\windows-release -Filter mitcad-cli.exe | Select-Object -First 1).FullName
+          "built=$built" >> $env:GITHUB_OUTPUT
+          Copy-Item -Force $built $cli
+          & $cli --help > $null
+          if ($LASTEXITCODE -ne 0) { throw "mitcad-cli --help failed ($LASTEXITCODE)" }
           & $cli run C:\m\tools\cli\tests\block_fillet_chamfer.json
           if ($LASTEXITCODE -ne 0) { throw "mitcad-cli run failed ($LASTEXITCODE)" }
       - name: Package
         run: |
           New-Item -ItemType Directory -Force out | Out-Null
-          Compress-Archive -Path C:\m\build\windows-release\tools\cli\mitcad-cli.exe -DestinationPath out\mitcad-cli-windows-x64.zip
+          Compress-Archive -Path "${{ steps.check.outputs.built }}" -DestinationPath out\mitcad-cli-windows-x64.zip
           Get-FileHash out\mitcad-cli-windows-x64.zip
       - uses: actions/upload-artifact@v4
         with:
@@ -226,7 +229,7 @@ jobs:
           CLI=~/o/${{ steps.pin.outputs.cli }}
           cp ~/m/build/linux-release/tools/cli/mitcad-cli "$CLI"
           export QT_QPA_PLATFORM=offscreen LD_LIBRARY_PATH=~/o/squashfs-root/usr/lib
-          "$CLI" version
+          "$CLI" --help > /dev/null
           "$CLI" run ~/m/tools/cli/tests/block_fillet_chamfer.json
       - name: Package
         run: |
