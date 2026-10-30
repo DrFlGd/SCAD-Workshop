@@ -31,5 +31,23 @@
         "cli": "squashfs-root/usr/bin/mitcad-cli"
       }
     }
+  },
+  "cli": {
+    "tag": "mitcad-cli-v0.36.0-9669078",
+    "page": "https://github.com/drflgd/scad-workshop/releases/tag/mitcad-cli-v0.36.0-9669078",
+    "assets": {
+      "windows-x64": {
+        "url": "https://github.com/drflgd/scad-workshop/releases/download/mitcad-cli-v0.36.0-9669078/mitcad-cli-windows-x64.zip",
+        "size": 49069180,
+        "sha256": "487a7c2003fbf67984df34d9566cbc186d075913c98403b3504dd5c404afcecc",
+        "program": "mitcad-cli.exe"
+      },
+      "linux-x64": {
+        "url": "https://github.com/drflgd/scad-workshop/releases/download/mitcad-cli-v0.36.0-9669078/mitcad-cli-linux-x64.tar.gz",
+        "size": 41804455,
+        "sha256": "bf57e1ff0127a9f7c51bf55981b04cf4fe4d0fefecba5a8f2cb8f5bc9aa2cc48",
+        "program": "mitcad-cli"
+      }
+    }
   }
 }
