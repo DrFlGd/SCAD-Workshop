@@ -1,0 +1,24 @@
+total 73124
+drwxr-xr-x  11 runner runner     4096 Nov  2 03:10 .
+drwxr-xr-x   3 runner runner     4096 Nov  2 03:07 ..
+-rw-r--r--   1 runner runner        0 Nov  2 03:07 .cargo-artifact-lock
+-rw-r--r--   1 runner runner        0 Nov  2 03:07 .cargo-build-lock
+-rw-r--r--   1 runner runner        0 Nov  2 03:07 .cargo-lock
+drwxr-xr-x 684 runner runner    49152 Nov  2 03:09 .fingerprint
+drwxr-xr-x 164 runner runner    12288 Nov  2 03:09 build
+drwxr-xr-x   4 runner runner     4096 Nov  2 03:11 bundle
+drwxr-xr-x   2 runner runner   126976 Nov  2 03:10 deps
+drwxr-xr-x   2 runner runner     4096 Nov  2 03:09 engine
+drwxr-xr-x   2 runner runner     4096 Nov  2 03:07 examples
+drwxr-xr-x   2 runner runner     4096 Nov  2 03:07 incremental
+drwxr-xr-x   9 runner runner     4096 Nov  2 03:09 libs
+-rw-r--r--   1 runner runner     8518 Nov  2 03:07 libworkshop_core.d
+-rw-r--r--   2 runner runner 15887838 Nov  2 03:07 libworkshop_core.rlib
+-rwxr-xr-x   2 runner runner 37622240 Nov  2 03:11 scad-workshop
+-rw-r--r--   1 runner runner    35282 Nov  2 03:10 scad-workshop.d
+drwxr-xr-x   4 runner runner     4096 Nov  2 03:09 site
+-rwxr-xr-x   2 runner runner 21097120 Nov  2 03:07 workshop-cli
+-rw-r--r--   1 runner runner     8592 Nov  2 03:07 workshop-cli.d
+ls: cannot access '/home/runner/work/_temp/home/.local/share': No such file or directory
+ls: cannot access '/home/runner/work/_temp/home/SCAD Workshop': No such file or directory
+ls: cannot access '/home/runner/work/_temp/home/SCAD Workshop/sources': No such file or directory
