@@ -1,0 +1,14 @@
+    Updating crates.io index
+ Downloading crates ...
+  Downloaded pulldown-cmark v0.13.6
+   Compiling mitcad-vec3 v0.0.0 (D:\a\SCAD-Workshop\SCAD-Workshop\desktop\core\mitcad\vec3)
+   Compiling mitcad-zip v0.0.0 (D:\a\SCAD-Workshop\SCAD-Workshop\desktop\core\mitcad\zip)
+   Compiling pulldown-cmark v0.13.6
+   Compiling mitcad-dump v0.0.0 (D:\a\SCAD-Workshop\SCAD-Workshop\desktop\core\mitcad\dump)
+   Compiling mitcad-asm v0.0.0 (D:\a\SCAD-Workshop\SCAD-Workshop\desktop\core\mitcad\asm)
+   Compiling mitcad-f3d-file v0.0.0 (D:\a\SCAD-Workshop\SCAD-Workshop\desktop\core\mitcad\f3d-file)
+   Compiling mitcad-f3d-names v0.0.0 (D:\a\SCAD-Workshop\SCAD-Workshop\desktop\core\mitcad\f3d-names)
+   Compiling mitcad-f3d-decode v0.0.0 (D:\a\SCAD-Workshop\SCAD-Workshop\desktop\core\mitcad\f3d-decode)
+   Compiling mitcad-f3d-design v0.0.0 (D:\a\SCAD-Workshop\SCAD-Workshop\desktop\core\mitcad\f3d-design)
+   Compiling workshop-core v0.4.30 (D:\a\SCAD-Workshop\SCAD-Workshop\desktop\core)
+    Finished `release` profile [optimized] target(s) in 2m 17s
