@@ -243,8 +243,20 @@ impl F3dFile {
             .collect()
     }
 
+    /// An entry of at most the zip reader's default limit (256 MiB): the
+    /// design streams, manifests, materials and display meshes.
     pub fn read(&self, name: &str) -> Result<Vec<u8>, ZipError> {
         self.archive.read_by_name(name)
+    }
+
+    /// An entry that may be larger than [`F3dFile::read`] takes, up to the
+    /// zip reader's [`LARGE_ENTRY_LIMIT`](crate::zip::LARGE_ENTRY_LIMIT):
+    /// the explicit opt-in for body blobs and the documents of an `.f3z`
+    /// package (mitcad#923). The ratio check still bounds it by the
+    /// entry's compressed size.
+    pub fn read_large(&self, name: &str) -> Result<Vec<u8>, ZipError> {
+        self.archive
+            .read_by_name_with_limit(name, crate::zip::LARGE_ENTRY_LIMIT)
     }
 
     /// Documents of an `.f3z` package (empty for an `.f3d`).
@@ -267,7 +279,7 @@ impl F3dFile {
     }
 
     pub fn open_document(&self, name: &str) -> Result<F3dFile, ZipError> {
-        F3dFile::from_bytes(self.read(name)?)
+        F3dFile::from_bytes(self.read_large(name)?)
     }
 
     /// The JSON of `Properties.dat` (after its u32 length), if present.

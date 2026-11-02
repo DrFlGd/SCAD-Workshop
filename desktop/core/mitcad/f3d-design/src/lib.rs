@@ -148,16 +148,30 @@ pub fn short_name(path: &Path) -> String {
 }
 
 /// The documents of a file with their labels: the file itself, or the
-/// `.f3d` entries of an `.f3z` package.
+/// `.f3d` entries of an `.f3z` package, all inflated at once. Where one
+/// at a time does, [`package`] opens them lazily (mitcad#923).
 pub fn documents(path: &Path) -> Result<Vec<(String, F3dFile)>, String> {
-    package(path).map(|p| p.documents)
+    package(path)?.into_documents()
 }
 
 /// The documents of a file ([`documents`]) and what an `.f3z` package says
 /// about them (mitcad#229, [`package::PackageDescription`]).
+///
+/// The documents of a package are inflated when they are opened
+/// ([`Package::open`], [`Package::documents`]), one at a time while each
+/// is dropped before the next is opened, never all when the package is
+/// read: an `.f3z` with many large designs must not hold them all in
+/// memory (mitcad#923).
 pub struct Package {
-    /// The documents with their labels.
-    pub documents: Vec<(String, F3dFile)>,
+    /// The file: the document itself, or the package holding them.
+    file: F3dFile,
+    /// The file's path, for messages.
+    path: String,
+    /// The documents' labels with their entries in a package (`None`: the
+    /// file itself).
+    entries: Vec<(String, Option<String>)>,
+    /// How many of the package's documents are open.
+    open: OpenCount,
     /// The root design's label, where `Manifest.json` names it.
     pub root: Option<String>,
     /// The designs `DesignDescription.json` lists that the package holds,
@@ -165,34 +179,192 @@ pub struct Package {
     pub described: Vec<(String, package::DescribedDesign)>,
 }
 
-/// [`documents`] with what an `.f3z` package says about them.
+/// How many documents of a [`Package`] are open now and at most so far.
+#[derive(Default)]
+struct OpenCount {
+    now: std::sync::atomic::AtomicUsize,
+    peak: std::sync::atomic::AtomicUsize,
+}
+
+impl OpenCount {
+    fn opened(&self) {
+        use std::sync::atomic::Ordering;
+        let now = self.now.fetch_add(1, Ordering::SeqCst) + 1;
+        self.peak.fetch_max(now, Ordering::SeqCst);
+    }
+
+    fn closed(&self) {
+        self.now.fetch_sub(1, std::sync::atomic::Ordering::SeqCst);
+    }
+}
+
+/// A document of a [`Package`], as an [`F3dFile`] (`Deref`): the file
+/// itself, or a document of an `.f3z` package, inflated while this is
+/// held.
+pub struct PackageDocument<'a> {
+    label: &'a str,
+    doc: Opened<'a>,
+}
+
+enum Opened<'a> {
+    File(&'a F3dFile),
+    /// A package's document and the count it is open in.
+    Nested(F3dFile, &'a OpenCount),
+}
+
+impl PackageDocument<'_> {
+    /// The document's label (see [`FileDesign::label`]).
+    pub fn label(&self) -> &str {
+        self.label
+    }
+}
+
+impl std::ops::Deref for PackageDocument<'_> {
+    type Target = F3dFile;
+
+    fn deref(&self) -> &F3dFile {
+        match &self.doc {
+            Opened::File(file) => file,
+            Opened::Nested(file, _) => file,
+        }
+    }
+}
+
+impl Drop for PackageDocument<'_> {
+    fn drop(&mut self) {
+        if let Opened::Nested(_, count) = &self.doc {
+            count.closed();
+        }
+    }
+}
+
+impl Package {
+    /// How many documents the file has.
+    pub fn len(&self) -> usize {
+        self.entries.len()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.entries.is_empty()
+    }
+
+    /// The documents' labels, in the package's order.
+    pub fn labels(&self) -> impl Iterator<Item = &str> + '_ {
+        self.entries.iter().map(|(label, _)| label.as_str())
+    }
+
+    /// The index of the document labelled `label`.
+    pub fn position(&self, label: &str) -> Option<usize> {
+        self.entries.iter().position(|(l, _)| l == label)
+    }
+
+    /// Opens the document `index`: a package's is inflated now, with the
+    /// zip reader's large entry limit (it holds the design's body blobs),
+    /// and held until the returned document is dropped.
+    pub fn open(&self, index: usize) -> Result<PackageDocument<'_>, String> {
+        let (label, entry) = self
+            .entries
+            .get(index)
+            .ok_or_else(|| format!("{}: no document {index}", self.path))?;
+        let doc = match entry {
+            None => Opened::File(&self.file),
+            Some(entry) => {
+                let doc = self
+                    .file
+                    .open_document(entry)
+                    .map_err(|e| format!("{}!{entry}: {e}", self.path))?;
+                self.open.opened();
+                Opened::Nested(doc, &self.open)
+            }
+        };
+        Ok(PackageDocument { label, doc })
+    }
+
+    /// The documents, each opened ([`Package::open`]) when the iterator
+    /// comes to it: one at a time unless the caller keeps them.
+    pub fn documents(&self) -> impl Iterator<Item = Result<PackageDocument<'_>, String>> + '_ {
+        (0..self.len()).map(move |index| self.open(index))
+    }
+
+    /// The document `index` with its label, owned (the file itself is
+    /// moved, not read again).
+    pub fn into_document(self, index: usize) -> Result<(String, F3dFile), String> {
+        let Package {
+            file,
+            path,
+            mut entries,
+            ..
+        } = self;
+        if index >= entries.len() {
+            return Err(format!("{path}: no document {index}"));
+        }
+        let (label, entry) = entries.swap_remove(index);
+        match entry {
+            None => Ok((label, file)),
+            Some(entry) => file
+                .open_document(&entry)
+                .map(|doc| (label, doc))
+                .map_err(|e| format!("{path}!{entry}: {e}")),
+        }
+    }
+
+    /// Every document with its label, all inflated at once ([`documents`]).
+    pub fn into_documents(self) -> Result<Vec<(String, F3dFile)>, String> {
+        let Package {
+            file,
+            path,
+            entries,
+            ..
+        } = self;
+        if let [(label, None)] = entries.as_slice() {
+            return Ok(vec![(label.clone(), file)]);
+        }
+        entries
+            .into_iter()
+            .filter_map(|(label, entry)| Some((label, entry?)))
+            .map(|(label, entry)| {
+                file.open_document(&entry)
+                    .map(|doc| (label, doc))
+                    .map_err(|e| format!("{path}!{entry}: {e}"))
+            })
+            .collect()
+    }
+
+    /// How many of the package's documents are open now (mitcad#923; the
+    /// file itself is not counted: it is read when the package is).
+    pub fn open_now(&self) -> usize {
+        self.open.now.load(std::sync::atomic::Ordering::SeqCst)
+    }
+
+    /// The most of the package's documents that were open at once.
+    pub fn peak_open(&self) -> usize {
+        self.open.peak.load(std::sync::atomic::Ordering::SeqCst)
+    }
+}
+
+/// The documents of a file and what an `.f3z` package says about them,
+/// without inflating any document of a package ([`Package`]).
 pub fn package(path: &Path) -> Result<Package, String> {
     let f = F3dFile::open(path).map_err(|e| format!("{}: {e}", path.display()))?;
     let name = short_name(path);
     let is_package = path.to_string_lossy().to_lowercase().ends_with(".f3z");
-    if !is_package {
-        return Ok(Package {
-            documents: vec![(name, f)],
-            root: None,
-            described: Vec::new(),
-        });
-    }
-    let description = package::PackageDescription::read(&f);
     let mut out = Package {
-        documents: Vec::new(),
+        file: f,
+        path: path.display().to_string(),
+        entries: Vec::new(),
+        open: OpenCount::default(),
         root: None,
         described: Vec::new(),
     };
-    for e in f.archive().entries() {
+    if !is_package {
+        out.entries.push((name, None));
+        return Ok(out);
+    }
+    let description = package::PackageDescription::read(&out.file);
+    for e in out.file.archive().entries() {
         if !e.name.to_lowercase().ends_with(".f3d") {
             continue;
         }
-        let data = f
-            .archive()
-            .read(e)
-            .map_err(|err| format!("{}!{}: {err}", path.display(), e.name))?;
-        let doc = F3dFile::from_bytes(data)
-            .map_err(|err| format!("{}!{}: {err}", path.display(), e.name))?;
         let prefix: String = e.name.chars().take(8).collect();
         let label = format!("{name}!{prefix}");
         if description
@@ -207,7 +379,7 @@ pub fn package(path: &Path) -> Result<Package, String> {
                 out.described.push((label.clone(), d.clone()));
             }
         }
-        out.documents.push((label, doc));
+        out.entries.push((label, Some(e.name.clone())));
     }
     Ok(out)
 }
@@ -286,25 +458,35 @@ pub fn resolve_derive_placements(
         .map_or(0, |dump| derive_sources::resolve(dump, documents))
 }
 
-/// Decodes every design of an `.f3d` or `.f3z` file.
+/// Decodes every design of an `.f3d` or `.f3z` file, one document inflated
+/// at a time.
 pub fn decode_path(path: &Path) -> Result<Vec<FileDesign>, String> {
-    documents(path)?
-        .iter()
-        .map(|(label, doc)| decode_document(doc, label))
+    package(path)?
+        .documents()
+        .map(|doc| {
+            let doc = doc?;
+            decode_document(&doc, doc.label())
+        })
         .collect()
 }
 
 #[cfg(test)]
 mod tests;
 
+/// The largest `Manifest.dat` [`manifest_guids`] reads: a manifest lists a
+/// few GUIDs and names (some KB in real files).
+pub const MANIFEST_LIMIT: u64 = 16 << 20;
+
 /// The GUIDs (lower case) the `Manifest.dat` files of a document list: an
 /// external document's `document_guid` (`ir::ExternalDocument`) is one of
-/// those of the file it refers to (mitcad#196).
+/// those of the file it refers to (mitcad#196). One manifest is inflated
+/// at a time, each to at most [`MANIFEST_LIMIT`]; a larger one is skipped
+/// (mitcad#923).
 pub fn manifest_guids(doc: &F3dFile) -> Vec<String> {
     let mut out = Vec::new();
     for e in doc.archive().entries() {
         if e.name.rsplit('/').next() == Some("Manifest.dat")
-            && let Ok(data) = doc.archive().read(e)
+            && let Ok(data) = doc.archive().read_with_limit(e, MANIFEST_LIMIT)
         {
             out.extend(build::guid_strings(&data));
         }

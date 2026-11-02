@@ -64,7 +64,7 @@ fn step_of(v: f64) -> f64 {
 /// not the bodies' history), so it runs at ingest beside OpenSCAD's settings export.
 pub fn read(path: &Path) -> Result<F3dInfo> {
     let package = mitcad_f3d_design::package(path).map_err(|e| anyhow!("{e}"))?;
-    let (_, doc, design) = choose(&package)?;
+    let (_, doc, design) = choose(package)?;
     let dump = design.dump.context("the file has no design segment")?;
     let mut info = F3dInfo { label: mitcad_f3d_design::short_name(path), writer: dump.generator.as_ref().and_then(|g| g.writer.clone()).unwrap_or_default(), ..Default::default() };
     info.timeline_items = dump.timeline_items().len();
@@ -108,38 +108,43 @@ pub fn read(path: &Path) -> Result<F3dInfo> {
 
 /// The design MitCad's importer would pick: an `.f3z` package's root design, else the one
 /// with the longest timeline (a plain `.f3d` has one). Its streams decoded, inputs not resolved.
-fn choose(package: &mitcad_f3d_design::Package) -> Result<(&str, &mitcad_f3d_file::F3dFile, mitcad_f3d_design::FileDesign)> {
-    let decode = |(l, d): &(String, mitcad_f3d_file::F3dFile)| mitcad_f3d_design::decode_streams(d, l).map_err(|e| anyhow!("{e}"));
-    if let Some(i) = package.root.as_ref().and_then(|r| package.documents.iter().position(|(l, _)| l == r)) {
-        let (l, d) = &package.documents[i];
-        return Ok((l, d, decode(&package.documents[i])?));
-    }
-    // (the last of the longest, as MitCad's `max_by_key`)
-    let mut best: Option<(usize, usize, mitcad_f3d_design::FileDesign)> = None;
-    for (i, doc) in package.documents.iter().enumerate() {
-        let design = decode(doc)?;
-        let items = design.dump.as_ref().map_or(0, |d| d.timeline_items().len());
-        if best.as_ref().is_none_or(|(_, n, _)| items >= *n) {
-            best = Some((i, items, design));
+/// A package's documents are opened one at a time, as MitCad's reader keeps them (0.4.30).
+fn choose(package: mitcad_f3d_design::Package) -> Result<(String, mitcad_f3d_file::F3dFile, mitcad_f3d_design::FileDesign)> {
+    let decode = |l: &str, d: &mitcad_f3d_file::F3dFile| mitcad_f3d_design::decode_streams(d, l).map_err(|e| anyhow!("{e}"));
+    let pick = match package.root.as_deref().and_then(|r| package.position(r)) {
+        Some(i) => i,
+        None if package.len() <= 1 => 0,
+        None => {
+            // (the last of the longest, as MitCad's `max_by_key`)
+            let mut best: Option<(usize, usize)> = None;
+            for (i, doc) in package.documents().enumerate() {
+                let doc = doc.map_err(|e| anyhow!("{e}"))?;
+                let design = decode(doc.label(), &doc)?;
+                let items = design.dump.as_ref().map_or(0, |d| d.timeline_items().len());
+                if best.is_none_or(|(_, n)| items >= n) {
+                    best = Some((i, items));
+                }
+            }
+            best.context("no design in the file")?.0
         }
-    }
-    let (i, _, design) = best.context("no design in the file")?;
-    let (l, d) = &package.documents[i];
+    };
+    let (l, d) = package.into_document(pick).map_err(|e| anyhow!("{e}"))?;
+    let design = decode(&l, &d)?;
     Ok((l, d, design))
 }
 
-/// The design as MitCad's importer reads it from the file, with our reader (and its patches,
-/// `desktop/core/mitcad/patches/`): the dump IR with the features' inputs found in the bodies'
+/// The design as MitCad's importer reads it from the file, with our reader (MitCad's, from our
+/// fork in `desktop/core/mitcad/PIN.json`, with any patches in `desktop/core/mitcad/patches/`): the dump IR with the features' inputs found in the bodies'
 /// history, as JSON for `mitcad-cli import-f3d --dump`. MitCad then replays our reading of the
 /// design instead of its own, so a fix in our reader needs no change to MitCad (0.4.28).
 /// Inputs in other documents (a design that derives from another file) aren't found here.
 pub fn design_dump(path: &Path, threads: usize) -> Result<String> {
     let package = mitcad_f3d_design::package(path).map_err(|e| anyhow!("{e}"))?;
-    let (_, doc, mut design) = choose(&package)?;
+    let (_, doc, mut design) = choose(package)?;
     if design.dump.is_none() {
         anyhow::bail!("the file has no design segment");
     }
-    mitcad_f3d_design::resolve_inputs(&mut design, doc, threads.max(1));
+    mitcad_f3d_design::resolve_inputs(&mut design, &doc, threads.max(1));
     Ok(serde_json::to_string(&design.dump)?)
 }
 

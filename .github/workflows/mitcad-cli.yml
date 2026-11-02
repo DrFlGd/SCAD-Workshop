@@ -1,0 +1,274 @@
+name: MitCad cli from our fork
+
+# Builds `mitcad-cli` from the MitCad fork and commit pinned in
+# desktop/core/mitcad/PIN.json (DrFlGd/Mitcad: the f3d reader and import
+# fixes waiting to go upstream) for Windows and Linux, checks it runs inside
+# the official release it is laid over (PIN.json "release": its Qt, OpenCascade
+# and other libraries), and publishes it as a prerelease of this repository,
+# `mitcad-cli-<release tag>-<commit>`, which Settings › Engine › Download MitCad
+# lays over the official download. MitCad has no CI of its own to do this.
+#
+# The first run builds MitCad's vcpkg libraries, Open Image Denoise and Cycles
+# (the render worker every MitCad build needs), hours; later runs take them from
+# the caches. Each job saves its caches even when it fails or times out, so a
+# run that runs out of time picks up where it stopped.
+on:
+  workflow_dispatch:
+  push:
+    branches: ["claude/**"]
+    paths: [".github/workflows/mitcad-cli.yml"]
+
+permissions:
+  contents: write
+
+jobs:
+  windows:
+    runs-on: windows-2022
+    timeout-minutes: 350
+    env:
+      # (VCPKG_ROOT is set after the MSVC environment, which points it at Visual Studio's vcpkg)
+      VCPKG_DEFAULT_BINARY_CACHE: C:\vb
+      MITCAD_RENDER_DEPS: C:\r
+      MITCAD_RENDER_JOBS: "4"
+      QT_ROOT_DIR: C:\Qt\6.12.0\msvc2022_64
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read the pin
+        id: pin
+        run: |
+          $pin = Get-Content desktop/core/mitcad/PIN.json | ConvertFrom-Json
+          $repo = $pin.repository
+          $commit = $pin.commit
+          git clone --quiet $repo C:\m
+          git -C C:\m checkout --quiet $commit
+          $pins = @{}
+          foreach ($line in Get-Content C:\m\tools\dev-env\versions.sh) {
+            if ($line -match '^([A-Z0-9_]+)="?([^"]*)"?$') { $pins[$Matches[1]] = $Matches[2] }
+          }
+          $hash = { param($paths) (Get-ChildItem -Recurse -File $paths | Sort-Object FullName | Get-FileHash).Hash -join '' }
+          $sha = [Security.Cryptography.SHA256]::Create()
+          $key = { param($s) (-join ($sha.ComputeHash([Text.Encoding]::UTF8.GetBytes($s)) | ForEach-Object { $_.ToString('x2') })).Substring(0, 16) }
+          $vcpkgKey = & $key ((& $hash @('C:\m\vcpkg.json', 'C:\m\third_party\vcpkg-ports')) + $pins.VCPKG_COMMIT)
+          $renderKey = & $key ($vcpkgKey + (& $hash @('C:\m\tools\dev-env\versions.sh', 'C:\m\tools\dev-env\build-cycles.ps1')))
+          "commit=$commit" >> $env:GITHUB_OUTPUT
+          "short=$($commit.Substring(0, 7))" >> $env:GITHUB_OUTPUT
+          "tag=$($pin.release.tag)" >> $env:GITHUB_OUTPUT
+          "zip=$($pin.release.assets.'windows-x64'.url)" >> $env:GITHUB_OUTPUT
+          "cli=$($pin.release.assets.'windows-x64'.cli)" >> $env:GITHUB_OUTPUT
+          "vcpkg_commit=$($pins.VCPKG_COMMIT)" >> $env:GITHUB_OUTPUT
+          "qt=$($pins.QT_VERSION)" >> $env:GITHUB_OUTPUT
+          "aqt=$($pins.AQT_SPEC)" >> $env:GITHUB_OUTPUT
+          "vcpkg_key=$vcpkgKey" >> $env:GITHUB_OUTPUT
+          "render_key=$renderKey" >> $env:GITHUB_OUTPUT
+          Get-PSDrive -PSProvider FileSystem | Format-Table Name, Used, Free
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+      - name: vcpkg
+        run: |
+          $env:VCPKG_ROOT = 'C:\v'
+          "VCPKG_ROOT=C:\v" >> $env:GITHUB_ENV
+          git clone --quiet https://github.com/microsoft/vcpkg $env:VCPKG_ROOT
+          git -C $env:VCPKG_ROOT checkout --quiet ${{ steps.pin.outputs.vcpkg_commit }}
+          & "$env:VCPKG_ROOT\bootstrap-vcpkg.bat" -disableMetrics
+          New-Item -ItemType Directory -Force $env:VCPKG_DEFAULT_BINARY_CACHE | Out-Null
+          python -m pip install --quiet ninja
+      - uses: actions/cache/restore@v4
+        with:
+          path: C:\vb
+          key: vcpkg-win-${{ steps.pin.outputs.vcpkg_key }}-${{ github.run_id }}
+          restore-keys: |
+            vcpkg-win-${{ steps.pin.outputs.vcpkg_key }}-
+            vcpkg-win-
+      - uses: actions/cache/restore@v4
+        id: render
+        with:
+          path: |
+            C:\r\install
+            C:\r\build\cycles\compile_commands.json
+          key: render2-win-${{ steps.pin.outputs.render_key }}
+      - name: Qt
+        run: |
+          python -m pip install --quiet "${{ steps.pin.outputs.aqt }}"
+          python -m aqt install-qt windows desktop ${{ steps.pin.outputs.qt }} win64_msvc2022_64 -O C:\Qt
+          Test-Path "$env:QT_ROOT_DIR\bin\Qt6Core.dll"
+      - name: Render worker libraries (Open Image Denoise, Cycles)
+        run: C:\m\tools\dev-env\build-cycles.ps1 -Prefix $env:MITCAD_RENDER_DEPS
+      - uses: actions/cache/save@v4
+        if: steps.render.outputs.cache-hit != 'true'
+        with:
+          path: |
+            C:\r\install
+            C:\r\build\cycles\compile_commands.json
+          key: render2-win-${{ steps.pin.outputs.render_key }}
+      - name: Configure
+        working-directory: C:\m
+        run: cmake --preset windows-release -DMITCAD_COMPILER_CACHE=OFF
+      - name: Build mitcad-cli
+        working-directory: C:\m
+        run: cmake --build build/windows-release --target mitcad-cli
+      - uses: actions/cache/save@v4
+        if: always()
+        with:
+          path: C:\vb
+          key: vcpkg-win-${{ steps.pin.outputs.vcpkg_key }}-${{ github.run_id }}
+      - name: Check it runs inside the official release
+        id: check
+        run: |
+          New-Item -ItemType Directory -Force C:\o | Out-Null
+          curl.exe -fsSL -o C:\o\release.zip "${{ steps.pin.outputs.zip }}"
+          Expand-Archive C:\o\release.zip -DestinationPath C:\o
+          $cli = Join-Path C:\o "${{ steps.pin.outputs.cli }}"
+          $built = (Get-ChildItem -Recurse -File C:\m\build\windows-release -Filter mitcad-cli.exe | Select-Object -First 1).FullName
+          "built=$built" >> $env:GITHUB_OUTPUT
+          Copy-Item -Force $built $cli
+          & $cli --help > $null
+          if ($LASTEXITCODE -ne 0) { throw "mitcad-cli --help failed ($LASTEXITCODE)" }
+          & $cli run C:\m\tools\cli\tests\block_fillet_chamfer.json
+          if ($LASTEXITCODE -ne 0) { throw "mitcad-cli run failed ($LASTEXITCODE)" }
+      - name: Package
+        run: |
+          New-Item -ItemType Directory -Force out | Out-Null
+          Compress-Archive -Path "${{ steps.check.outputs.built }}" -DestinationPath out\mitcad-cli-windows-x64.zip
+          Get-FileHash out\mitcad-cli-windows-x64.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mitcad-cli-windows-x64
+          path: out/mitcad-cli-windows-x64.zip
+    outputs:
+      tag: ${{ steps.pin.outputs.tag }}
+      short: ${{ steps.pin.outputs.short }}
+      commit: ${{ steps.pin.outputs.commit }}
+
+  linux:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 350
+    env:
+      VCPKG_ROOT: /home/runner/v
+      VCPKG_DEFAULT_BINARY_CACHE: /home/runner/vb
+      MITCAD_RENDER_DEPS: /home/runner/r
+      MITCAD_RENDER_JOBS: "4"
+      QT_ROOT_DIR: /home/runner/Qt/6.12.0/gcc_64
+    steps:
+      - uses: actions/checkout@v4
+      - name: Room on the disk
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+          df -h /
+      - name: Read the pin
+        id: pin
+        run: |
+          read -r REPO COMMIT TAG URL CLI < <(python3 -c 'import json;p=json.load(open("desktop/core/mitcad/PIN.json"));a=p["release"]["assets"]["linux-x64"];print(p["repository"],p["commit"],p["release"]["tag"],a["url"],a["cli"])')
+          git clone --quiet "$REPO" ~/m
+          git -C ~/m checkout --quiet "$COMMIT"
+          . ~/m/tools/dev-env/versions.sh
+          VK=$( (cat ~/m/vcpkg.json; find ~/m/third_party/vcpkg-ports -type f | sort | xargs cat; echo "$VCPKG_COMMIT") | sha256sum | cut -c1-16)
+          RK=$( (echo "$VK"; cat ~/m/tools/dev-env/versions.sh ~/m/tools/dev-env/build-cycles.sh) | sha256sum | cut -c1-16)
+          {
+            echo "commit=$COMMIT"; echo "tag=$TAG"; echo "url=$URL"; echo "cli=$CLI"
+            echo "vcpkg_commit=$VCPKG_COMMIT"; echo "qt=$QT_VERSION"; echo "aqt=$AQT_SPEC"
+            echo "vcpkg_key=$VK"; echo "render_key=$RK"
+          } >> "$GITHUB_OUTPUT"
+      - name: System packages
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq build-essential cmake ninja-build pkg-config git curl zip unzip tar \
+            autoconf autoconf-archive automake libtool python3-venv bison flex \
+            libgl1-mesa-dev libegl1-mesa-dev libx11-dev libxext-dev libxi-dev libxrandr-dev \
+            libxcursor-dev libxinerama-dev libxkbcommon-dev libxkbcommon-x11-0 libxcb-cursor0 \
+            libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-render-util0 libxcb-xinerama0 \
+            libxcb-xkb1 libxcb-shape0 libxcb-randr0 libfontconfig1-dev libfreetype-dev libdbus-1-3 \
+            libsecret-1-dev libopengl0 libegl1
+      - name: vcpkg
+        run: |
+          git clone --quiet https://github.com/microsoft/vcpkg "$VCPKG_ROOT"
+          git -C "$VCPKG_ROOT" checkout --quiet ${{ steps.pin.outputs.vcpkg_commit }}
+          "$VCPKG_ROOT/bootstrap-vcpkg.sh" -disableMetrics
+          mkdir -p "$VCPKG_DEFAULT_BINARY_CACHE"
+      - uses: actions/cache/restore@v4
+        with:
+          path: /home/runner/vb
+          key: vcpkg-linux-${{ steps.pin.outputs.vcpkg_key }}-${{ github.run_id }}
+          restore-keys: |
+            vcpkg-linux-${{ steps.pin.outputs.vcpkg_key }}-
+            vcpkg-linux-
+      - uses: actions/cache/restore@v4
+        id: render
+        with:
+          path: |
+            /home/runner/r/install
+            /home/runner/r/build/cycles/compile_commands.json
+          key: render2-linux-${{ steps.pin.outputs.render_key }}
+      - name: Qt
+        run: |
+          python3 -m venv ~/aqt
+          ~/aqt/bin/pip install --quiet "${{ steps.pin.outputs.aqt }}"
+          ~/aqt/bin/aqt install-qt linux desktop ${{ steps.pin.outputs.qt }} linux_gcc_64 -O ~/Qt
+          test -e "$QT_ROOT_DIR/lib/libQt6Core.so.6"
+      - name: Render worker libraries (Open Image Denoise, Cycles)
+        run: ~/m/tools/dev-env/build-cycles.sh "$MITCAD_RENDER_DEPS"
+      - uses: actions/cache/save@v4
+        if: steps.render.outputs.cache-hit != 'true'
+        with:
+          path: |
+            /home/runner/r/install
+            /home/runner/r/build/cycles/compile_commands.json
+          key: render2-linux-${{ steps.pin.outputs.render_key }}
+      - name: Configure
+        working-directory: /home/runner/m
+        run: cmake --preset linux-release -DMITCAD_COMPILER_CACHE=OFF
+      - name: Build mitcad-cli
+        working-directory: /home/runner/m
+        run: cmake --build build/linux-release --target mitcad-cli
+      - uses: actions/cache/save@v4
+        if: always()
+        with:
+          path: /home/runner/vb
+          key: vcpkg-linux-${{ steps.pin.outputs.vcpkg_key }}-${{ github.run_id }}
+      - name: Check it runs inside the official release
+        run: |
+          mkdir -p ~/o && cd ~/o
+          curl -fsSL -o Mitcad.AppImage "${{ steps.pin.outputs.url }}"
+          chmod +x Mitcad.AppImage
+          ./Mitcad.AppImage --appimage-extract > /dev/null
+          CLI=~/o/${{ steps.pin.outputs.cli }}
+          cp ~/m/build/linux-release/tools/cli/mitcad-cli "$CLI"
+          export QT_QPA_PLATFORM=offscreen LD_LIBRARY_PATH=~/o/squashfs-root/usr/lib
+          "$CLI" --help > /dev/null
+          "$CLI" run ~/m/tools/cli/tests/block_fillet_chamfer.json
+      - name: Package
+        run: |
+          mkdir -p out
+          strip -o out/mitcad-cli ~/m/build/linux-release/tools/cli/mitcad-cli
+          tar -C out -czf out/mitcad-cli-linux-x64.tar.gz mitcad-cli
+          sha256sum out/mitcad-cli-linux-x64.tar.gz
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mitcad-cli-linux-x64
+          path: out/mitcad-cli-linux-x64.tar.gz
+
+  publish:
+    needs: [windows, linux]
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: out
+          merge-multiple: true
+      - name: Prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: mitcad-cli-${{ needs.windows.outputs.tag }}-${{ needs.windows.outputs.short }}
+        run: |
+          cd out
+          sha256sum * | tee SHA256SUMS
+          NOTES="mitcad-cli built from ${{ github.server_url }}/drflgd/mitcad/commit/${{ needs.windows.outputs.commit }}, to lay over the official MitCad ${{ needs.windows.outputs.tag }} download. Built by ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}."
+          if gh release view "$TAG" -R "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
+            gh release upload "$TAG" * --clobber -R "$GITHUB_REPOSITORY"
+          else
+            gh release create "$TAG" * --prerelease --latest=false --target "$GITHUB_SHA" \
+              --title "$TAG" --notes "$NOTES" -R "$GITHUB_REPOSITORY"
+          fi

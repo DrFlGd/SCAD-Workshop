@@ -987,9 +987,11 @@ pub fn parse_parameter(seg: &Segment, o: &Object) -> Option<ParameterEntry> {
     // parameter keeps its comment as a str16 right at the start, before
     // the number, so the gap is the comment's length (and may exceed 24).
     let v5_comment = if version <= 6 {
-        [p, p + 1]
-            .into_iter()
-            .find_map(|start| str16_at(d, start).filter(|(c, _)| !c.is_empty() && unicode::is_printable(c)).map(|(c, q)| (c, q - p)))
+        [p, p + 1].into_iter().find_map(|start| {
+            str16_at(d, start)
+                .filter(|(c, _)| !c.is_empty() && unicode::is_printable(c))
+                .map(|(c, q)| (c, q - p))
+        })
     } else {
         None
     };

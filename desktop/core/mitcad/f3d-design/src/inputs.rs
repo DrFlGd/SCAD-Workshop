@@ -2358,7 +2358,7 @@ fn find_in_stored(
     let mut hits: Vec<(String, Fingerprint, usize)> = Vec::new();
     let mut why = String::new();
     for b in doc.body_blobs().into_iter().filter(|b| !b.history) {
-        let Ok(data) = doc.read(&b.entry) else {
+        let Ok(data) = doc.read_large(&b.entry) else {
             continue;
         };
         let Ok(file) = AsmFile::parse(&data) else {
@@ -2748,7 +2748,7 @@ fn history_blobs(doc: &F3dFile) -> Vec<Blob> {
         .into_iter()
         .filter(|b| b.history)
         .filter_map(|b| {
-            let data = doc.read(&b.entry).ok()?;
+            let data = doc.read_large(&b.entry).ok()?;
             let file = AsmFile::parse(&data).ok()?;
             let history = History::parse(&file).ok().flatten()?;
             let entry = b.entry.rsplit('/').next().unwrap_or(&b.entry).to_owned();

@@ -374,6 +374,11 @@ pub const SKETCH_CURVE_ID: &str = "E2CEFD18-D755-4E09-8E7F-953A2F6D43F8";
 /// The sketch point an entity input names: `u64 sketch | u64 point tag`
 /// (the point's `pt_tag`).
 pub const SKETCH_POINT_ID: &str = "D95DBAC0-238B-4429-A0AD-4AE5BEE79ADF";
+/// A sketch feature's record of one entity projected into its sketch: an
+/// input slot ([`INPUT_SLOT`]) with the source's entity input
+/// ([`ENTITY_REF`]), as `mitcad_f3d_design::build`'s `projection_sources`
+/// reads it. Not in [`KNOWN`].
+pub const SKETCH_PROJECTION: &str = "F1451EC8-11A4-4952-84ED-5AB7C13E2E83";
 
 /// Sketch point classes.
 pub fn is_point_class(guid: Option<&str>) -> bool {
