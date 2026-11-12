@@ -404,7 +404,7 @@ async fn site_finish(mut a: Args) -> Result<()> {
         for m in native {
             let mut files = plan.common_files.clone();
             files.extend(m.files.clone());
-            let req = workshop_core::RenderRequest { model: m.key.clone(), entry: m.entry.clone(), files, values: Default::default(), defines: vec![], call: None, format: None, engine: None };
+            let req = workshop_core::RenderRequest { model: m.key.clone(), entry: m.entry.clone(), files, values: Default::default(), defines: vec![], call: None, format: None };
             let v = match r.export_params(&req).await {
                 Ok(v) => v,
                 Err(e) => json!({ "error": format!("{}\n{}", e.message, e.logs.join("\n")) }),
@@ -655,7 +655,7 @@ async fn serve(mut a: Args) -> Result<()> {
                             match res {
                                 Ok(out) => {
                                     let mut evs = events.lock().unwrap().clone();
-                                    evs.push(json!({ "type": "done", "ms": out.ms, "cached": out.cached, "format": out.format, "warning": out.warning, "logs": out.logs.iter().rev().take(50).rev().collect::<Vec<_>>() }));
+                                    evs.push(json!({ "type": "done", "ms": out.ms, "cached": out.cached, "format": out.format, "logs": out.logs.iter().rev().take(50).rev().collect::<Vec<_>>() }));
                                     respond(&mut stream, 200, "application/octet-stream", &[("x-events", serde_json::to_string(&evs)?)], &out.stl)
                                 }
                                 // a cancelled render isn't a server error (the page cancels when you move on)
