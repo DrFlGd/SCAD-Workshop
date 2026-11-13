@@ -1183,6 +1183,12 @@ async def main():
             await pg.goto(B + "#/settings")
             await pg.wait_for_selector("#ls-appearance")
             toc = await pg.eval_on_selector_all("#about-body .ls-toc a", "els => els.map((e) => e.textContent)")
+            # (Review 7, item 13) Settings and Licenses are Preact pages; a licence row asked for is marked
+            await pg.goto(B + "#/licenses/components-BOSL2")
+            await pg.wait_for_selector("#lic-components-BOSL2.focus")
+            lic = await pg.evaluate("() => [[...document.querySelectorAll('#about-body h2')].map((h) => h.textContent), document.querySelector('#lic-components-BOSL2 td').textContent]")
+            check("Licenses lists the projects, parts packs and component libraries, the one asked for marked",
+                  lic[0] == ["Parametric Models", "Parts Library", "Components", "This app"] and lic[1] != "Not stated", lic)
             await pg.goto(B + "#/m/anylid/lid")
             await pg.wait_for_selector("#p-Mirror_X")
             cols = await pg.evaluate("() => ['#p-Mirror_X', '#p-Width_Units'].map((s) => Math.round(document.querySelector(s).getBoundingClientRect().left))")

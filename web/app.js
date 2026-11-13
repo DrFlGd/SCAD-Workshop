@@ -14,6 +14,7 @@ import { setContext } from "./ui/context.js";
 import { html, render } from "./lib/html.js";
 import { LibrarySettingsPage } from "./ui/libsettings.js";
 import { SettingsPage, applyProfile, preferredFormat } from "./ui/settings.js";
+import { LicensesPage } from "./ui/licenses.js";
 import { unflagItems } from "./ui/actions.js";
 import { saveComponentThumb, when, sourceById, rescanLocal, madeFrom } from "./ui/library.js";
 import { ui, recordRecent, setTabs, layoutFor, isDark } from "./ui/state.js";
@@ -1986,42 +1987,10 @@ function showLicenses(focus) {
   showView("about");
   $("#about-title").textContent = "Licenses & credits";
   document.title = "Licenses & credits | SCAD Workshop";
-  const c = state.catalog;
-  const fams = (c?.families || []).filter((f) => f.status !== "missing-source").sort((a, b) => a.name.localeCompare(b.name));
-  const row = (id, name, what, authors, lic, source) => el("tr", { id: `lic-${id}`, class: id === focus ? "focus" : null },
-    el("th", { scope: "row" }, el("div", { class: "lic-name" }, el("b", { text: name }), el("span", { class: "muted", text: what }))),
-    el("td", { text: authors || "Not stated" }),
-    el("td", { text: spdx(lic) }),
-    el("td", {}, el("span", { class: `badge ${lic?.public_use || "ok"}`, text: STATUS_TEXT[lic?.public_use || "ok"] }),
-      lic?.notes ? el("span", { class: "lic-note", text: lic.notes }) : null),
-    el("td", {}, source ? el("a", { href: source, target: "_blank", rel: "noopener", text: "Source" }) : "Supplied file"));
-  const table = (rows) => el("div", { class: "lic-wrap" }, el("table", { class: "lic-table" },
-    el("thead", {}, el("tr", {}, ["Project", "Authors", "License", "Status", "Source"].map((h) => el("th", { scope: "col", text: h })))),
-    el("tbody", {}, rows)));
-  const review = fams.filter((f) => f.license?.public_use && f.license.public_use !== "ok");
-  showPage([
-    el("p", { text: "Every model and part here is someone else's open work, credited below with its license. Generated files carry the same license as the project that made them." }),
-    review.length ? el("p", { class: "lic-summary" },
-      `${review.length} project${review.length > 1 ? "s need" : " needs"} a license check before files are shared or sold: `,
-      ...review.flatMap((f, i) => [i ? ", " : "", el("a", { href: `#/licenses/${f.id}`, text: f.name })]), ".") : null,
-    el("h2", { text: "Parametric Models" }),
-    table(fams.map((f) => row(f.id, f.name, (f.models || []).join(", "), (f.authors || []).map((a) => a.name).join(", "), f.license, f.source))),
-    el("h2", { text: "Parts Library" }),
-    table(state.libraries.map((l) => row(l.id, l.name, `${l.item_count} parts`, (l.authors || []).map((a) => a.name).join(", "), l.license, l.source_url))),
-    ...(c?.component_libraries?.length ? [el("h2", { text: "Components" }),
-      table(c.component_libraries.filter((l) => l.active).map((l) => row(`components-${l.name}`, l.name, l.provider === "project" ? "Your copy" : "Comes with the app",
-        (l.authors || []).join(", "), { spdx: l.license || "NOASSERTION", public_use: l.license ? "ok" : "review" }, l.repo ? `https://github.com/${l.repo}` : null)))] : []),
-    el("h2", { text: "This app" }),
-    el("ul", {},
-      el("li", {}, `OpenSCAD ${c?.engine || ""} makes every part on this computer. GNU GPL version 2 or later: `,
-        el("a", { href: "https://github.com/openscad/openscad", target: "_blank", rel: "noopener", text: "source code" }), ", ",
-        el("a", { href: "engine/COPYING", target: "_blank", text: "license text" }), "."),
-      el("li", { text: "3D preview: three.js (MIT). Interface: Preact (MIT) and htm (Apache-2.0)." }),
-      el("li", { text: "Fonts for text on parts: Liberation Sans and Liberation Mono (SIL Open Font License 1.1)." }),
-      el("li", { text: "Nothing you configure is sent to a server; the app works offline, except for adding and updating projects from the web." }))]);
-  const target = focus && document.getElementById(`lic-${focus}`);
-  if (target) requestAnimationFrame(() => target.scrollIntoView({ block: "center" }));
-  else window.scrollTo(0, 0);
+  const box = el("div", { id: "licenses-page" });
+  showPage([box]);
+  render(html`<${LicensesPage} focus=${focus} />`, box);
+  mountedPage = box;
 }
 
 // ---------------------------------------------------------------- viewer tools
