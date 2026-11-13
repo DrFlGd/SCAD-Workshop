@@ -18,7 +18,7 @@ After the Fusion support was removed, the owner asked for a review of the app as
 | 14 | Leftovers: unused commands, clippy, stale comments, old branches | Done, except deleting the branches `archive/server-v1`, `ci-screenshots`, `vendor-markdown` and `wip-0.4.3` (the session can't; the owner's to do) |
 | 15 | Docs: README, FEATURES.md, the agent notes, this plan's history | Done |
 | 2 | Batch generate varies each part of a paired setting (a bin's Width in units), guesses from the first group, leaves out hidden and debug settings | Done |
-| 4 | More components start on their own (NopSCADlib types with their other values guessed; MCAD) | |
+| 4 | More components start on their own (NopSCADlib types with their other values guessed; MCAD) | Done: 509 of 800 start (438), none fail (7) |
 | 6 | Component pictures made by CI and shipped with the app | |
 | 1 | Windows renders about 8 times slower than Linux: measure on the Windows runner, fix, then drop the race against the WebAssembly engine | |
 | 10 | The website half of the front end removed (`platform.js`'s browser branch, `store-browser.js`) | |

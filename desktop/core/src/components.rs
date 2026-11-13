@@ -20,7 +20,7 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
 
 /// Version of the index format (bump to read libraries again). 2: `listed` (choices from the docs).
-/// 3: a module's own list of types (`threaded_inserts`) before its file's.
+/// 3: a module's own list of types (`threaded_inserts`) before its file's; guesses beside a type.
 pub const FORMAT: u64 = 3;
 
 /// Files a library keeps (as tools/fetch_libraries.py): OpenSCAD files and the data files they import.
@@ -1879,12 +1879,15 @@ pub fn index_library(info: &LibInfo, root: &Path, curated: Option<&Value>, no_gu
     }
     // (documented libraries have their own examples: no guessing there)
     for c in comps.iter_mut().filter(|c| style != "docs" && c.examples.iter().all(|e| e.calls.is_empty()) && !c.hold) {
-        let required: Vec<&String> = c.args.iter().filter(|a| a.1.is_none()).map(|a| &a.0).collect();
+        // (a type from its file's list starts at the list's first entry: Review 7, item 4)
+        let required: Vec<String> = c.args.iter().filter(|a| a.1.is_none() && !c.choices.contains_key(&a.0)).map(|a| a.0.clone()).collect();
         if required.is_empty() {
             continue;
         }
+        let listed: Vec<(String, String)> = c.args.iter().filter(|a| a.1.is_none()).filter_map(|a| c.choices.get(&a.0).and_then(|l| l.first()).map(|f| (a.0.clone(), f.clone()))).collect();
         let guesses: Option<BTreeMap<String, String>> = required.iter().map(|n| guess_value(n).map(|v| (n.to_string(), v.to_string()))).collect();
-        if let Some(call) = guesses {
+        if let Some(mut call) = guesses {
+            call.extend(listed);
             let code = format!("{}({});", c.module, call.iter().map(|(k, v)| format!("{k}={v}")).collect::<Vec<_>>().join(", "));
             c.examples.push(Example { title: "Guessed start values".into(), code, calls: vec![call], flat: false });
         }
@@ -2085,15 +2088,20 @@ fn guess_value(name: &str) -> Option<&'static str> {
     let last = t.last()?.as_str();
     let has = |k: &[&str]| t.iter().any(|w| k.contains(&w.as_str()));
     Some(match last {
-        "r" | "radius" | "rad" => "10",
-        "d" | "dia" | "diam" | "diameter" => "20",
+        "r" | "radius" | "rad" | "r1" | "or" => "10",
+        "r2" | "ir" => "5",
+        "d" | "dia" | "diam" | "diameter" | "d1" => "20",
+        "d2" => "10",
         "h" | "height" | "z" => "10",
         "l" | "len" | "length" => "20",
-        "w" | "width" | "x" | "y" => "20",
+        "w" | "width" | "x" | "y" | "side" => "20",
+        "size" => "[20, 20, 10]",
         "depth" => "10",
         "thickness" | "thick" | "wall" => "2",
         "teeth" => "20",
         "n" | "count" | "sides" | "segments" | "number" => "6",
+        "ways" => "4",
+        "colour" | "color" => "\"silver\"",
         "angle" | "ang" => "45",
         "pitch" => "2",
         "pos" | "position" | "offset" | "translation" => "[0, 0, 0]",
@@ -2784,7 +2792,7 @@ module block(width=1, length=2, height=1, type="brick", reinforcement=false, stu
         let dir = std::env::temp_dir().join(format!("types-test-{}", std::process::id()));
         let files = [
             ("core.scad", "// core\n"),
-            ("vitamins/insert.scad", "module insert(type) { //! Draw an insert\n cube(type[1]); }\nmodule threaded_insert(type) { //! Draw a threaded insert\n cube(type[1]); }\n"),
+            ("vitamins/insert.scad", "module insert(type) { //! Draw an insert\n cube(type[1]); }\nmodule threaded_insert(type) { //! Draw a threaded insert\n cube(type[1]); }\nmodule insert_hole(type, length) { //! Draw a hole for an insert\n cylinder(r = type[1], h = length); }\n"),
             ("vitamins/inserts.scad", "F1BM2 = [\"F1BM2\", 3];\nM3x8 = [\"M3x8\", 4];\ninserts = [F1BM2];\nthreaded_inserts = [M3x8];\nuse <insert.scad>\n"),
             ("vitamins/battery.scad", "module battery(type) { //! Draw a battery\n cube(type[1]); }\nmodule battery_contact(type, pos = true) { //! Draw a contact\n cube(type[1]); }\n"),
             ("vitamins/batteries.scad", "AACELL = [\"AACELL\", 5];\nbcontact = [\"bcontact\", 1];\nbatteries = [AACELL];\nuse <battery.scad>\n"),
@@ -2802,6 +2810,9 @@ module block(width=1, length=2, height=1, type="brick", reinforcement=false, stu
         assert_eq!(choices("threaded_insert"), Some(json!({ "type": ["M3x8"] })));
         assert_eq!(choices("battery"), Some(json!({ "type": ["AACELL"] })));
         assert_eq!(choices("battery_contact"), Some(json!({})));
+        // (item 4) a type from the list beside a value guessed from its name: a start of its own
+        let start = index["components"].as_array().unwrap().iter().find(|c| c["module"] == "insert_hole").map(|c| c["examples"][0]["code"].clone());
+        assert_eq!(start, Some(json!("insert_hole(length=20, type=F1BM2);")));
     }
 
     #[test]

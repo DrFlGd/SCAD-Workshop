@@ -102,6 +102,17 @@
     "futabas3003": {
       "position": "[0, 0, 0]",
       "rotation": "[0, 0, 0]"
+    },
+    "donutSlice": {
+      "innerSize": "10",
+      "outerSize": "20",
+      "start_angle": "0",
+      "end_angle": "90"
+    },
+    "pieSlice": {
+      "size": "20",
+      "start_angle": "0",
+      "end_angle": "90"
     }
   },
   "Round-Anything": {
@@ -146,6 +157,14 @@
     },
     "pot_nut": {
       "type": "KY_040_encoder"
+    },
+    "rounded_rectangle": {
+      "size": "[30, 20, 5]",
+      "r": "3"
+    },
+    "rounded_square": {
+      "size": "[30, 20]",
+      "r": "3"
     }
   },
   "$no_guess": {
@@ -176,10 +195,14 @@
       "extrusion_corner_bracket_assembly",
       "poly_cylinder",
       "poly_drill",
+      "poly_ring",
+      "poly_tube",
+      "ribbon_cable",
       "screw_countersink",
       "screw_polysink",
       "screw_tearsink",
       "sector",
+      "sliding_ball_t_nut",
       "slot",
       "smd_coax",
       "solder",
