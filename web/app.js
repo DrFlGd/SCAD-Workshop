@@ -1,5 +1,6 @@
-// SCAD Workshop front end (static): catalog, settings forms with
-// upstream editor metadata, in-browser OpenSCAD renders, 3D preview, parts.
+// SCAD Workshop's page script: routing, the model page (settings form, 3D preview,
+// downloads, Batch generate, saved settings), Settings and Licenses & credits. The
+// browse views, sidebar, tabs and dialogs are Preact islands in web/ui/.
 import { Viewer } from "./viewer.js";
 import { createPlatform } from "./platform.js";
 import { makeZip } from "./zip.js";
@@ -181,6 +182,20 @@ function closeModelTab(key) {
 function openTabs(keys) {
   setTabs([...new Set([...ui.get().tabs, ...keys])]);
   if (keys.length) location.hash = `#/m/${keys[0]}`;
+}
+
+/** A link or a tab to a model that isn't in the library: say so, with nothing to make (Review 7, item 3). */
+function showMissing(key) {
+  const tabs = ui.get().tabs;
+  if (tabs.includes(key)) { tabStates.delete(key); setTabs(tabs.filter((k) => k !== key), null); }
+  showView("about");
+  document.title = "Not in the library | SCAD Workshop";
+  $("#about-title").textContent = "This model isn't in the library";
+  showPage([
+    el("p", { id: "model-missing" }, "Nothing in the library is called ", el("code", { text: key }),
+      ". It may have been removed, or its project read again under other names."),
+    el("p", {}, el("a", { href: ui.get().lastBrowse || "#/", text: "Back to the library" })),
+  ]);
 }
 
 /** One of a folder of examples made into parts (F-15): not listed as a model, but its page opens. */
@@ -423,10 +438,9 @@ async function openModel(key, shareCode = null, savedId = null, made = null) {
   try {
     detail = await loadDetail(key);
   } catch (e) {
+    if (e.status === 404 && !(platform.kind === "browser" && state.desktopOnly?.has(key))) { showMissing(key); return; }
     showView("model");
-    setStatus("error", e.status === 404 ? (platform.kind === "browser" && state.desktopOnly?.has(key)
-      ? "This model is too complex for the browser engine. It works in the desktop app."
-      : "This model doesn't exist. Pick one from the library.") : e.message);
+    setStatus("error", e.status === 404 ? "This model is too complex for the browser engine. It works in the desktop app." : e.message);
     return;
   }
   if (detail.browser === false && platform.kind === "browser") {
@@ -2207,11 +2221,8 @@ function desktopSettings() {
   const info = platform.info || {};
   const gb = (n) => (n == null ? "unknown" : bytes(n));
   const cacheLine = el("span", { text: gb(info.cache_bytes) });
+  // (the library folder and everything about it: Library settings; Review 7, item 9)
   return [
-    section("library", "Library", null,
-    el("p", {}, "Library folder: ", el("code", { text: info.library?.path || info.workspace || "not available" }), ". ",
-      el("a", { href: "#/library-settings", id: "settings-library-link", text: "Library settings" }),
-      " has projects, categories, hidden and deleted items, the trash and updates.")),
     section("engine", "Engine", null,
     info.engine
       ? el("p", {}, `OpenSCAD ${info.engine}, native, up to ${info.concurrency || 1} render${info.concurrency > 1 ? "s" : ""} at once. `, el("br"), el("code", { text: info.engine_path || "" }))

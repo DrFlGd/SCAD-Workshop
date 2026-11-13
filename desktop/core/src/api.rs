@@ -1564,12 +1564,6 @@ impl App {
                     app.read_project(&id, None, Some(&job)).await
                 })))
             }
-            "defaults_clear" => {
-                let lib = self.library()?;
-                lib.clear_checks(arg(&args, "source").map_err(e2s)?).map_err(e2s)?;
-                self.invalidate();
-                j(Value::Null)
-            }
             "icon_import" => {
                 // { category, path }: an image of your own as a category's icon, copied into the library's icons/ folder
                 let lib = self.library()?;
@@ -1654,17 +1648,6 @@ impl App {
                 crate::merge::resolve(&lib, &args["choices"]).map_err(e2s)?;
                 self.invalidate();
                 j(Value::Null)
-            }
-            "render_default" => {
-                // render a model at its defaults (tests and the starter check)
-                let key = arg(&args, "key").map_err(e2s)?;
-                let c = self.catalog()?;
-                let model = c.models.get(key).ok_or_else(|| format!("no model {key}"))?;
-                let req = crate::render::default_request(model, &c.catalog["common_files"]).map_err(e2s)?;
-                let r = self.renderer().await?;
-                r.add_blobs(catalog::blob_list(&c));
-                let out = r.render(&format!("default-{}", key.replace('/', "-")), &req, |_| {}).await.map_err(|e| e.message)?;
-                j(json!({ "key": key, "triangles": crate::render::stl_triangles(&out.stl), "bytes": out.stl.len(), "ms": out.ms, "cached": out.cached }))
             }
             "cache_clear" => {
                 let r = self.renderer().await?;

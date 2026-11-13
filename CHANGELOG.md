@@ -83,6 +83,14 @@ The development sandbox has a network allowlist and is reset between sessions (t
 
 ## Unreleased
 
+- **Review 7 (of 0.4.26, 2026-11-12; the owner took all 15 items).** Quick fixes first:
+  - A link or tab to a model that isn't in the library opens a page saying so, with a way back, instead of the model page's buttons (or the previous model's form) under an error (item 3).
+  - The seven NopSCADlib components that failed with their start values make a shape: `threaded_insert` takes its own list of types (`threaded_inserts`, not `inserts`: a module's own `<module>s` list comes before its file's), and `catalog/components.json` has start values for `atx_psu_cutout`, `battery_contact` (a contact, not a battery), `iec_inserts`, `motor_faceplate`, `motor_shaft` (a motor's faceplate and shaft) and `pot_nut`; a start value that isn't one of the file's types drops that list (item 5). Component index format 3.
+  - Library settings › Categories no longer mentions "Use as the group's icon", which 0.4.26 removed (item 7).
+  - The "part" badge shows only where parts mix with models and components, not on every tile of the Parts Library (item 8).
+  - Settings has no Library section: the folder and everything about it are in Library settings (item 9).
+  - Leftovers (item 14): the unused `defaults_clear` and `render_default` commands are gone, clippy is clean (including the tests), and `app.js`'s header describes the app rather than the website.
+
 - **Fusion 360 files are no longer Parametric Models.** The owner removed the MitCad support (2026-11-12) to focus on cleaning up and reviewing the app: the code is back to 0.4.26's (MitCad's reader in `desktop/core/mitcad/`, `f3d.rs`, `mitcad.rs`, Download MitCad in Settings › Engine, the `mitcad-cli` workflow, `tools/fetch_mitcad.py` and the stand-in are gone), and `.f3d` files are Parts Library files again. A project already read with a Fusion model needs Read again; the app's MitCad download (`mitcad/` in its data folder) can be deleted. The design and its lessons stay in DESKTOP_PLAN.md and CHANGELOG.md at `v0.4.30`.
 
 ## 0.4.30 — 2026-11-02 · Fusion files use our MitCad fork

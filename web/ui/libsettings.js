@@ -286,7 +286,7 @@ function Categories({ ro }) {
               onClick=${() => setRemoving({ id: c.id, to: "other" })}>Remove…</button>` : null}`}
         </td></tr>`)}
     </tbody></table>
-    <p class="muted">A category's icon is a picture of your own (Image…, copied into the library's <code>icons/</code> folder), or an item's thumbnail: group by category, condense, and use “Use as the group's icon” on an item in it.</p>
+    <p class="muted">A category's icon is a picture of your own: Image… copies it into the library's <code>icons/</code> folder. It shows on the category's group when you group by category.</p>
     ${removed.length ? html`<details class="ls-removed"><summary>${plural(removed.length, "removed category", "removed categories")}</summary>
       <ul>${removed.map((c) => html`<li>${c.label} <span class="muted">→ ${c.moved_to_label}</span>
         <button type="button" class="ghost small" disabled=${ro} onClick=${() => set({ id: c.id, moved_to: "" }, `${c.label} is back.`)} data-act="restore-category">Bring back</button></li>`)}</ul></details>` : null}

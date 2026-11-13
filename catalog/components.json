@@ -128,6 +128,26 @@
       "width": "2"
     }
   },
+  "NopSCADlib": {
+    "atx_psu_cutout": {
+      "type": "ATX300"
+    },
+    "battery_contact": {
+      "type": "bcontact"
+    },
+    "iec_inserts": {
+      "type": "IEC_inlet"
+    },
+    "motor_faceplate": {
+      "type": "servo_motor_faceplate(Lichuan_M01330_80ST)"
+    },
+    "motor_shaft": {
+      "type": "servo_motor_shaft(Lichuan_M01330_80ST)"
+    },
+    "pot_nut": {
+      "type": "KY_040_encoder"
+    }
+  },
   "$no_guess": {
     "$comment": "Modules whose guessed or default start values don't make a shape (workshop-cli components-check): they wait for values instead.",
     "MCAD": [

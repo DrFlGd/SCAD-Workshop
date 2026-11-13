@@ -1010,7 +1010,7 @@ mod tests {
         let dir = std::env::temp_dir().join(format!("workshop-scan-changes-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&dir);
         std::fs::create_dir_all(&dir).unwrap();
-        let (lib, _) = Library::open(&dir.join("lib"), &crate::config::Prefs::new(dir.join("p.json"))).unwrap();
+        let (lib, _) = Library::open(dir.join("lib"), &crate::config::Prefs::new(dir.join("p.json"))).unwrap();
         // a project added from a ZIP, read at format 4 with fingerprints
         let files = dir.join("lib/sources/zip-box/files/zip-1");
         std::fs::create_dir_all(&files).unwrap();

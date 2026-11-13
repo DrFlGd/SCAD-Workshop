@@ -1178,8 +1178,19 @@ async def main():
             cols = await pg.evaluate("() => ['#p-Mirror_X', '#p-Width_Units'].map((s) => Math.round(document.querySelector(s).getBoundingClientRect().left))")
             readme = (library / "README.txt").read_text()
             check("Settings is laid out like Library settings; a yes/no setting's box is in the value column; the library's README explains pins, your own projects and old versions",
-                  toc[:5] == ["Appearance", "Printer profile", "Downloads", "Library", "Engine"] and abs(cols[0] - cols[1]) <= 2
+                  toc[:4] == ["Appearance", "Printer profile", "Downloads", "Engine"] and abs(cols[0] - cols[1]) <= 2
                   and "sources/pinned/pins/" in readme and "Remove versions not in use" in readme, (toc, cols))
+
+            # (Review 7, items 3 and 8) a model that isn't in the library gets a page saying so, with nothing
+            # to make; everything in the Parts Library is a part, so no "part" badges there
+            await pg.goto(B + "#/m/anylid/no-such-model")
+            await pg.wait_for_selector("#model-missing")
+            missing = await pg.evaluate("() => [document.querySelector('#view-model').hidden, document.querySelector('#about-title').textContent]")
+            await pg.goto(B + "#/browse/parts")
+            await pg.wait_for_selector("[data-item]")
+            part_badges = await pg.evaluate("() => [document.querySelectorAll('[data-item]').length, [...document.querySelectorAll('.badge-mini')].filter((b) => b.textContent === 'part').length]")
+            check("a model that isn't in the library gets a page saying so, with nothing to make; no part badges in the Parts Library",
+                  missing == [True, "This model isn't in the library"] and part_badges[0] > 0 and part_badges[1] == 0, (missing, part_badges))
 
             # 13e. (0.4.9, F-1) the starter projects that are on GitHub as the app had them become GitHub projects
             # at the same commit, in upstream's own layout: same model ids, saved settings' code edits moved to

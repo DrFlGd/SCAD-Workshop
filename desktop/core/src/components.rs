@@ -20,7 +20,8 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
 
 /// Version of the index format (bump to read libraries again). 2: `listed` (choices from the docs).
-pub const FORMAT: u64 = 2;
+/// 3: a module's own list of types (`threaded_inserts`) before its file's.
+pub const FORMAT: u64 = 3;
 
 /// Files a library keeps (as tools/fetch_libraries.py): OpenSCAD files and the data files they import.
 const KEEP_EXT: [&str; 8] = ["scad", "stl", "dxf", "svg", "dat", "json", "csv", "off"];
@@ -94,8 +95,8 @@ fn mask_comments(text: &str) -> String {
                     }
                     i += 1;
                 }
-                for k in i..(i + 2).min(b.len()) {
-                    out[k] = b' ';
+                for o in out.iter_mut().take((i + 2).min(b.len())).skip(i) {
+                    *o = b' ';
                 }
                 i += 2;
             }
@@ -444,7 +445,7 @@ pub fn lift_call_values(text: &str, source_rel: &str, libs: &[String], hints: &[
             *c
         };
         let def = defs.iter().find(|d| d.name == module);
-        let docs = def.map(|d| arg_descriptions(d)).unwrap_or_default();
+        let docs = def.map(arg_descriptions).unwrap_or_default();
         let lent = borrowed.entry(module.clone()).or_insert_with(|| borrowed_args(&texts, &module));
         let mut lifted = vec![];
         let mut args_out = vec![];
@@ -1820,10 +1821,13 @@ pub fn index_library(info: &LibInfo, root: &Path, curated: Option<&Value>, no_gu
                 prelude.extend(default_prelude());
             }
             let mut choices = BTreeMap::new();
-            if !consts.is_empty() {
-                if let Some(first) = def.args.first() {
-                    if first.1.is_none() && (first.0 == "type" || first.0.ends_with("_type")) {
-                        choices.insert(first.0.clone(), consts.clone());
+            if let Some(first) = def.args.first() {
+                if first.1.is_none() && (first.0 == "type" || first.0.ends_with("_type")) {
+                    // a list of its own first (`threaded_inserts` for threaded_insert), then the file's
+                    let own = plural.as_ref().and_then(|p| type_list(&texts[p], &format!("{}s", def.name)));
+                    let list = own.unwrap_or_else(|| consts.clone());
+                    if !list.is_empty() {
+                        choices.insert(first.0.clone(), list);
                     }
                 }
             }
@@ -1863,6 +1867,11 @@ pub fn index_library(info: &LibInfo, root: &Path, curated: Option<&Value>, no_gu
             c.examples.push(Example { title: "Suggested start".into(), code, calls: vec![call], flat: false });
         }
     }
+    // a start value that isn't one of the file's types (a battery's contact, a motor's shaft): that list isn't its types
+    for c in comps.iter_mut() {
+        let Some(vals) = curated.and_then(|cur| cur.get(&c.module)).and_then(Value::as_object) else { continue };
+        c.choices.retain(|arg, list| vals.get(arg).and_then(Value::as_str).is_none_or(|v| list.iter().any(|o| o == v)));
+    }
     // otherwise guessed values for arguments with telling names (radius, height, ...) when that covers all the required ones
     let no_guess: Vec<String> = no_guess.and_then(Value::as_array).into_iter().flatten().filter_map(|v| v.as_str().map(String::from)).collect();
     for c in comps.iter_mut().filter(|c| c.examples.iter().all(|e| e.calls.is_empty())) {
@@ -1893,7 +1902,7 @@ pub fn index_library(info: &LibInfo, root: &Path, curated: Option<&Value>, no_gu
         });
         c.fileset = idx;
     }
-    comps.sort_by(|a, b| a.module.to_lowercase().cmp(&b.module.to_lowercase()));
+    comps.sort_by_key(|a| a.module.to_lowercase());
     Ok(json!({
         "format": FORMAT,
         "library": name,
@@ -2693,7 +2702,7 @@ module block(width=1, length=2, height=1, type="brick", reinforcement=false, stu
 "#
         .to_string();
         let ex = "use <../LEGO.scad>;\n\nblock(\n    width=1,\n    length=2,\n    height=1/3,\n    type=\"tile\",\n    reinforcement=true,\n    stud_notches=true,\n    round_radius=12\n);";
-        let out = lift_call_values(ex, "examples/3070.scad", &[lib.clone()], &[]).expect("lifted");
+        let out = lift_call_values(ex, "examples/3070.scad", std::slice::from_ref(&lib), &[]).expect("lifted");
         assert!(out.contains("// Width of the block, in studs\nwidth = 1;\nlength = 2;\n"), "{out}");
         // 1/3 is the library's own 1/3 choice
         assert!(out.contains("in studs\nwidth = 1;\nlength = 2;\n// Height of the block. A ratio of \"1\" is a standard LEGO brick height; a ratio of \"1/3\" is a standard LEGO plate height.\nheight = .33333333333; // [.33333333333:1/3, .5:1/2, 1:1, 1.5:1 1/2, 2:2, 3:3]\n"), "{out}");
@@ -2707,16 +2716,16 @@ module block(width=1, length=2, height=1, type="brick", reinforcement=false, stu
         assert!(out.contains("// Corner radius\nround_radius = 12;\n"), "{out}");
         assert!(out.contains("block(width=width, length=length, height=height, type=type, reinforcement=reinforcement, stud_notches=stud_notches, round_radius=round_radius);"), "{out}");
         let inc = ex.replace("use <", "include <");
-        assert!(lift_call_values(&inc, "a.scad", &[lib.clone()], &[]).unwrap().contains("// Corner radius\nblock_round_radius = 12;\n"));
+        assert!(lift_call_values(&inc, "a.scad", std::slice::from_ref(&lib), &[]).unwrap().contains("// Corner radius\nblock_round_radius = 12;\n"));
         // a value that isn't one of the choices becomes one more, labelled as written
         let ex2 = "use <../LEGO.scad>;\nblock(width=2, height=2/3, type=\"round-tile\");\n";
-        let out = lift_call_values(ex2, "a.scad", &[lib.clone()], &[]).expect("lifted");
+        let out = lift_call_values(ex2, "a.scad", std::slice::from_ref(&lib), &[]).expect("lifted");
         assert!(out.contains("height = 0.6666666666666666; // [.33333333333:1/3, .5:1/2, 0.6666666666666666:2/3, 1:1, 1.5:1 1/2, 2:2, 3:3]\n"), "{out}");
         assert!(out.contains("type = \"round-tile\"; // [brick:Brick, tile:Tile, wing:Wing, round-tile:round-tile]\n"), "{out}");
         // the library's call in another of the project's files (not one the model includes)
         let bare = "module block(width=1, length=2, height=1, type=\"brick\") { cube([width, length, height]); }\n".to_string();
         let main = "use <lib.scad>;\n// Width of the block, in studs\nblock_width = 2;\nblock(width=block_width);\n".to_string();
-        let out = lift_call_values("use <lib.scad>;\nblock(width=4, height=2+(2/3));\n", "b.scad", &[bare.clone()], &[main]).expect("lifted");
+        let out = lift_call_values("use <lib.scad>;\nblock(width=4, height=2+(2/3));\n", "b.scad", std::slice::from_ref(&bare), &[main]).expect("lifted");
         assert!(out.contains("// Width of the block, in studs\nwidth = 4;\n"), "{out}");
         // a fraction with no list to pick from: a number
         assert!(out.contains("\nheight = 2.6666666666666665;\n"), "{out}");
@@ -2766,6 +2775,33 @@ module block(width=1, length=2, height=1, type="brick", reinforcement=false, stu
         assert_eq!(type_list(text, "fans"), Some(vec!["fan17x8".to_string(), "fan25x10".into()]));
         assert_eq!(type_list(text, "inserts"), None);
         assert_eq!(type_constants("F1BM2   = [ \"F1BM2\",   4.0 ];\nX = 3;\n"), vec!["F1BM2"]);
+    }
+
+    #[test]
+    fn a_modules_own_type_list() {
+        // (Review 7, item 5) threaded_insert takes the file's `threaded_inserts`, not `inserts`; a start value
+        // that isn't in the file's list (a battery's contact) drops the list
+        let dir = std::env::temp_dir().join(format!("types-test-{}", std::process::id()));
+        let files = [
+            ("core.scad", "// core\n"),
+            ("vitamins/insert.scad", "module insert(type) { //! Draw an insert\n cube(type[1]); }\nmodule threaded_insert(type) { //! Draw a threaded insert\n cube(type[1]); }\n"),
+            ("vitamins/inserts.scad", "F1BM2 = [\"F1BM2\", 3];\nM3x8 = [\"M3x8\", 4];\ninserts = [F1BM2];\nthreaded_inserts = [M3x8];\nuse <insert.scad>\n"),
+            ("vitamins/battery.scad", "module battery(type) { //! Draw a battery\n cube(type[1]); }\nmodule battery_contact(type, pos = true) { //! Draw a contact\n cube(type[1]); }\n"),
+            ("vitamins/batteries.scad", "AACELL = [\"AACELL\", 5];\nbcontact = [\"bcontact\", 1];\nbatteries = [AACELL];\nuse <battery.scad>\n"),
+        ];
+        for (rel, text) in files {
+            std::fs::create_dir_all(dir.join(rel).parent().unwrap()).unwrap();
+            std::fs::write(dir.join(rel), text).unwrap();
+        }
+        let info: LibInfo = serde_json::from_value(json!({ "name": "Nop" })).unwrap();
+        let curated = json!({ "battery_contact": { "type": "bcontact" } });
+        let index = index_library(&info, &dir, Some(&curated), None).unwrap();
+        let _ = std::fs::remove_dir_all(&dir);
+        let choices = |m: &str| index["components"].as_array().unwrap().iter().find(|c| c["module"] == m).map(|c| c["choices"].clone());
+        assert_eq!(choices("insert"), Some(json!({ "type": ["F1BM2"] })));
+        assert_eq!(choices("threaded_insert"), Some(json!({ "type": ["M3x8"] })));
+        assert_eq!(choices("battery"), Some(json!({ "type": ["AACELL"] })));
+        assert_eq!(choices("battery_contact"), Some(json!({})));
     }
 
     #[test]

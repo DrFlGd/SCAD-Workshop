@@ -220,6 +220,7 @@ fn or_arr(v: &Value) -> Value {
 
 /// Everything a model page needs, from a family manifest, one of its models,
 /// the model's files and OpenSCAD's settings export. Returns (catalog summary, model detail).
+#[allow(clippy::too_many_arguments)]
 pub fn assemble_model(
     fam: &Value,
     m: &Value,

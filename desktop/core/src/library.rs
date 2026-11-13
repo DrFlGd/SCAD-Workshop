@@ -1360,15 +1360,6 @@ impl Library {
         Ok(c)
     }
 
-    pub fn clear_checks(&self, id: &str) -> Result<()> {
-        self.writable()?;
-        let p = self.source_dir(id)?.join("checks.json");
-        if p.exists() {
-            std::fs::remove_file(p)?;
-        }
-        Ok(())
-    }
-
     // ------------------------------------------------------------ trash
 
     /// Deleted projects wait in trash/<time>-<id>/ (source/, local/ for your own
