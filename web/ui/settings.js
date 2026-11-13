@@ -44,6 +44,16 @@ export function applyProfile(detail) {
 // ---------------------------------------------------------------- download formats (milestone 5)
 export const PREFERRED = [["stl", "STL where there is one"], ["3mf", "3MF where there is one, otherwise STL"], ["step", "STEP where there is one, otherwise STL"]];
 export const preferredFormat = () => prefs().get("gw-format-pref") || "stl";
+/** The format to offer first among `formats` (["stl", "3mf", ...]): the one last chosen for `key`, else the rule above. */
+export function pickFormat(key, formats) {
+  const last = (prefs().get("gw-formats", {}) || {})[key];
+  if (last && formats.includes(last)) return last;
+  const pref = preferredFormat();
+  return formats.includes(pref) ? pref : formats.includes("stl") ? "stl" : formats[0];
+}
+export function rememberFormat(key, fmt) {
+  prefs().set("gw-formats", { ...(prefs().get("gw-formats", {}) || {}), [key]: fmt });
+}
 
 // ---------------------------------------------------------------- the page
 const SECTIONS = [["appearance", "Appearance"], ["profile", "Printer profile"], ["downloads", "Downloads"], ["engine", "Engine"], ["about", "About"]];

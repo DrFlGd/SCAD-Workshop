@@ -104,30 +104,7 @@
   </main>
 
   <main id="view-library" class="workbench" hidden>
-    <aside class="rail" aria-label="Parts">
-      <div class="rail-head">
-        <h1 id="lib-title"></h1>
-        <p id="lib-summary" class="muted"></p>
-        <p id="lib-credit" class="credit"></p>
-        <div id="lib-extra" class="lib-extra"></div>
-      </div>
-      <div class="rail-tools">
-        <label class="search small">
-          <span class="visually-hidden">Find a part</span>
-          <input id="part-search" type="search" placeholder="Find a part" autocomplete="off">
-        </label>
-      </div>
-      <nav id="part-list" class="part-list" aria-label="Parts"></nav>
-      <div class="actionbar">
-        <div id="part-status" class="part-status"></div>
-        <div id="part-downloads" class="downloads"></div>
-        <div class="part-row"><button type="button" id="part-collect" class="ghost" hidden title="Add this part to one of your collections">Add to collection…</button>
-        <details class="menu" id="part-more" hidden><summary class="ghost" aria-label="More" title="More">⋯</summary><div class="menu-panel">
-          <button type="button" id="part-reveal" title="Show the part's file in its folder">Show in folder</button>
-          <button type="button" id="part-picture" title="Show another picture for it: one from its project, or your own">Choose picture…</button>
-          <button type="button" id="part-content" title="Add a file or a link to it: a build video, an assembly guide, photos">Add content…</button></div></details></div>
-      </div>
-    </aside>
+    <aside class="rail" aria-label="Parts" id="parts-rail"></aside>
   </main>
 
   <main id="view-about" class="pages" hidden>

@@ -13,7 +13,8 @@ import { sideModelButtons, openSide, SideButtons } from "./ui/sideview.js";
 import { setContext } from "./ui/context.js";
 import { html, render } from "./lib/html.js";
 import { LibrarySettingsPage } from "./ui/libsettings.js";
-import { SettingsPage, applyProfile, preferredFormat } from "./ui/settings.js";
+import { SettingsPage, applyProfile, pickFormat, rememberFormat } from "./ui/settings.js";
+import { PartsRail } from "./ui/parts.js";
 import { LicensesPage } from "./ui/licenses.js";
 import { unflagItems } from "./ui/actions.js";
 import { saveComponentThumb, when, sourceById, rescanLocal, madeFrom } from "./ui/library.js";
@@ -1019,17 +1020,6 @@ function setDownload(blob, name) {
 // A model's render downloads as STL or 3MF (the core writes the 3MF from the render); a part with
 // several formats has one Download button and a format beside it. The choice is kept per model or
 // part, and Settings › Downloads gives the default.
-/** The format to offer first among `formats` (["stl", "3mf", ...]): the one last chosen for `key`, else Settings' rule. */
-function pickFormat(key, formats) {
-  const last = (store.prefs.get("gw-formats", {}) || {})[key];
-  if (last && formats.includes(last)) return last;
-  const pref = preferredFormat();
-  return formats.includes(pref) ? pref : formats.includes("stl") ? "stl" : formats[0];
-}
-function rememberFormat(key, fmt) {
-  store.prefs.set("gw-formats", { ...(store.prefs.get("gw-formats", {}) || {}), [key]: fmt });
-}
-
 let formatJob = 0;
 async function applyDownloadFormat() {
   const a = $("#download"), sel = $("#download-format");
@@ -1279,9 +1269,6 @@ $("#model-collect").addEventListener("click", () => {
   const settings = rec && JSON.stringify(changedValues(m, withChanges(m, rec.values || {}).values)) === JSON.stringify(values) ? rec.id : null;
   const named = rec && settings ? `${m.name} · ${rec.name}` : Object.keys(values).length ? partName(m, state.values) : m.name;
   ui.set({ dialog: { type: "collect", entries: [{ ref: `${m.kind === "component" ? "comp" : "gen"}:${m.key}`, name: named, settings, values: Object.keys(values).length ? values : null }] } });
-});
-$("#part-collect").addEventListener("click", () => {
-  if (state.partEntry) ui.set({ dialog: { type: "collect", entries: [state.partEntry] } });
 });
 
 /** A made part's recipe, from its parts link (`#/m/<model>?part=<pack>/<part>`), when it was made from this model. */
@@ -1808,151 +1795,33 @@ async function openLibrary(libId, itemId) {
     try {
       lib = state.libDetail[libId] = await getJSON(`data/libraries/${libId}.json`);
     } catch {
-      $("#lib-title").textContent = "Parts not found";
-      $("#lib-summary").textContent = "This collection doesn't exist. Go back to the catalog to pick one.";
+      state.openLib = null;
+      drawPartsRail(null);
       return;
     }
   }
   if (state.openLib !== libId) {
     state.openLib = libId;
-    $("#lib-title").textContent = lib.name;
-    $("#lib-summary").textContent = lib.summary || "";
-    const credit = $("#lib-credit");
-    credit.replaceChildren();
-    // the same credit line as a model's: By … · Source · License
-    const parts = [];
-    if (lib.authors?.length) parts.push(`By ${lib.authors.map((a) => a.name).join(", ")}`);
-    if (lib.source_url) parts.push(el("a", { href: lib.source_url, target: "_blank", rel: "noopener", text: "Source" }));
-    const spdx = lib.license?.spdx;
-    // parts you've made from models: each is under the license of the project it was made from (UI-28)
-    if (libId === "local-made-parts") parts.push("Each part keeps the license of the project it was made from");
-    else parts.push(el("a", { href: `#/licenses/${lib.id}`, text: spdx && spdx !== "NOASSERTION" ? `License ${spdx}` : "License details" }));
-    credit.append(...parts.flatMap((x, i) => (i ? [" · ", x] : [x])));
     // the pack's project documents (its README), as on model pages, and in the side viewer's tabs (UI-25)
     const sourceId = lib.source_id || state.libraries.find((l) => l.id === libId)?.source_id || null;
-    const partRef = sourceId ? { source: sourceId } : null;
-    ui.set({ partRef });
-    render(partRef ? html`<${SideButtons} refObj=${partRef} />` : null, $("#lib-extra"));
-    $("#part-search").value = "";
-    buildPartList(lib);
+    ui.set({ partRef: sourceId ? { source: sourceId } : null });
   }
   const item = lib.items.find((i) => i.id === itemId) || lib.items.find((i) => i.preview_url) || lib.items[0];
   if (!itemId && item) history.replaceState(null, "", `#/parts/${libId}/${item.id}`);
+  drawPartsRail(lib, item);
   showPart(lib, item);
 }
 
-function buildPartList(lib) {
-  const nav = $("#part-list");
-  nav.replaceChildren();
-  for (const c of [...new Set(lib.items.map((i) => i.category))]) {
-    nav.append(el("div", { class: "part-group", "data-cat": c },
-      el("h2", { text: c }),
-      // by name, numbers as numbers (Brick 1x2 before 1x17), as the grid sorts (UI-29)
-      el("ul", {}, lib.items.filter((i) => i.category === c).sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true })).map((i) => el("li", {},
-        el("a", { href: `#/parts/${lib.id}/${i.id}`, "data-id": i.id, "data-search": [i.name, c, ...(i.tags || [])].join(" ").toLowerCase() },
-          el("span", { text: i.name }),
-          el("span", { class: "formats", text: [...new Set(i.files.map((f) => FORMAT_LABEL[f.format] || f.format))].join(" ") })))))));
-  }
+/** The rail beside the 3D view on a parts pack's page (web/ui/parts.js). */
+function drawPartsRail(lib, item = null) {
+  render(html`<${PartsRail} key=${lib?.id || ""} lib=${lib} item=${item} partRef=${ui.get().partRef} reveal=${revealFile} />`, $("#parts-rail"));
 }
 
-$("#part-search").addEventListener("input", (e) => {
-  const q = e.target.value.trim().toLowerCase();
-  document.querySelectorAll(".part-group").forEach((g) => {
-    let any = false;
-    g.querySelectorAll("a").forEach((a) => { const hit = !q || a.dataset.search.includes(q); a.parentElement.hidden = !hit; any ||= hit; });
-    g.hidden = !any;
-  });
-});
-
+/** A part's preview in the shared 3D view (the rail beside it: drawPartsRail). */
 async function showPart(lib, item) {
   if (!item) return;
   document.title = `${item.name}, ${lib.name} | SCAD Workshop`;
-  document.querySelectorAll("#part-list a").forEach((a) => a.toggleAttribute("aria-current", a.dataset.id === item.id));
-  const nav = $("#part-list"), cur = $(`#part-list a[data-id="${CSS.escape(item.id)}"]`);
-  if (cur && nav.scrollHeight > nav.clientHeight + 1) {
-    const top = cur.offsetTop - nav.offsetTop;
-    if (top < nav.scrollTop || top > nav.scrollTop + nav.clientHeight - 80) nav.scrollTop = top - nav.clientHeight / 3;
-  }
-  const status = $("#part-status");
-  status.replaceChildren(el("p", { class: "part-name", text: item.name }));
-  // (a part with no summary of its own shows none: not its collection's again)
-  if (item.description && item.description.trim() !== (lib.summary || "").trim()) status.append(el("p", { class: "help", text: item.description }));
-  const made = madeFrom(item.made_from);
-  if (made) {
-    const link = `${made.href}?part=${lib.id}/${item.id}`;
-    status.append(el("div", { class: "made-from", id: "made-from" },
-      el("p", { class: "help", text: made.available ? made.text : `${made.text} That model isn't in the library now.` }),
-      made.outdated ? el("p", { class: "help made-outdated", text: made.outdated }) : null,
-      made.available ? el("p", { class: "made-actions" },
-        el("a", { class: "button secondary", id: "made-open", href: link, text: "Open with these settings" }),
-        !state.catalog.library?.read_only
-          ? el("a", { class: "button secondary", id: "made-again", href: `${link}&again`, title: "Make it with the same settings and replace its files, keeping the name", text: "Make again" }) : null) : null));
-  } else if (item.example) {
-    // one of a folder of examples made into parts: its own model prints this one size; the main file's model,
-    // when it has settings, prints any (UI-29)
-    status.append(el("p", { class: "help" }, el("a", { href: `#/m/${item.generator}`, id: "example-open", text: "Open the example as a model" }),
-      ...(item.main_model && state.catalog?.models?.some((m) => m.key === item.main_model)
-        ? [", or ", el("a", { href: `#/m/${item.main_model}`, id: "example-main", text: `open ${state.catalog.models.find((m) => m.key === item.main_model).name}` }), " to make it at other sizes."] : ["."])));
-  } else if (item.generator) status.append(el("p", { class: "help" }, el("a", { href: `#/m/${item.generator}`, text: "Open the parametric model" }), " to print it at any size."));
-  // a part made from several files ("Make one part", milestone 5) can be split again
-  if (item.merged?.length && !state.catalog.library?.read_only) {
-    status.append(el("p", { class: "help" }, `Made one part from ${item.merged.length + 1} files. `,
-      el("button", { type: "button", class: "link-btn", id: "part-split", text: "Split into separate parts",
-        onclick: async () => {
-          try {
-            await platform.api("parts_merge", { source: lib.source_id || lib.id, ids: [item.id], split: true });
-            await reloadCatalog();
-            toast("Split into separate parts.");
-          } catch (e) { toast(String(e.message || e)); }
-        } })));
-  }
-  // ⋯: Show in folder, Choose picture…, Add content… (0.4.23, milestone 6)
-  const more = $("#part-more"), partSource = lib.source_id || lib.id, ro = !!state.catalog.library?.read_only;
-  more.hidden = false;
-  more.open = false;
-  $("#part-reveal").hidden = !item.files.length;
-  $("#part-reveal").onclick = () => { more.open = false; revealFile({ source: partSource, rel: item.files[0].path, examples: !!item.example }); };
-  const level = { source: partSource, level: "part", target: item.id, name: item.name };
   ui.set({ partItem: item.id }); // (the side viewer shows its own content too)
-  $("#part-picture").disabled = $("#part-content").disabled = ro;
-  $("#part-picture").onclick = () => { more.open = false; ui.set({ dialog: { type: "picture", ...level, current: item.meta?.icon || null } }); };
-  $("#part-content").onclick = () => { more.open = false; ui.set({ dialog: { type: "content", ...level } }); };
-  state.partEntry = { ref: `part:${lib.id}/${item.id}`, name: item.name };
-  const dl = $("#part-downloads");
-  const formats = item.files.map((f) => f.format);
-  if (formats.length > 1 && new Set(formats).size === formats.length && !item.files.some((f) => f.label)) {
-    // one Download with the format beside it (milestone 5): the last one chosen for this part, else Settings' rule
-    const key = `part:${lib.id}/${item.id}`;
-    const link = el("a", { class: "button primary", id: "part-download" });
-    const show = (fmt) => {
-      const f = item.files.find((x) => x.format === fmt) || item.files[0];
-      link.href = f.url;
-      link.setAttribute("download", f.path.split("/").pop());
-      link.title = f.path.split("/").pop();
-      link.textContent = `Download (${bytes(f.bytes)})`; // the picker beside it names the format (UI-33)
-    };
-    const sel = el("select", { class: "format-pick", id: "part-format", "aria-label": "Format",
-      onchange: (e) => { rememberFormat(key, e.target.value); show(e.target.value); } },
-      item.files.map((f) => el("option", { value: f.format, text: FORMAT_LABEL[f.format] || f.format })));
-    sel.value = pickFormat(key, formats);
-    show(sel.value);
-    dl.replaceChildren(el("span", { class: "download-pick" }, link, sel));
-    dl.classList.remove("many");
-  } else if (item.files.length === 1 && !item.files[0].label) {
-    // one file: the same Download, with its format named beside it (Review 6, UI-41)
-    const f = item.files[0];
-    const name = f.path.split("/").pop();
-    dl.replaceChildren(el("span", { class: "download-pick" },
-      el("a", { class: "button primary", id: "part-download", href: f.url, download: name, title: name, text: `Download (${bytes(f.bytes)})` }),
-      el("span", { class: "format-label", id: "part-format-label", text: FORMAT_LABEL[f.format] || f.format.toUpperCase() })));
-    dl.classList.remove("many");
-  } else {
-    dl.replaceChildren(...item.files.map((f, i) => el("a", {
-      class: `button ${i === 0 && !["step", "shapr"].includes(f.format) ? "primary" : "secondary"}`, href: f.url,
-      download: f.path.split("/").pop(), title: f.path.split("/").pop(),
-      text: `${f.label ? f.label + ": " : ""}${FORMAT_LABEL[f.format] || f.format} (${bytes(f.bytes)})` })));
-    dl.classList.toggle("many", item.files.length > 4);
-  }
   state.viewerOwner = "library";
   $("#log").hidden = true;
   showOverlay(null);
@@ -2138,7 +2007,7 @@ async function reloadCatalog() {
     state.engine = platform.makeEngine(state.catalog);
     $("#engine").textContent = state.engine.label;
     $("#save-part").hidden = !!catalog.library?.read_only;
-    $("#model-collect").hidden = $("#part-collect").hidden = $("#save-part").hidden;
+    $("#model-collect").hidden = $("#save-part").hidden;
     state.libraries = libraries;
     for (const l of state.libraries) state.libDetail[l.id] = l;
     state.index = new LocalIndex(state.catalog, state.libraries);
