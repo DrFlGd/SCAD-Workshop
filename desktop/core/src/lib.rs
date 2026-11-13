@@ -23,6 +23,7 @@ pub mod config;
 pub mod docs;
 pub mod engine;
 pub mod format;
+pub mod includes;
 pub mod ingest;
 pub mod library;
 pub mod merge;

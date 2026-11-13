@@ -20,7 +20,7 @@ After the Fusion support was removed, the owner asked for a review of the app as
 | 2 | Batch generate varies each part of a paired setting (a bin's Width in units), guesses from the first group, leaves out hidden and debug settings | Done |
 | 4 | More components start on their own (NopSCADlib types with their other values guessed; MCAD) | Done: 509 of 800 start (438), none fail (7) |
 | 6 | Component pictures made by CI and shipped with the app | Done |
-| 1 | Windows renders about 8 times slower than Linux: measure on the Windows runner, fix, then drop the race against the WebAssembly engine | |
+| 1 | Windows renders about 8 times slower than Linux: measure on the Windows runner, fix, then drop the race against the WebAssembly engine | Cause found (repeated includes, see CHANGELOG); include once built, Windows numbers next |
 | 10 | The website half of the front end removed (`platform.js`'s browser branch, `store-browser.js`) | |
 | 11 | Converters for libraries older than format 2 removed (owner: old libraries can be added again instead) | |
 | 12 | Small test projects in `tests/` instead of the 81 MB of website-era projects and the site build | |

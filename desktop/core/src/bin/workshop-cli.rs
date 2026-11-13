@@ -27,6 +27,7 @@
 
 use anyhow::{bail, Context, Result};
 use serde_json::{json, Value};
+use sha2::{Digest, Sha256};
 use std::path::PathBuf;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
@@ -493,16 +494,17 @@ async fn bench_library(mut a: Args) -> Result<()> {
         let req = default_request(model, &c.catalog["common_files"])?;
         let t0 = Instant::now();
         let res = r.render(&format!("bench-{}", key.replace('/', "-")), &req, |_| {}).await;
-        let (status, tris, err) = match res {
-            Ok(o) => ("pass", stl_triangles(&o.stl).unwrap_or(0), None),
+        let (status, tris, sha, err) = match res {
+            // (the mesh's hash: the same model gives the same mesh, with or without include once)
+            Ok(o) => ("pass", stl_triangles(&o.stl).unwrap_or(0), Some(hex::encode(&Sha256::digest(&o.stl)[..6])), None),
             Err(e) => {
                 failed += 1;
-                ("fail", 0, Some(e.message))
+                ("fail", 0, None, Some(e.message))
             }
         };
         let secs = (t0.elapsed().as_millis() as f64 / 10.0).round() / 100.0;
         eprintln!("{status:<5} {key:<44} {secs:>7}s  {tris} tris");
-        results.push(json!({ "key": key, "status": status, "seconds": secs, "triangles": tris, "error": err }));
+        results.push(json!({ "key": key, "status": status, "seconds": secs, "triangles": tris, "mesh": sha, "error": err }));
     }
     let report = json!({ "library": true, "os": std::env::consts::OS, "models": keys.len(), "failed": failed, "results": results });
     if let Some(out) = out {

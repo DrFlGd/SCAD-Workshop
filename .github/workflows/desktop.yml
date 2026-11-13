@@ -245,6 +245,20 @@ jobs:
         run: |
           desktop/target/release/workshop-cli.exe bench --app-site build/desktop/site --starter build/desktop/starter \
             --engine build/desktop/engine --out ci-out/bench-native-windows.json 2>&1 | tee ci-out/bench-native-windows.log
+      - name: Include once (Review 7, item 1), the same models without it, meshes compared
+        run: |
+          WORKSHOP_INCLUDE_ONCE=0 desktop/target/release/workshop-cli.exe bench --app-site build/desktop/site --starter build/desktop/starter \
+            --engine build/desktop/engine --out ci-out/bench-native-windows-plain.json 2>&1 | tail -1
+          python - <<'EOF'
+          import json
+          once, plain = (json.load(open(f"ci-out/bench-native-windows{s}.json"))["results"] for s in ("", "-plain"))
+          p = {r["key"]: r for r in plain}
+          differ = [r["key"] for r in once if r["mesh"] != p[r["key"]]["mesh"]]
+          t1, t0 = sum(r["seconds"] for r in once), sum(r["seconds"] for r in plain)
+          print(f"::notice title=Include once::{t0:.1f} s without it, {t1:.1f} s with it; meshes that differ: {differ or 'none'}")
+          if differ:
+              raise SystemExit(f"include once changed {differ}")
+          EOF
       - name: Components on Windows (a sample from each library)
         run: |
           desktop/target/release/workshop-cli.exe components-check --libs build/desktop/libs --app-site build/desktop/site \

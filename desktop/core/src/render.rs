@@ -430,7 +430,12 @@ impl Renderer {
         } else {
             std::fs::write(&params, parameter_set(&req.values, &req.defines))
                 .map_err(|e| RenderFailure::failed(format!("Couldn't write settings: {e}"), vec![]))?;
-            cmd.arg(tree.join(&entry));
+            // the model's files with repeated includes left out, where that can't change the result (includes.rs)
+            let main = {
+                let (tree, entry) = (tree.clone(), entry.clone());
+                tokio::task::spawn_blocking(move || crate::includes::prepare(&tree, &entry)).await.ok().and_then(|r| r.map_err(|e| eprintln!("include once: {e:#}")).ok()).flatten()
+            };
+            cmd.arg(main.unwrap_or_else(|| tree.join(&entry)));
             for d in &req.defines {
                 if let Some(v) = req.values.get(d) {
                     cmd.arg("-D").arg(format!("{d}={v}"));
@@ -480,6 +485,7 @@ impl Renderer {
 
         let mut logs: Vec<String> = vec![];
         let push = |line: String, logs: &mut Vec<String>| {
+            let line = crate::includes::clean_log(&line).into_owned();
             if let Some(s) = stage_for(&line) {
                 on_event(RenderEvent::Stage { stage: s.into() });
             }
