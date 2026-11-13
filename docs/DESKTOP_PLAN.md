@@ -20,8 +20,8 @@ After the Fusion support was removed, the owner asked for a review of the app as
 | 2 | Batch generate varies each part of a paired setting (a bin's Width in units), guesses from the first group, leaves out hidden and debug settings | Done |
 | 4 | More components start on their own (NopSCADlib types with their other values guessed; MCAD) | Done: 509 of 800 start (438), none fail (7) |
 | 6 | Component pictures made by CI and shipped with the app | Done |
-| 1 | Windows renders about 8 times slower than Linux: measure on the Windows runner, fix, then drop the race against the WebAssembly engine | Cause found (repeated includes, see CHANGELOG); include once built, Windows numbers next |
-| 10 | The website half of the front end removed (`platform.js`'s browser branch, `store-browser.js`) | Done (the WebAssembly engine stays until item 1's Windows numbers are in) |
+| 1 | Windows renders about 8 times slower than Linux: measure on the Windows runner, fix, then drop the race against the WebAssembly engine | Done: include once (see CHANGELOG), all 58 test models 224 s → 87 s on Windows; the race and its Forget button are gone |
+| 10 | The website half of the front end removed (`platform.js`'s browser branch, `store-browser.js`) | Done (the WebAssembly engine went with item 1; the site build still uses it until item 12) |
 | 11 | Converters for libraries older than format 2 removed (owner: old libraries can be added again instead) | Done (format 1 to 2 kept; the test library's `fill_in` waits for item 12) |
 | 12 | Small test projects in `tests/` instead of the 81 MB of website-era projects and the site build | |
 | 13 | `app.js` moved to Preact, a page at a time | |
@@ -58,9 +58,7 @@ A desktop "Swiss Army knife" for parametric 3D design on **Windows and Linux**:
 ## Architecture
 
 ```
-web/  (shared UI: catalog, search, forms, viewer, library pages)
-  │
-  ├── in a browser ──> engine: OpenSCAD WebAssembly worker  storage: IndexedDB
+web/  (the UI: catalog, search, forms, viewer, library pages)
   │
   └── in Tauri ──────> engine: native OpenSCAD (render queue)  storage: library folder
                          │
@@ -71,13 +69,11 @@ desktop/src-tauri (Rust) ├── jobs: run openscad, N in parallel, cancel, ca
                          └── library: collections, imports, recipes, export
 ```
 
-**Seams in the front end** make one UI work in both places:
+**Seams in the front end** (`web/platform.js`) made one UI work on the website and in the app; the website's half was removed in Review 7 (item 10), and the WebAssembly engine with it (item 1):
 
-- `engine`: `render(model, files, settings) -> STL/3MF` plus progress and cancel. Today's `engine-client.js` becomes the browser implementation; the desktop one calls a Tauri command.
-- `store`: saved settings, projects and library. Browser: IndexedDB. Desktop: files in the library folder.
-- `index` (added for the new interface, section 5): `query({ text, filters, sort, group, offset, limit }) -> { total, items, facets }`, `get(id)`, `update(id, patch)`. Browser: in memory over `catalog.json`, read-only. Desktop: SQLite in Rust, so the page never loads the whole catalog.
-
-The page detects Tauri at start-up and picks the implementation. Everything above the seams is shared.
+- `engine`: `render(model, files, settings) -> STL/3MF` plus progress and cancel, through a Tauri command.
+- `store`: saved settings, projects and library: files in the library folder.
+- `index` (added for the new interface, section 5): `query({ text, filters, sort, group, offset, limit }) -> { total, items, facets }`, `get(id)`, `update(id, patch)`, in memory over the library's catalog.
 
 ### Native engine
 
@@ -85,7 +81,7 @@ The page detects Tauri at start-up and picks the implementation. Everything abov
 - **Render queue:** one OpenSCAD process per job, up to (cores − 1) at once; cancel kills the process.
 - **Cache:** results are stored in the app's data folder on the computer (not in the library), keyed by a hash of (engine version, model files, settings). Repeating a render is instant.
 - **Fonts and libraries:** native OpenSCAD sees system fonts, and `OPENSCADPATH` points at the bundled libraries and those in the library folder.
-- **Benchmark:** `tools/engine/cli.mjs bench` gets a native mode, so CI records native vs WebAssembly times side by side.
+- **Benchmark:** `workshop-cli bench` renders every test model natively; CI runs it on Linux and Windows (on Windows a second time without include once, comparing the meshes).
 
 ### Library folder
 

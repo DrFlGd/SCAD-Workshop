@@ -159,8 +159,7 @@ pub fn stl_triangles(stl: &[u8]) -> Option<u32> {
     (stl.len() >= 84).then(|| u32::from_le_bytes([stl[80], stl[81], stl[82], stl[83]]))
 }
 
-/// OpenSCAD parameter-set file: strings unquoted, everything else as JSON text
-/// (mirrors web/render-worker.js).
+/// OpenSCAD parameter-set file: strings unquoted, everything else as JSON text.
 fn parameter_set(values: &BTreeMap<String, Value>, skip: &[String]) -> String {
     let set: serde_json::Map<String, Value> = values
         .iter()

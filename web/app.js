@@ -1053,7 +1053,7 @@ async function applyDownloadFormat() {
       a.classList.add("is-disabled");
       a.textContent = "Making the DXF…";
       const m = state.model;
-      blob = (await state.engine.render({ ...forRender(m), format: "dxf", browser: false }, renderValues(m, state.lastResultValues)).promise).blob;
+      blob = (await state.engine.render({ ...forRender(m), format: "dxf" }, renderValues(m, state.lastResultValues)).promise).blob;
     } catch (e) {
       toast(`Couldn't make the DXF: ${e?.message || e}`);
       blob = null;
@@ -1102,7 +1102,7 @@ async function native3mf() {
   if (!m || !state.engine?.info?.engine || !state.lastResultValues) return null;
   const sent = forRender(m);
   if (editsKey(sent.edits) !== (state.renderedEdits || "")) return null;
-  return (await state.engine.render({ ...sent, format: "3mf", browser: false }, renderValues(m, state.lastResultValues)).promise).blob;
+  return (await state.engine.render({ ...sent, format: "3mf" }, renderValues(m, state.lastResultValues)).promise).blob;
 }
 /** OpenSCAD's 3MF of the last render and what's in it ({ blob, info: { objects, colours, triangles } }), made
  * once for each render and shared by the 3D view, the 3MF download and Save as part (UI-39, F-28). */
@@ -1263,7 +1263,7 @@ async function renderModel(key, { values = null, settings = null, format = null 
   // a 3MF (0.4.19): OpenSCAD's own where the app's OpenSCAD is there (objects apart, colours kept), else
   // written by the app from the STL
   if (format === "3mf" && state.engine?.info?.engine) {
-    const own = await state.engine.render({ ...sent, format: "3mf", browser: false }, edits ? changedValues(detail, full) : full).promise.catch(() => null);
+    const own = await state.engine.render({ ...sent, format: "3mf" }, edits ? changedValues(detail, full) : full).promise.catch(() => null);
     if (own) return own.blob;
   }
   const job = state.engine.render(sent, edits ? changedValues(detail, full) : full);
@@ -1400,7 +1400,6 @@ function cancelJob() {
 }
 
 async function showResult(result, values, restoring = false, ek = state.renderedEdits || "") {
-  document.body.dataset.engine = result.engine || ""; // which engine made it (desktop on Windows races two)
   try {
     state.viewColoured = false; // (the render itself: a 3MF's colours are shown again once it's made)
     fileColoursAvailable(false);
@@ -1745,7 +1744,7 @@ async function runBatch(keep) {
       if (run.cancelled) throw Object.assign(new Error("Batch cancelled."), { cancelled: true });
       const i = next++;
       const { values } = combos[i];
-      const job = state.engine.render(as3mf || flat ? { ...forRender(model), format: ext, browser: false } : forRender(model), renderValues(model, values));
+      const job = state.engine.render(as3mf || flat ? { ...forRender(model), format: ext } : forRender(model), renderValues(model, values));
       run.jobs.add(job);
       try { results[i] = { values, result: await job.promise }; } finally { run.jobs.delete(job); }
       done++;
@@ -2015,7 +2014,7 @@ function showLicenses(focus) {
         (l.authors || []).join(", "), { spdx: l.license || "NOASSERTION", public_use: l.license ? "ok" : "review" }, l.repo ? `https://github.com/${l.repo}` : null)))] : []),
     el("h2", { text: "This app" }),
     el("ul", {},
-      el("li", {}, `OpenSCAD ${c?.engine || ""} (native, plus the WebAssembly build on Windows) makes every part on this computer. GNU GPL version 2 or later: `,
+      el("li", {}, `OpenSCAD ${c?.engine || ""} makes every part on this computer. GNU GPL version 2 or later: `,
         el("a", { href: "https://github.com/openscad/openscad", target: "_blank", rel: "noopener", text: "source code" }), ", ",
         el("a", { href: "engine/COPYING", target: "_blank", text: "license text" }), "."),
       el("li", { text: "3D preview: three.js (MIT). Interface: Preact (MIT) and htm (Apache-2.0)." }),
@@ -2221,13 +2220,6 @@ function desktopSettings() {
     info.engine
       ? el("p", {}, `OpenSCAD ${info.engine}, native, up to ${info.concurrency || 1} render${info.concurrency > 1 ? "s" : ""} at once. `, el("br"), el("code", { text: info.engine_path || "" }))
       : el("p", { class: "lic-summary", text: info.engine_error || "OpenSCAD isn't available." }),
-    info.os === "windows" ? (() => {
-      const picks = store.prefs.get("gw-engine-pick", {}) || {};
-      const wasm = Object.values(picks).filter((v) => v === "wasm").length;
-      const line = el("p", {}, `On Windows, OpenSCAD is slow with projects made of many files, where the WebAssembly engine (the website's) is faster. The first time you make a model, both run and the faster one is remembered: ${wasm} of ${Object.keys(picks).length} models so far use WebAssembly. `,
-        el("button", { type: "button", class: "ghost", text: "Forget", onclick: () => { store.prefs.set("gw-engine-pick", {}); line.firstChild.textContent = "Forgotten: the next render of each model tries both engines again. "; } }));
-      return line;
-    })() : null,
     el("p", {}, "Finished renders are kept so repeating one is instant: ", cacheLine, ". ",
       el("button", { type: "button", class: "ghost", text: "Clear", onclick: async () => {
         try { await platform.workspace.clearCache(); const i = await platform.refreshInfo(); cacheLine.textContent = gb(i.cache_bytes); } catch (e) { toast(String(e)); }

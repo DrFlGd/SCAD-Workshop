@@ -2,8 +2,6 @@
 // reached through the app's commands (desktop/core/src/api.rs, called through
 // Tauri's "api" / "api_bytes" commands in desktop/src-tauri/src/main.rs).
 
-import { EngineClient } from "./engine-client.js";
-
 const tauri = globalThis.__TAURI__;
 const invoke = (cmd, args, opts) => tauri.core.invoke(cmd, args, opts);
 /** One of the app's commands, answered as JSON. */
@@ -17,86 +15,21 @@ const newId = () => (crypto.randomUUID ? crypto.randomUUID() : `${Date.now().toS
 const cancelledError = () => Object.assign(new Error("Render cancelled."), { cancelled: true });
 
 /**
- * Native OpenSCAD, plus (on Windows) the same WebAssembly engine as the website.
- * Native OpenSCAD on Windows is slow with projects made of many `use`d files
- * (Gridfinity Extended: ~10 s vs ~1 s in WebAssembly), while it's much faster
- * for heavy geometry. So on Windows the first render of each model races both
- * engines, keeps the faster one's result and remembers the winner for that model.
+ * Native OpenSCAD. (Until Review 7's item 1, the Windows app also raced the website's
+ * WebAssembly engine, which was faster there for projects made of many files; native
+ * renders now leave out repeated includes, desktop/core/src/includes.rs, and are faster.)
  */
 class DesktopEngine {
-  constructor(info, catalog, prefs) {
+  constructor(info, catalog) {
     this.common = catalog.common_files || {};
     this.info = info;
-    this.prefs = prefs;
     this.concurrency = info.concurrency || 1;
     this.label = info.engine ? `OpenSCAD ${info.engine}, native` : "OpenSCAD not available";
     this.n = 0;
-    this.hybrid = info.os === "windows";
-    this.wasm = null;
-  }
-
-  wasmEngine() {
-    this.wasm ||= new EngineClient({
-      commonFiles: this.common,
-      readFile: async (sha) => new Uint8Array(await apiBytes("blob", { sha })),
-    });
-    return this.wasm;
-  }
-
-  picks() { return this.prefs.get("gw-engine-pick", {}) || {}; }
-
-  remember(key, engine) {
-    if (this.picks()[key] !== engine) this.prefs.set("gw-engine-pick", { ...this.picks(), [key]: engine });
   }
 
   render(model, values, onEvent = () => {}) {
-    if (!this.hybrid || model.browser === false || !this.info.engine) return this.renderNative(model, values, onEvent);
-    const pick = this.picks()[model.key];
-    if (pick === "native") return this.renderNative(model, values, onEvent);
-    if (pick === "wasm") return this.withFallback(this.wasmEngine().render(model, values, onEvent), model, values, onEvent);
-    return this.race(model, values, onEvent);
-  }
-
-  /** WebAssembly first; if it fails (memory, crash), native. */
-  withFallback(job, model, values, onEvent) {
-    let current = job;
-    const promise = job.promise.then((r) => ({ ...r, engine: "wasm" }), (e) => {
-      if (e.cancelled) throw e;
-      current = this.renderNative(model, values, onEvent);
-      return current.promise;
-    });
-    return { promise, cancel: () => current.cancel() };
-  }
-
-  race(model, values, onEvent) {
-    const jobs = { native: this.renderNative(model, values, onEvent), wasm: this.wasmEngine().render(model, values, () => {}) };
-    let settled = false, rejectRace;
-    const promise = new Promise((resolve, reject) => {
-      rejectRace = reject;
-      const errors = {};
-      for (const [name, job] of Object.entries(jobs)) {
-        job.promise.then((result) => {
-          if (settled) return;
-          settled = true;
-          for (const [other, j] of Object.entries(jobs)) if (other !== name) j.cancel();
-          if (!result.cached) this.remember(model.key, name); // a cache hit says nothing about speed
-          resolve({ ...result, engine: name });
-        }, (e) => {
-          if (settled || e.cancelled) return;
-          errors[name] = e;
-          if (Object.keys(errors).length === 2) { settled = true; reject(errors.native); }
-        });
-      }
-    });
-    return {
-      promise,
-      cancel() {
-        if (settled) return;
-        settled = true;
-        for (const j of Object.values(jobs)) j.cancel();
-        rejectRace(cancelledError());
-      },
-    };
+    return this.renderNative(model, values, onEvent);
   }
 
   renderNative(model, values, onEvent = () => {}) {
@@ -209,7 +142,7 @@ export async function createPlatform() {
     modelFile: async (sha) => new TextDecoder().decode(await apiBytes("blob", { sha })),
     /** A web link in the default browser. */
     openUrl: (url) => invoke("open_url", { url }).catch((err) => console.warn("open_url", err)),
-    makeEngine: (catalog) => new DesktopEngine(info, catalog, store.prefs),
+    makeEngine: (catalog) => new DesktopEngine(info, catalog),
     /** App files and the library's catalog, model pages and files (by relative path). */
     async fetch(path) {
       try {
