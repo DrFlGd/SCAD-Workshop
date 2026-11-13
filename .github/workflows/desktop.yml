@@ -253,7 +253,14 @@ jobs:
           import json
           once, plain = (json.load(open(f"ci-out/bench-native-windows{s}.json"))["results"] for s in ("", "-plain"))
           p = {r["key"]: r for r in plain}
-          differ = [r["key"] for r in once if r["mesh"] != p[r["key"]]["mesh"]]
+          # volume, area and size: OpenSCAD can triangulate a flat face differently from run to run
+          def same(a, b):
+              if not a or not b:
+                  return a == b
+              x = [a["volume"], a["area"], *a["size"]]
+              y = [b["volume"], b["area"], *b["size"]]
+              return all(abs(u - v) <= 1e-6 * max(1, abs(u), abs(v)) for u, v in zip(x, y))
+          differ = [r["key"] for r in once if not same(r["mesh"], p[r["key"]]["mesh"])]
           t1, t0 = sum(r["seconds"] for r in once), sum(r["seconds"] for r in plain)
           print(f"::notice title=Include once::{t0:.1f} s without it, {t1:.1f} s with it; meshes that differ: {differ or 'none'}")
           if differ:

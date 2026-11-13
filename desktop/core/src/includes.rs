@@ -19,7 +19,8 @@
 //!
 //! Includes inside a block (`module m() { include <x.scad> }`) are left alone. A file that isn't
 //! understood (an include from outside the model's folder, a path that doesn't end) leaves the
-//! model as it is. `WORKSHOP_INCLUDE_ONCE=0` turns this off.
+//! model as it is, and so does one in which no include would be left out (no copies are written).
+//! `WORKSHOP_INCLUDE_ONCE=0` turns this off.
 
 use anyhow::{Context, Result};
 use sha2::{Digest, Sha256};
@@ -334,25 +335,33 @@ impl Preparer<'_> {
                 e.insert(self.unit(&u)?);
             }
         }
-        let mut made: HashMap<PathBuf, PathBuf> = HashMap::new();
-        let mut included: HashSet<PathBuf> = HashSet::new();
-        let mut stack = vec![];
-        self.emit(root, &id, &once, &used, &mut included, &mut stack, &mut made)?;
-        Ok(made.get(root).cloned())
+        let mut u = Unit { id, once, used, included: HashSet::new(), stack: vec![], made: HashMap::new(), texts: vec![], changed: false };
+        let copy = self.emit(root, &mut u)?;
+        if !u.changed {
+            // nothing left out and no used file's copy: the files as they are (no copies)
+            return Ok(None);
+        }
+        // the root last, so a copy of it means all of them are there
+        for (rel, text) in u.texts {
+            let dst = self.tree.join(&rel);
+            let tmp = dst.with_extension(format!("tmp-{}-{:?}", std::process::id(), std::thread::current().id()).replace(['(', ')'], ""));
+            std::fs::write(&tmp, text).with_context(|| format!("writing {}", tmp.display()))?;
+            std::fs::rename(&tmp, &dst).with_context(|| format!("writing {}", dst.display()))?;
+        }
+        Ok(Some(copy))
     }
 
-    /// Write `file`'s copy for unit `id` (once), returning its tree-relative path.
-    #[allow(clippy::too_many_arguments)]
-    fn emit(&mut self, file: &Path, id: &str, once: &HashSet<PathBuf>, used: &HashMap<PathBuf, Option<PathBuf>>,
-            included: &mut HashSet<PathBuf>, stack: &mut Vec<PathBuf>, made: &mut HashMap<PathBuf, PathBuf>) -> Result<PathBuf> {
+    /// `file`'s copy for the unit (once): its text in `u.texts` (after those of the files it
+    /// includes), and its tree-relative path.
+    fn emit(&mut self, file: &Path, u: &mut Unit) -> Result<PathBuf> {
         let base = file.file_name().map(|n| n.to_string_lossy().into_owned()).unwrap_or_default();
-        let copy = file.with_file_name(copy_name(&base, id));
-        if made.contains_key(file) {
+        let copy = file.with_file_name(copy_name(&base, &u.id));
+        if u.made.contains_key(file) {
             return Ok(copy);
         }
         let (text, s) = self.file(file).context("a file went missing")?;
         let (text, directives) = (text.clone(), s.directives.clone());
-        stack.push(file.to_path_buf());
+        u.stack.push(file.to_path_buf());
         let mut out = String::with_capacity(text.len());
         let mut at = 0;
         for d in directives.iter().filter(|d| d.top) {
@@ -361,18 +370,22 @@ impl Preparer<'_> {
             // the path as written, its last part the copy's name
             let (dir, last) = name.rsplit_once(['/', '\\']).map_or(("", name), |(d, l)| (&name[..d.len() + 1], l));
             let replace = if d.include {
-                if stack.contains(&target) {
-                    Some(format!("include <{dir}{}>", copy_name(last, id)))
-                } else if once.contains(&target) && included.contains(&target) {
+                if u.stack.contains(&target) {
+                    Some(format!("include <{dir}{}>", copy_name(last, &u.id)))
+                } else if u.once.contains(&target) && u.included.contains(&target) {
+                    u.changed = true;
                     Some(String::new())
                 } else {
-                    included.insert(target.clone());
-                    self.emit(&target, id, once, used, included, stack, made)?;
-                    Some(format!("include <{dir}{}>", copy_name(last, id)))
+                    u.included.insert(target.clone());
+                    self.emit(&target, u)?;
+                    Some(format!("include <{dir}{}>", copy_name(last, &u.id)))
                 }
             } else {
                 // (the used file's own copy, when it has one)
-                used.get(&target).cloned().flatten().map(|_| format!("use <{dir}{}>", copy_name(last, &unit_id(&target))))
+                u.used.get(&target).cloned().flatten().map(|_| {
+                    u.changed = true;
+                    format!("use <{dir}{}>", copy_name(last, &unit_id(&target)))
+                })
             };
             if let Some(r) = replace {
                 out.push_str(&text[at..d.span.0]);
@@ -381,14 +394,30 @@ impl Preparer<'_> {
             }
         }
         out.push_str(&text[at..]);
-        stack.pop();
-        let dst = self.tree.join(&copy);
-        let tmp = dst.with_extension(format!("tmp-{}-{:?}", std::process::id(), std::thread::current().id()).replace(['(', ')'], ""));
-        std::fs::write(&tmp, out).with_context(|| format!("writing {}", tmp.display()))?;
-        std::fs::rename(&tmp, &dst).with_context(|| format!("writing {}", dst.display()))?;
-        made.insert(file.to_path_buf(), copy.clone());
+        u.stack.pop();
+        u.texts.push((copy.clone(), out));
+        u.made.insert(file.to_path_buf(), copy.clone());
         Ok(copy)
     }
+}
+
+/// One unit being prepared.
+struct Unit {
+    id: String,
+    /// files it's safe to include once
+    once: HashSet<PathBuf>,
+    /// the files it uses: their copies (None: used as they are)
+    used: HashMap<PathBuf, Option<PathBuf>>,
+    /// files included so far
+    included: HashSet<PathBuf>,
+    /// the includes being followed (a file that includes itself, round about, keeps its include)
+    stack: Vec<PathBuf>,
+    /// files done: their copies
+    made: HashMap<PathBuf, PathBuf>,
+    /// the copies' paths and texts, in the order to write them
+    texts: Vec<(PathBuf, String)>,
+    /// an include left out, or a used file's copy used: worth writing the copies
+    changed: bool,
 }
 
 #[cfg(test)]
@@ -476,9 +505,17 @@ mod tests {
             ("consts.scad", "pitch = 42;\n"),
             ("a.scad", "include <consts.scad>\nmodule box() cube(pitch);\n"),
         ]);
-        prepare(t.path(), Path::new("model.scad")).unwrap().unwrap();
-        let id = unit_id(Path::new("model.scad"));
-        assert_eq!(read(t.path(), &format!("a.~{id}.scad")), format!("include <consts.~{id}.scad>\nmodule box() cube(pitch);\n"));
+        // (nothing else would be left out, so the model is left as it is)
+        assert_eq!(prepare(t.path(), Path::new("model.scad")).unwrap(), None);
+        assert_eq!(std::fs::read_dir(t.path()).unwrap().count(), 3);
+    }
+
+    #[test]
+    fn no_copies_when_nothing_is_left_out() {
+        let t = tree(&[("model.scad", "minkowski() { cube(1); sphere(1); }\n"), ("lib.scad", "x = 1;\n"), ("two.scad", "include <lib.scad>\nuse <lib.scad>\ncube(x);\n")]);
+        assert_eq!(prepare(t.path(), Path::new("model.scad")).unwrap(), None);
+        assert_eq!(prepare(t.path(), Path::new("two.scad")).unwrap(), None);
+        assert_eq!(std::fs::read_dir(t.path()).unwrap().count(), 3);
     }
 
     #[test]
@@ -488,9 +525,15 @@ mod tests {
         let t = tree(&[("model.scad", "include <../outside.scad>\n")]);
         assert_eq!(prepare(t.path(), Path::new("model.scad")).unwrap(), None);
         // from the libraries folder, as OpenSCAD finds it there
-        let t = tree(&[("model.scad", "include <BOSL2/std.scad>\ncube(1);\n"), ("libraries/BOSL2/std.scad", "include <a.scad>\n"), ("libraries/BOSL2/a.scad", "a = 1;\n")]);
+        let t = tree(&[
+            ("model.scad", "include <BOSL2/std.scad>\ncube(1);\n"),
+            ("libraries/BOSL2/std.scad", "include <a.scad>\ninclude <b.scad>\n"),
+            ("libraries/BOSL2/a.scad", "a = 1;\n"),
+            ("libraries/BOSL2/b.scad", "include <a.scad>\nb = a;\n"),
+        ]);
         let id = unit_id(Path::new("model.scad"));
         prepare(t.path(), Path::new("model.scad")).unwrap().unwrap();
-        assert_eq!(read(t.path(), &format!("libraries/BOSL2/std.~{id}.scad")), format!("include <a.~{id}.scad>\n"));
+        assert_eq!(read(t.path(), &format!("libraries/BOSL2/std.~{id}.scad")), format!("include <a.~{id}.scad>\ninclude <b.~{id}.scad>\n"));
+        assert_eq!(read(t.path(), &format!("libraries/BOSL2/b.~{id}.scad")), "\nb = a;\n");
     }
 }

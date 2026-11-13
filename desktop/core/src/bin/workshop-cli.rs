@@ -27,7 +27,6 @@
 
 use anyhow::{bail, Context, Result};
 use serde_json::{json, Value};
-use sha2::{Digest, Sha256};
 use std::path::PathBuf;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
@@ -469,6 +468,34 @@ async fn library_summary(mut a: Args) -> Result<()> {
     Ok(())
 }
 
+/// A binary STL's volume, surface area and size. Not its bytes' hash: OpenSCAD can triangulate
+/// the same flat face differently from one run to the next (Manifold's threads), so two renders
+/// of one model can differ in their triangles but not in these.
+fn mesh_measures(stl: &[u8]) -> Option<serde_json::Value> {
+    let n = stl_triangles(stl)? as usize;
+    let body = stl.get(84..84 + 50 * n)?;
+    let (mut volume, mut area) = (0f64, 0f64);
+    let (mut lo, mut hi) = ([f64::MAX; 3], [f64::MIN; 3]);
+    for t in body.chunks_exact(50) {
+        let f = |i: usize| f32::from_le_bytes(t[i..i + 4].try_into().unwrap()) as f64;
+        let v: [[f64; 3]; 3] = std::array::from_fn(|k| std::array::from_fn(|j| f(12 + 12 * k + 4 * j)));
+        let cross = |a: [f64; 3], b: [f64; 3]| [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+        let sub = |a: [f64; 3], b: [f64; 3]| [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+        let c = cross(v[1], v[2]);
+        volume += (v[0][0] * c[0] + v[0][1] * c[1] + v[0][2] * c[2]) / 6.0;
+        let c = cross(sub(v[1], v[0]), sub(v[2], v[0]));
+        area += (c[0] * c[0] + c[1] * c[1] + c[2] * c[2]).sqrt() / 2.0;
+        for p in v {
+            for j in 0..3 {
+                lo[j] = lo[j].min(p[j]);
+                hi[j] = hi[j].max(p[j]);
+            }
+        }
+    }
+    let size: Vec<f64> = (0..3).map(|j| if n > 0 { hi[j] - lo[j] } else { 0.0 }).collect();
+    Some(json!({ "volume": volume, "area": area, "size": size }))
+}
+
 /// Render every model in a starter library, the way the app does (from library files).
 async fn bench_library(mut a: Args) -> Result<()> {
     let app_site = PathBuf::from(a.need("--app-site")?);
@@ -495,8 +522,8 @@ async fn bench_library(mut a: Args) -> Result<()> {
         let t0 = Instant::now();
         let res = r.render(&format!("bench-{}", key.replace('/', "-")), &req, |_| {}).await;
         let (status, tris, sha, err) = match res {
-            // (the mesh's hash: the same model gives the same mesh, with or without include once)
-            Ok(o) => ("pass", stl_triangles(&o.stl).unwrap_or(0), Some(hex::encode(&Sha256::digest(&o.stl)[..6])), None),
+            // (the mesh's measures: the same model gives the same, with or without include once)
+            Ok(o) => ("pass", stl_triangles(&o.stl).unwrap_or(0), mesh_measures(&o.stl), None),
             Err(e) => {
                 failed += 1;
                 ("fail", 0, None, Some(e.message))
