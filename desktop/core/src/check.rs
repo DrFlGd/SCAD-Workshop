@@ -232,8 +232,7 @@ mod tests {
     fn finds_and_repairs() {
         let dir = std::env::temp_dir().join(format!("gw-check-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&dir);
-        let prefs = crate::config::Prefs::new(dir.join("prefs.json"));
-        let (lib, _) = Library::open(dir.join("lib"), &prefs).unwrap();
+        let (lib, _) = Library::open(dir.join("lib")).unwrap();
         let src = lib.sources_dir();
         std::fs::create_dir_all(src.join("zip-a/files/v1")).unwrap();
         std::fs::create_dir_all(src.join("zip-a/docs/v0")).unwrap();

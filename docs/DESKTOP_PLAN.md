@@ -22,7 +22,7 @@ After the Fusion support was removed, the owner asked for a review of the app as
 | 6 | Component pictures made by CI and shipped with the app | Done |
 | 1 | Windows renders about 8 times slower than Linux: measure on the Windows runner, fix, then drop the race against the WebAssembly engine | Cause found (repeated includes, see CHANGELOG); include once built, Windows numbers next |
 | 10 | The website half of the front end removed (`platform.js`'s browser branch, `store-browser.js`) | |
-| 11 | Converters for libraries older than format 2 removed (owner: old libraries can be added again instead) | |
+| 11 | Converters for libraries older than format 2 removed (owner: old libraries can be added again instead) | Done (format 1 to 2 kept; the test library's `fill_in` waits for item 12) |
 | 12 | Small test projects in `tests/` instead of the 81 MB of website-era projects and the site build | |
 | 13 | `app.js` moved to Preact, a page at a time | |
 

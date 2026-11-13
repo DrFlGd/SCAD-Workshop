@@ -99,11 +99,6 @@ pub fn upgrade(kind: Kind, v: &mut Value, path: Option<&Path>) -> bool {
         Kind::PartRecipe => {
             let stem = path.and_then(|p| p.file_name()).and_then(|n| n.to_str()).and_then(|n| n.strip_suffix(".recipe.json"));
             recipe(v, true, stem);
-            // made before 0.4.20 the type wasn't recorded: the part beside it says
-            if v["output"].as_str().is_none() {
-                let three = stem.zip(path.and_then(Path::parent)).is_some_and(|(s, d)| d.join(format!("{s}.3mf")).is_file());
-                v["output"] = json!(if three { "3mf" } else { "stl" });
-            }
         }
         _ => {}
     }

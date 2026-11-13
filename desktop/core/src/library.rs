@@ -22,7 +22,7 @@
 //!
 //! No database lives here: the app's search index and render cache are on the computer.
 
-use crate::config::{read_json_object, write_json, Prefs};
+use crate::config::{read_json_object, write_json};
 use anyhow::{bail, Context, Result};
 use serde_json::{json, Map, Value};
 use std::path::{Component, Path, PathBuf};
@@ -34,542 +34,7 @@ pub const FORMAT: u64 = 2;
 
 const SUBDIRS: [&str; 4] = ["sources", "local", "collections", "recipes"];
 
-/// The README.txt written before 0.4.4: replaced when found unchanged.
-const README_0_4_3: &str = "SCAD Workshop library\n\
-\n\
-This folder is a library for the SCAD Workshop desktop app: projects you added,\n\
-your own projects, saved settings and all your edits. Move it, copy it, sync it\n\
-or keep it in git, then use \"Open library...\" in the app to use it anywhere.\n\
-\n\
-  library.json    name, favourites and library-wide settings\n\
-  sources/        one folder per project: source.json (where it came from),\n\
-                  metadata.json (your edits), files/ (the project's files, untouched)\n\
-  local/          your own projects: put .scad or model files in a folder here\n\
-  recipes/        saved settings\n\
-\n\
-The app's render cache and search index are kept on each computer, not here.\n";
-
-/// The README.txt written by 0.4.4 and 0.4.5, by 0.4.6 and by 0.4.7: replaced when found unchanged.
-const README_0_4_4: &str = "SCAD Workshop library\n\
-\n\
-This folder is a library for the SCAD Workshop desktop app: projects you added,\n\
-your own projects, saved settings and all your edits. Move it, copy it, sync it\n\
-or keep it in git, then use \"Open library...\" in the app to use it anywhere.\n\
-\n\
-  library.json    name, favourites, categories and library-wide settings\n\
-  sources/        one folder per project (below)\n\
-  local/          your own projects: put .scad or model files in a folder here\n\
-  recipes/        saved settings, with any code edits\n\
-  collections/    collections (coming)\n\
-  icons/          pictures you chose for categories\n\
-  thumbs/         thumbnails of components (rebuildable)\n\
-  trash/          deleted projects, until you empty the trash\n\
-\n\
-Inside sources/<project>/:\n\
-  source.json     where it came from (GitHub, ZIP, folder), its versions, updates\n\
-  metadata.json   your edits: names, categories, licenses, forms\n\
-  files/<version>/   the project's files exactly as they came, never changed\n\
-  derived/        what the app found when it read them (rebuildable)\n\
-  generated/      copies made so typed-in values become settings (rebuildable)\n\
-  docs/           the README as HTML, PDFs (rebuildable)\n\
-  thumbs/, previews/   pictures (rebuildable)\n\
-\n\
-Rebuildable folders can be deleted: the app makes them again.\n\
-The app's render cache and search index are kept on each computer, not here.\n";
-
-const README_0_4_6: &str = "SCAD Workshop library\n\
-\n\
-This folder is a library for the SCAD Workshop desktop app: projects you added,\n\
-your own projects, saved settings and all your edits. Move it, copy it, sync it\n\
-or keep it in git, then use \"Open library...\" in the app to use it anywhere.\n\
-\n\
-  library.json    name, favourites, categories and library-wide settings\n\
-  sources/        one folder per project (below)\n\
-  local/          your own projects: put .scad or model files in a folder here\n\
-  recipes/        saved settings, with any code edits\n\
-  collections/    collections (coming)\n\
-  icons/          pictures you chose for categories\n\
-  thumbs/         thumbnails of components (rebuildable)\n\
-  trash/          deleted projects, until you empty the trash\n\
-\n\
-Inside sources/<project>/:\n\
-  source.json     where it came from (GitHub, ZIP, folder), its versions, updates\n\
-  metadata.json   your edits: names, categories, licenses, forms\n\
-  files/<version>/   the project's files exactly as they came, never changed\n\
-  derived/        what the app found when it read them (rebuildable)\n\
-  generated/      copies made so typed-in values become settings (rebuildable)\n\
-  docs/           the README as HTML, PDFs (rebuildable)\n\
-  thumbs/, previews/   pictures (rebuildable)\n\
-  checks.json     whether each model renders at its defaults (rebuildable)\n\
-\n\
-Rebuildable folders can be deleted: the app makes them again.\n\
-The app's render cache and search index are kept on each computer, not here.\n";
-
-const README_0_4_7: &str = "SCAD Workshop library\n\
-\n\
-This folder is a library for the SCAD Workshop desktop app: projects you added,\n\
-your own projects, saved settings and all your edits. Move it, copy it, sync it\n\
-or keep it in git, then use \"Open library...\" in the app to use it anywhere.\n\
-\n\
-  library.json    name, favourites, categories and library-wide settings\n\
-  sources/        one folder per project (below)\n\
-  local/          your own projects: put .scad or model files in a folder here\n\
-  recipes/        saved settings, with any code edits\n\
-  collections/    collections (coming)\n\
-  icons/          pictures you chose for categories\n\
-  thumbs/         thumbnails of components (rebuildable)\n\
-  trash/          deleted projects, until you empty the trash\n\
-\n\
-Inside sources/<project>/:\n\
-  source.json     where it came from (GitHub, ZIP, folder), its versions, updates\n\
-  metadata.json   your edits: names, categories, licenses, forms\n\
-  files/<version>/   the project's files exactly as they came, never changed\n\
-  derived/        what the app found when it read them (rebuildable)\n\
-  generated/      copies made so typed-in values become settings (rebuildable)\n\
-  docs/           the README as HTML, PDFs (rebuildable)\n\
-  thumbs/, previews/   pictures (rebuildable)\n\
-  checks.json     whether each model renders at its defaults (rebuildable)\n\
-  workshop.json   what the project is: its models and their names (rebuildable)\n\
-\n\
-Rebuildable folders can be deleted: the app makes them again.\n\
-The app's render cache and search index are kept on each computer, not here.\n";
-
-const README_0_4_8: &str = "SCAD Workshop library\n\
-\n\
-This folder is a library for the SCAD Workshop desktop app: projects you added,\n\
-your own projects, saved settings and all your edits. Move it, copy it, sync it\n\
-or keep it in git, then use \"Open library...\" in the app to use it anywhere.\n\
-\n\
-  library.json    name, favourites, categories and library-wide settings\n\
-  sources/        one folder per project (below)\n\
-  local/          your own projects: put .scad or model files in a folder here\n\
-  recipes/        saved settings, with any code edits\n\
-  collections/    collections (coming)\n\
-  icons/          pictures you chose for categories\n\
-  thumbs/         thumbnails of components (rebuildable)\n\
-  trash/          deleted projects, until you empty the trash\n\
-\n\
-Inside sources/<project>/:\n\
-  source.json     where it came from (GitHub, ZIP, folder), its versions, updates;\n\
-                  \"version\" is the one in use\n\
-  metadata.json   your edits: names, categories, licenses, forms\n\
-  files/<version>/   the project's files exactly as they came, never changed. It can\n\
-                  hold several versions: Versions > Remove versions not in use, on\n\
-                  the project's page, deletes the others\n\
-  derived/        what the app found when it read them (rebuildable)\n\
-  generated/      copies made so typed-in values become settings (rebuildable)\n\
-  docs/           the README as HTML, PDFs (rebuildable)\n\
-  thumbs/         pictures of its models and parts (rebuildable)\n\
-  previews/       models the app made for its parts (rebuildable)\n\
-  checks.json     whether each model renders at its defaults (rebuildable)\n\
-  workshop.json   what the project is: its models and their names (rebuildable)\n\
-\n\
-Your own projects (local/<name>/) are read where they are: their sources/ folder\n\
-has no files/. sources/pinned/pins/ holds the components you pinned as models:\n\
-keep it, it isn't rebuildable.\n\
-\n\
-Rebuildable folders can be deleted: the app makes them again.\n\
-The app's render cache and search index are kept on each computer, not here.\n";
-
-/// The README.txt written by 0.4.9: replaced when found unchanged.
-const README_0_4_9: &str = "SCAD Workshop library\n\
-\n\
-This folder is a library for the SCAD Workshop desktop app: projects you added,\n\
-your own projects, saved settings and all your edits. Move it, copy it, sync it\n\
-or keep it in git, then use \"Open library...\" in the app to use it anywhere.\n\
-\n\
-  library.json    name, favourites, categories and library-wide settings\n\
-  sources/        one folder per project (below)\n\
-  local/          your own projects: put .scad or model files in a folder here\n\
-  recipes/        saved settings, with any code edits\n\
-  collections/    collections (coming)\n\
-  icons/          pictures you chose for categories\n\
-  thumbs/         thumbnails of components (rebuildable)\n\
-  trash/          deleted projects, until you empty the trash\n\
-\n\
-Inside sources/<project>/:\n\
-  source.json     where it came from (GitHub, ZIP, folder), its versions, updates;\n\
-                  \"version\" is the one in use\n\
-  metadata.json   your edits: names, categories, licenses, forms\n\
-  files/<version>/   the project's files exactly as they came, never changed. It can\n\
-                  hold several versions: Versions > Remove versions not in use, on\n\
-                  the project's page, deletes the others\n\
-  derived/        what the app found when it read them (rebuildable)\n\
-  generated/      copies made so typed-in values become settings (rebuildable)\n\
-  docs/           the README as HTML, PDFs (rebuildable)\n\
-  thumbs/         pictures of its models and parts (rebuildable)\n\
-  previews/       models the app made for its parts (rebuildable)\n\
-  checks.json     whether each model renders at its defaults (rebuildable)\n\
-  workshop.json   what the project is: its models and their names (rebuildable)\n\
-  description.json   the app's description of a project it knows from GitHub (a\n\
-                  starter project from an earlier app, Gridfinity Rebuilt...): which\n\
-                  files are models and their forms, when the project has no\n\
-                  workshop.json of its own. Keep it\n\
-\n\
-Your own projects (local/<name>/) are read where they are: their sources/ folder\n\
-has no files/. sources/pinned/pins/ holds the components you pinned as models:\n\
-keep it, it isn't rebuildable.\n\
-\n\
-Rebuildable folders can be deleted: the app makes them again.\n\
-The app's render cache and search index are kept on each computer, not here.\n";
-
-/// Written with concat! so its lines keep their indentation (a `\` line continuation drops it, F-18).
-/// The README.txt written by 0.4.10 and 0.4.11: replaced when found unchanged.
-const README_0_4_10: &str = concat!(
-    "SCAD Workshop library\n",
-    "\n",
-    "This folder is a library for the SCAD Workshop desktop app: projects you added,\n",
-    "your own projects, saved settings and all your edits. Move it, copy it, sync it\n",
-    "or keep it in git, then use \"Open library...\" in the app to use it anywhere.\n",
-    "\n",
-    "  library.json    name, favourites, categories and library-wide settings\n",
-    "  sources/        one folder per project (below)\n",
-    "  local/          your own projects: put .scad or model files in a folder here\n",
-    "  recipes/        saved settings, with any code edits\n",
-    "  collections/    collections (coming)\n",
-    "  icons/          pictures you chose for categories\n",
-    "  thumbs/         thumbnails of components (rebuildable)\n",
-    "  trash/          deleted projects, until you empty the trash\n",
-    "\n",
-    "Inside sources/<project>/:\n",
-    "  source.json     where it came from and its versions; \"version\" is the one in\n",
-    "                  use. origin.type says where from: github (checked for updates),\n",
-    "                  zip, folder (copied in), linked (a folder elsewhere, below),\n",
-    "                  local (local/<name>/), app (a starter project from an earlier\n",
-    "                  app) or pinned (your pinned components)\n",
-    "  metadata.json   your edits: names, categories, licenses, forms\n",
-    "  files/<version>/   the project's files exactly as they came, never changed. It\n",
-    "                  can hold several versions: on the project's page, Versions >\n",
-    "                  Remove versions not in use deletes the others\n",
-    "  derived/        what the app found when it read them (rebuildable)\n",
-    "  generated/      copies made so typed-in values become settings (rebuildable)\n",
-    "  docs/           the README as HTML, PDFs (rebuildable)\n",
-    "  thumbs/         pictures of its models and parts (rebuildable)\n",
-    "  previews/       models the app made for its parts (rebuildable)\n",
-    "  checks.json     whether each model renders at its defaults (rebuildable)\n",
-    "  workshop.json   what the app read the project as: its models and their\n",
-    "                  names and forms. It reports; it doesn't decide (rebuildable)\n",
-    "  description.json   the app's description of a project it knows from GitHub (a\n",
-    "                  starter project from an earlier app, Gridfinity Rebuilt...):\n",
-    "                  names and forms for the files it lists, and the files it leaves\n",
-    "                  out; any other file that draws something is a model too. Used\n",
-    "                  when the project has no workshop.json of its own. Keep it\n",
-    "\n",
-    "Your own projects (local/<name>/) are read where they are: their sources/ folder\n",
-    "has no files/. Linked projects (origin \"linked\") are read from their own folder\n",
-    "outside the library: they don't move with it and aren't in its backups.\n",
-    "sources/pinned/pins/ holds the components you pinned as models: keep it, it\n",
-    "isn't rebuildable.\n",
-    "\n",
-    "Rebuildable folders can be deleted: the app makes them again.\n",
-    "The app's render cache and search index are kept on each computer, not here.\n",
-);
-
-/// The README.txt written by 0.4.12: replaced when found unchanged.
-const README_0_4_12: &str = concat!(
-    "SCAD Workshop library\n",
-    "\n",
-    "This folder is a library for the SCAD Workshop desktop app: projects you added,\n",
-    "your own projects, saved settings and all your edits. Move it, copy it, sync it\n",
-    "or keep it in git, then use \"Open library...\" in the app to use it anywhere.\n",
-    "\n",
-    "  library.json    name, favourites, categories and library-wide settings\n",
-    "  sources/        one folder per project (below)\n",
-    "  local/          your own projects: put .scad or model files in a folder here\n",
-    "  recipes/        saved settings, with any code edits\n",
-    "  collections/    collections (coming)\n",
-    "  icons/          pictures you chose for categories\n",
-    "  thumbs/         thumbnails of components (rebuildable)\n",
-    "  trash/          deleted projects, until you empty the trash\n",
-    "\n",
-    "Inside sources/<project>/:\n",
-    "  source.json     where it came from and its versions; \"version\" is the one in\n",
-    "                  use. origin.type says where from: github (checked for updates),\n",
-    "                  zip, folder (copied in), linked (a folder elsewhere, below),\n",
-    "                  local (local/<name>/), app (a starter project from an earlier\n",
-    "                  app) or pinned (your pinned components)\n",
-    "  metadata.json   your edits: names, categories, licenses, forms\n",
-    "  files/<version>/   the project's files exactly as they came, never changed. It\n",
-    "                  can hold several versions: on the project's page, Versions >\n",
-    "                  Remove versions not in use deletes the others\n",
-    "  derived/        what the app found when it read them (rebuildable)\n",
-    "  generated/      copies made so typed-in values become settings (rebuildable)\n",
-    "  docs/           the README as HTML, PDFs (rebuildable)\n",
-    "  thumbs/         pictures of its models and parts (rebuildable)\n",
-    "  examples/       parts made from a folder of examples (rebuildable)\n",
-    "  previews/       models the app made for its parts (rebuildable)\n",
-    "  checks.json     whether each model renders at its defaults (rebuildable)\n",
-    "  workshop.json   what the app read the project as: its models and their\n",
-    "                  names and forms. It reports; it doesn't decide (rebuildable)\n",
-    "  description.json   the app's description of a project it knows from GitHub (a\n",
-    "                  starter project from an earlier app, Gridfinity Rebuilt...):\n",
-    "                  names and forms for the files it lists, and the files it leaves\n",
-    "                  out; any other file that draws something is a model too. Used\n",
-    "                  when the project has no workshop.json of its own. Keep it\n",
-    "\n",
-    "Your own projects (local/<name>/) are read where they are: their sources/ folder\n",
-    "has no files/. Linked projects (origin \"linked\") are read from their own folder\n",
-    "outside the library: they don't move with it and aren't in its backups.\n",
-    "sources/pinned/pins/ holds the components you pinned as models: keep it, it\n",
-    "isn't rebuildable.\n",
-    "\n",
-    "Rebuildable folders can be deleted: the app makes them again.\n",
-    "The app's render cache and search index are kept on each computer, not here.\n",
-);
-
-/// The README.txt written by 0.4.13 to 0.4.16: replaced when found unchanged.
-const README_0_4_16: &str = concat!(
-    "SCAD Workshop library\n",
-    "\n",
-    "This folder is a library for the SCAD Workshop desktop app: projects you added,\n",
-    "your own projects, saved settings and all your edits. Move it, copy it, sync it\n",
-    "or keep it in git, then use \"Open library...\" in the app to use it anywhere.\n",
-    "\n",
-    "  library.json    name, favourites, categories and library-wide settings\n",
-    "  sources/        one folder per project (below)\n",
-    "  local/          your own projects: put .scad or model files in a folder here\n",
-    "  recipes/        saved settings, with any code edits\n",
-    "  collections/    collections (coming)\n",
-    "  icons/          pictures you chose for categories\n",
-    "  thumbs/         thumbnails of components (rebuildable)\n",
-    "  trash/          deleted projects, until you empty the trash\n",
-    "\n",
-    "Inside sources/<project>/:\n",
-    "  source.json     where it came from and its versions; \"version\" is the one in\n",
-    "                  use. origin.type says where from: github (checked for updates),\n",
-    "                  zip, folder (copied in), linked (a folder elsewhere, below),\n",
-    "                  local (local/<name>/), app (a starter project from an earlier\n",
-    "                  app) or pinned (your pinned components)\n",
-    "  metadata.json   your edits: names, categories, licenses, forms\n",
-    "  files/<version>/   the project's files exactly as they came, never changed. It\n",
-    "                  can hold several versions: on the project's page, Versions >\n",
-    "                  Remove versions not in use deletes the others\n",
-    "  derived/        what the app found when it read them (rebuildable)\n",
-    "  generated/      copies made so typed-in values become settings (rebuildable)\n",
-    "  docs/           the README as HTML, PDFs (rebuildable)\n",
-    "  thumbs/         pictures of its models and parts (rebuildable)\n",
-    "  examples/<fingerprint>/   parts made from a folder of examples, kept by the\n",
-    "                  files each example uses (rebuildable)\n",
-    "  previews/       models the app made for its parts (rebuildable)\n",
-    "  checks.json     whether each model renders at its defaults (rebuildable)\n",
-    "  workshop.json   what the app read the project as: its models and their\n",
-    "                  names and forms. It reports; it doesn't decide (rebuildable)\n",
-    "  description.json   the app's description of a project it knows from GitHub (a\n",
-    "                  starter project from an earlier app, Gridfinity Rebuilt...):\n",
-    "                  names and forms for the files it lists, and the files it leaves\n",
-    "                  out; any other file that draws something is a model too. Used\n",
-    "                  when the project has no workshop.json of its own. Keep it\n",
-    "\n",
-    "Your own projects (local/<name>/) are read where they are: their sources/ folder\n",
-    "has no files/. Linked projects (origin \"linked\") are read from their own folder\n",
-    "outside the library: they don't move with it and aren't in its backups.\n",
-    "sources/pinned/pins/ holds the components you pinned as models: keep it, it\n",
-    "isn't rebuildable.\n",
-    "\n",
-    "local/Made parts/<model>/ holds the parts you made from models (Save as part,\n",
-    "Make several), in a folder per model (\"<model> (<project>)\" when two models\n",
-    "share a name). Beside each part, <name>.recipe.json says how it was made: the\n",
-    "model, its changed settings and code edits, and the fingerprint of the files\n",
-    "the model used. Make again and Open with these settings read it: keep it, it\n",
-    "isn't rebuildable.\n",
-    "\n",
-    "Rebuildable folders can be deleted: the app makes them again.\n",
-    "The app's render cache and search index are kept on each computer, not here.\n",
-);
-
-/// The README.txt written by 0.4.17: replaced when found unchanged.
-const README_0_4_17: &str = concat!(
-    "SCAD Workshop library\n",
-    "\n",
-    "This folder is a library for the SCAD Workshop desktop app: projects you added,\n",
-    "your own projects, saved settings and all your edits. Move it, copy it, sync it\n",
-    "or keep it in git, then use \"Open library...\" in the app to use it anywhere.\n",
-    "\n",
-    "  library.json    name, favourites, categories and library-wide settings\n",
-    "  sources/        one folder per project (below)\n",
-    "  local/          your own projects: put .scad or model files in a folder here\n",
-    "  recipes/        saved settings, with any code edits\n",
-    "  collections/    lists of parts and models (by name, not copies) with quantities\n",
-    "                  and what is printed: collections/<id>/collection.json\n",
-    "  icons/          pictures you chose for categories\n",
-    "  thumbs/         thumbnails of components (rebuildable)\n",
-    "  trash/          deleted projects, until you empty the trash\n",
-    "\n",
-    "Inside sources/<project>/:\n",
-    "  source.json     where it came from and its versions; \"version\" is the one in\n",
-    "                  use. origin.type says where from: github (checked for updates),\n",
-    "                  zip, folder (copied in), linked (a folder elsewhere, below),\n",
-    "                  local (local/<name>/), app (a starter project from an earlier\n",
-    "                  app) or pinned (your pinned components)\n",
-    "  metadata.json   your edits: names, categories, licenses, forms\n",
-    "  files/<version>/   the project's files exactly as they came, never changed. It\n",
-    "                  can hold several versions: on the project's page, Versions >\n",
-    "                  Remove versions not in use deletes the others\n",
-    "  derived/        what the app found when it read them (rebuildable)\n",
-    "  generated/      copies made so typed-in values become settings (rebuildable)\n",
-    "  docs/           the README as HTML, PDFs (rebuildable)\n",
-    "  thumbs/         pictures of its models and parts (rebuildable)\n",
-    "  examples/<fingerprint>/   parts made from a folder of examples, kept by the\n",
-    "                  files each example uses (rebuildable)\n",
-    "  previews/       models the app made for its parts (rebuildable)\n",
-    "  checks.json     whether each model renders at its defaults (rebuildable)\n",
-    "  workshop.json   what the app read the project as: its models and their\n",
-    "                  names and forms. It reports; it doesn't decide (rebuildable)\n",
-    "  description.json   the app's description of a project it knows from GitHub (a\n",
-    "                  starter project from an earlier app, Gridfinity Rebuilt...):\n",
-    "                  names and forms for the files it lists, and the files it leaves\n",
-    "                  out; any other file that draws something is a model too. Used\n",
-    "                  when the project has no workshop.json of its own. Keep it\n",
-    "\n",
-    "Your own projects (local/<name>/) are read where they are: their sources/ folder\n",
-    "has no files/. Linked projects (origin \"linked\") are read from their own folder\n",
-    "outside the library: they don't move with it and aren't in its backups.\n",
-    "sources/pinned/pins/ holds the components you pinned as models: keep it, it\n",
-    "isn't rebuildable.\n",
-    "\n",
-    "local/Made parts/<model>/ holds the parts you made from models (Save as part,\n",
-    "Make several), in a folder per model (\"<model> (<project>)\" when two models\n",
-    "share a name). Beside each part, <name>.recipe.json says how it was made: the\n",
-    "model, its changed settings and code edits, and the fingerprint of the files\n",
-    "the model used. Make again and Open with these settings read it: keep it, it\n",
-    "isn't rebuildable.\n",
-    "\n",
-    "Rebuildable folders can be deleted: the app makes them again.\n",
-    "The app's render cache and search index are kept on each computer, not here.\n",
-);
-
-/// The README.txt written by 0.4.18 and 0.4.19: replaced when found unchanged.
-const README_0_4_18: &str = concat!(
-    "SCAD Workshop library\n",
-    "\n",
-    "This folder is a library for the SCAD Workshop desktop app: projects you added,\n",
-    "your own projects, saved settings and all your edits. Move it, copy it, sync it\n",
-    "or keep it in git, then use \"Open library...\" in the app to use it anywhere.\n",
-    "\n",
-    "  library.json    name, favourites, categories and library-wide settings\n",
-    "  sources/        one folder per project (below)\n",
-    "  local/          your own projects: put .scad or model files in a folder here\n",
-    "  recipes/        saved settings, with any code edits\n",
-    "  collections/    lists of parts and models (by name, not copies) with quantities\n",
-    "                  and what is printed: collections/<id>/collection.json\n",
-    "  icons/          pictures you chose for categories\n",
-    "  thumbs/         thumbnails of components (rebuildable)\n",
-    "  trash/          deleted projects, until you empty the trash\n",
-    "\n",
-    "Inside sources/<project>/:\n",
-    "  source.json     where it came from and its versions; \"version\" is the one in\n",
-    "                  use. origin.type says where from: github (checked for updates),\n",
-    "                  zip, folder (copied in), linked (a folder elsewhere, below),\n",
-    "                  local (local/<name>/), app (a starter project from an earlier\n",
-    "                  app) or pinned (your pinned components).\n",
-    "                  origin.site names the model's page on a site (Printables) and\n",
-    "                  the PDF of that page among its files. \"detected\" is what was\n",
-    "                  read from the files and that PDF; your edits win over it\n",
-    "  metadata.json   your edits: names, categories, licenses, forms\n",
-    "  files/<version>/   the project's files exactly as they came, never changed. It\n",
-    "                  can hold several versions: on the project's page, Versions >\n",
-    "                  Remove versions not in use deletes the others\n",
-    "  derived/        what the app found when it read them (rebuildable)\n",
-    "  generated/      copies made so typed-in values become settings (rebuildable)\n",
-    "  docs/           the README as HTML, PDFs (rebuildable)\n",
-    "  thumbs/         pictures of its models and parts (rebuildable)\n",
-    "  examples/<fingerprint>/   parts made from a folder of examples, kept by the\n",
-    "                  files each example uses (rebuildable)\n",
-    "  previews/       models the app made for its parts (rebuildable)\n",
-    "  checks.json     whether each model renders at its defaults (rebuildable)\n",
-    "  workshop.json   what the app read the project as: its models and their\n",
-    "                  names and forms. It reports; it doesn't decide (rebuildable)\n",
-    "  description.json   the app's description of a project it knows from GitHub (a\n",
-    "                  starter project from an earlier app, Gridfinity Rebuilt...):\n",
-    "                  names and forms for the files it lists, and the files it leaves\n",
-    "                  out; any other file that draws something is a model too. Used\n",
-    "                  when the project has no workshop.json of its own. Keep it\n",
-    "\n",
-    "Your own projects (local/<name>/) are read where they are: their sources/ folder\n",
-    "has no files/. Linked projects (origin \"linked\") are read from their own folder\n",
-    "outside the library: they don't move with it and aren't in its backups.\n",
-    "sources/pinned/pins/ holds the components you pinned as models: keep it, it\n",
-    "isn't rebuildable.\n",
-    "\n",
-    "local/Made parts/<model>/ holds the parts you made from models (Save as part,\n",
-    "Make several), in a folder per model (\"<model> (<project>)\" when two models\n",
-    "share a name). Beside each part, <name>.recipe.json says how it was made: the\n",
-    "model, its changed settings and code edits, and the fingerprint of the files\n",
-    "the model used. Make again and Open with these settings read it: keep it, it\n",
-    "isn't rebuildable.\n",
-    "\n",
-    "Rebuildable folders can be deleted: the app makes them again.\n",
-    "The app's render cache and search index are kept on each computer, not here.\n",
-);
-
-/// The README.txt written by 0.4.20 and 0.4.21: replaced when found unchanged.
-const README_0_4_20: &str = concat!(
-    "SCAD Workshop library\n",
-    "\n",
-    "This folder is a library for the SCAD Workshop desktop app: projects you added,\n",
-    "your own projects, saved settings and all your edits. Move it, copy it, sync it\n",
-    "or keep it in git, then use \"Open library...\" in the app to use it anywhere.\n",
-    "\n",
-    "  library.json    name, favourites, categories and library-wide settings\n",
-    "  sources/        one folder per project (below)\n",
-    "  local/          your own projects: put .scad or model files in a folder here\n",
-    "  recipes/        saved settings, with any code edits\n",
-    "  collections/    lists of parts and models with quantities and how many are\n",
-    "                  printed: collections/<id>/collection.json. Entries refer to\n",
-    "                  items by id (part:<project>/<part>, gen:<project>/<model>), not\n",
-    "                  copies; a model's entry keeps its settings and the fingerprint\n",
-    "                  of the files it used, as a recipe does\n",
-    "  icons/          pictures you chose for categories\n",
-    "  thumbs/         thumbnails of components (rebuildable)\n",
-    "  trash/          deleted projects, until you empty the trash\n",
-    "\n",
-    "Inside sources/<project>/:\n",
-    "  source.json     where it came from and its versions; \"version\" is the one in\n",
-    "                  use. origin.type says where from: github (checked for updates),\n",
-    "                  zip, folder (copied in), linked (a folder elsewhere, below),\n",
-    "                  local (local/<name>/), app (a starter project from an earlier\n",
-    "                  app) or pinned (your pinned components).\n",
-    "                  origin.site names the model's page on a site (Printables) and\n",
-    "                  the PDF of that page among its files. \"detected\" is what was\n",
-    "                  read from the files and that PDF; your edits win over it\n",
-    "  metadata.json   your edits: names, categories, licenses, forms, parts made into\n",
-    "                  one and files kept apart (\"apart\"), projects merged into it,\n",
-    "                  and what its folder of examples should be\n",
-    "  files/<version>/   the project's files exactly as they came, never changed. It\n",
-    "                  can hold several versions: on the project's page, Versions >\n",
-    "                  Remove versions not in use deletes the others\n",
-    "  derived/        what the app found when it read them (rebuildable)\n",
-    "  generated/      copies made so typed-in values become settings (rebuildable)\n",
-    "  docs/           the README as HTML, PDFs (rebuildable)\n",
-    "  thumbs/         pictures of its models and parts (rebuildable)\n",
-    "  examples/<fingerprint>/   parts made from a folder of examples, kept by the\n",
-    "                  files each example uses (rebuildable)\n",
-    "  previews/       models the app made for its parts (rebuildable)\n",
-    "  checks.json     whether each model renders at its defaults (rebuildable)\n",
-    "  workshop.json   what the app read the project as: its models and their\n",
-    "                  names and forms. It reports; it doesn't decide (rebuildable)\n",
-    "  description.json   the app's description of a project it knows from GitHub (a\n",
-    "                  starter project from an earlier app, Gridfinity Rebuilt...):\n",
-    "                  names and forms for the files it lists, and the files it leaves\n",
-    "                  out; any other file that draws something is a model too. Used\n",
-    "                  when the project has no workshop.json of its own. Keep it\n",
-    "\n",
-    "Your own projects (local/<name>/) are read where they are: their sources/ folder\n",
-    "has no files/. Linked projects (origin \"linked\") are read from their own folder\n",
-    "outside the library: they don't move with it and aren't in its backups.\n",
-    "sources/pinned/pins/ holds the components you pinned as models: keep it, it\n",
-    "isn't rebuildable.\n",
-    "\n",
-    "local/Made parts/<model>/ holds the parts you made from models (Save as part,\n",
-    "Make several), in a folder per model (\"<model> (<project>)\" when two models\n",
-    "share a name), as .stl or .3mf (the format chosen beside Download). Beside each\n",
-    "part, <name>.recipe.json says how it was made: the model, its changed settings\n",
-    "and code edits, the format, and the fingerprint of the files the model used.\n",
-    "Make again and Open with these settings read it: keep it, it isn't rebuildable.\n",
-    "\n",
-    "Rebuildable folders can be deleted: the app makes them again.\n",
-    "The app's render cache and search index are kept on each computer, not here.\n",
-);
+/// The README.txt that 0.4.22 and 0.4.23 wrote: replaced when found unchanged.
 const README_0_4_22: &str = concat!(
     "SCAD Workshop library\n",
     "\n",
@@ -817,14 +282,11 @@ pub struct Library {
     read_only: Option<String>,
 }
 
-/// What opening a Phase 1 workspace moved.
+/// What opening a library changed.
 #[derive(Debug, Default)]
 pub struct Migration {
     /// Files brought up to this version's format on opening (backed up first).
     pub upgraded: Vec<String>,
-    pub recipes: usize,
-    pub prefs_moved: bool,
-    pub cache_removed: bool,
 }
 
 pub fn valid_id(id: &str) -> Result<()> {
@@ -877,9 +339,9 @@ fn random_id(prefix: &str) -> String {
 }
 
 impl Library {
-    /// Open a library folder, creating it if needed and upgrading a Phase 1
-    /// workspace (saved settings -> recipes/, preferences -> the app, cache removed).
-    pub fn open(root: impl Into<PathBuf>, app_prefs: &Prefs) -> Result<(Self, Migration)> {
+    /// Open a library folder, creating it if needed, and bring a format 1 library (0.4.21 and
+    /// before) to format 2.
+    pub fn open(root: impl Into<PathBuf>) -> Result<(Self, Migration)> {
         let root = root.into();
         std::fs::create_dir_all(&root).with_context(|| format!("couldn't create {}", root.display()))?;
         let meta_path = root.join("library.json");
@@ -902,21 +364,13 @@ impl Library {
         }
         let fresh = !meta_path.is_file();
         if fresh {
-            migration = lib.migrate_workspace(app_prefs)?;
             let name = lib.root.file_name().map(|n| n.to_string_lossy().into_owned()).unwrap_or_else(|| "Library".into());
-            write_json(
-                &meta_path,
-                &json!({ "format": FORMAT, "id": random_id("lib-"), "name": name, "created": now_iso(), "favourites": migration_favs(&lib) }),
-            )?;
-            let _ = std::fs::remove_file(lib.root.join(".favourites-migrated.json"));
+            write_json(&meta_path, &json!({ "format": FORMAT, "id": random_id("lib-"), "name": name, "created": now_iso(), "favourites": [] }))?;
         }
         let readme = lib.root.join("README.txt");
         let old_readme = std::fs::read_to_string(&readme).ok();
-        // written by the app (a Phase 1 workspace's, or an older version's left as it was): replaced;
-        // one the user changed is left alone
-        if old_readme.as_deref().is_none_or(|t| {
-            t.starts_with("SCAD Workshop workspace") || t.starts_with("Claude Grid Workshop workspace") || [README_0_4_3, README_0_4_4, README_0_4_6, README_0_4_7, README_0_4_8, README_0_4_9, README_0_4_10, README_0_4_12, README_0_4_16, README_0_4_17, README_0_4_18, README_0_4_20, README_0_4_22, README_0_4_23].contains(&t)
-        }) {
+        // written by an older version and left as it was: replaced; one the user changed is left alone
+        if old_readme.as_deref().is_none_or(|t| [README_0_4_22, README_0_4_23].contains(&t)) {
             let _ = std::fs::write(&readme, README);
         }
         if fresh || lib.meta()["format"].as_u64().unwrap_or(1) < FORMAT {
@@ -990,49 +444,6 @@ impl Library {
             }
         }
         Ok(changed.iter().map(|(p, _, _)| rel(p)).collect())
-    }
-
-    /// Phase 1 kept saved settings in settings/saved, preferences in settings/prefs.json
-    /// and the render cache in cache/.
-    fn migrate_workspace(&self, app_prefs: &Prefs) -> Result<Migration> {
-        let mut m = Migration::default();
-        let saved = self.root.join("settings/saved");
-        if saved.is_dir() {
-            for e in std::fs::read_dir(&saved)?.flatten() {
-                let p = e.path();
-                if p.extension().is_some_and(|x| x == "json") {
-                    let dst = self.root.join("recipes").join(p.file_name().unwrap());
-                    if !dst.exists() {
-                        std::fs::rename(&p, &dst).or_else(|_| std::fs::copy(&p, &dst).map(|_| ()))?;
-                        m.recipes += 1;
-                    }
-                }
-            }
-            let _ = std::fs::remove_dir(&saved);
-        }
-        let old_prefs = self.root.join("settings/prefs.json");
-        if old_prefs.is_file() {
-            let mut prefs = read_json_object(&old_prefs);
-            let favs = prefs.as_object_mut().and_then(|o| o.shift_remove("gw-favs")).unwrap_or(json!([]));
-            // favourites go with the library; everything else (printer profile, view) stays with the app
-            std::fs::write(self.root.join(".favourites-migrated.json"), serde_json::to_vec(&favs)?)?;
-            let mut app = app_prefs.get();
-            for (k, v) in prefs.as_object().into_iter().flatten() {
-                if app.get(k).is_none() {
-                    app[k] = v.clone();
-                }
-            }
-            app_prefs.set(&app)?;
-            std::fs::remove_file(&old_prefs)?;
-            m.prefs_moved = true;
-        }
-        let _ = std::fs::remove_dir(self.root.join("settings"));
-        let _ = std::fs::remove_dir(self.root.join("libraries"));
-        let cache = self.root.join("cache");
-        if cache.is_dir() && std::fs::remove_dir_all(&cache).is_ok() {
-            m.cache_removed = true;
-        }
-        Ok(m)
     }
 
     pub fn root(&self) -> &Path {
@@ -1475,14 +886,6 @@ fn dir_bytes(p: &Path) -> u64 {
         .unwrap_or(0)
 }
 
-fn migration_favs(lib: &Library) -> Value {
-    std::fs::read(lib.root.join(".favourites-migrated.json"))
-        .ok()
-        .and_then(|b| serde_json::from_slice::<Value>(&b).ok())
-        .filter(Value::is_array)
-        .unwrap_or_else(|| json!([]))
-}
-
 /// "BelfrySCAD/BOSL2" -> "belfryscad-bosl2": lowercase letters, digits and single hyphens.
 pub fn slug(s: &str) -> String {
     let mut out = String::new();
@@ -1516,8 +919,7 @@ mod tests {
     #[test]
     fn collections_are_kept_by_id() {
         let dir = temp_dir("collections");
-        let prefs = Prefs::new(dir.join("p.json"));
-        let (lib, _) = Library::open(&dir, &prefs).unwrap();
+        let (lib, _) = Library::open(&dir).unwrap();
         assert!(lib.put_collection(&json!({ "name": "  " })).is_err());
         let a = lib.put_collection(&json!({ "name": "RC car", "items": [{ "ref": "part:x/wheel", "quantity": 4 }] })).unwrap();
         let b = lib.put_collection(&json!({ "name": "RC car!" })).unwrap();
@@ -1542,65 +944,24 @@ mod tests {
     }
 
     #[test]
-    fn migrates_a_phase_1_workspace() {
-        let dir = temp_dir("migrate");
-        std::fs::create_dir_all(dir.join("settings/saved")).unwrap();
-        std::fs::create_dir_all(dir.join("cache/renders")).unwrap();
-        std::fs::write(dir.join("settings/saved/a1.json"), r#"{"id":"a1","model":"m/x","name":"A","values":{}}"#).unwrap();
-        std::fs::write(dir.join("settings/prefs.json"), r#"{"gw-favs":["gen:m/x"],"gw-profile":{"bed":[220,220]},"gw-ui":{"theme":"night"}}"#).unwrap();
-        let prefs = Prefs::new(dir.join("app/prefs.json"));
-        let (lib, m) = Library::open(&dir, &prefs).unwrap();
-        assert_eq!(m.recipes, 1);
-        assert!(m.prefs_moved && m.cache_removed);
-        assert_eq!(lib.recipes("m/x").unwrap().len(), 1);
-        assert_eq!(lib.favourites(), json!(["gen:m/x"]));
-        assert_eq!(prefs.get()["gw-profile"]["bed"], json!([220, 220]));
-        assert!(prefs.get().get("gw-favs").is_none());
-        assert!(!dir.join("settings").exists() && !dir.join("cache").exists());
-        assert_eq!(lib.meta()["format"], json!(FORMAT));
-        // opening again changes nothing
-        let (lib2, m2) = Library::open(&dir, &prefs).unwrap();
-        assert_eq!(m2.recipes, 0);
-        assert_eq!(lib2.meta()["id"], lib.meta()["id"]);
-        let _ = std::fs::remove_dir_all(&dir);
-    }
-
-    #[test]
     fn readme_is_refreshed_unless_changed() {
         let dir = temp_dir("readme");
-        let prefs = Prefs::new(dir.join("p.json"));
-        Library::open(&dir, &prefs).unwrap();
+        Library::open(&dir).unwrap();
         assert_eq!(std::fs::read_to_string(dir.join("README.txt")).unwrap(), README);
         assert!(README.contains("\n  library.json") && README.contains("\n                  use."), "the README keeps its indentation (F-18)");
-        // the ones 0.4.3, 0.4.9 and 0.4.12 wrote are replaced
-        std::fs::write(dir.join("README.txt"), README_0_4_9).unwrap();
-        Library::open(&dir, &prefs).unwrap();
-        assert_eq!(std::fs::read_to_string(dir.join("README.txt")).unwrap(), README);
-        std::fs::write(dir.join("README.txt"), README_0_4_12).unwrap();
-        Library::open(&dir, &prefs).unwrap();
-        assert_eq!(std::fs::read_to_string(dir.join("README.txt")).unwrap(), README);
-        std::fs::write(dir.join("README.txt"), README_0_4_16).unwrap();
-        Library::open(&dir, &prefs).unwrap();
-        assert_eq!(std::fs::read_to_string(dir.join("README.txt")).unwrap(), README);
+        // the ones 0.4.22 and 0.4.23 wrote are replaced
+        for old in [README_0_4_22, README_0_4_23] {
+            std::fs::write(dir.join("README.txt"), old).unwrap();
+            Library::open(&dir).unwrap();
+            assert_eq!(std::fs::read_to_string(dir.join("README.txt")).unwrap(), README);
+        }
         assert!(README.contains("recipe.json"), "the README describes made parts' recipes (F-22)");
-        std::fs::write(dir.join("README.txt"), README_0_4_17).unwrap();
-        Library::open(&dir, &prefs).unwrap();
-        assert_eq!(std::fs::read_to_string(dir.join("README.txt")).unwrap(), README);
         assert!(README.contains("origin.site") && README.contains("\"detected\""), "the README says where a project's site details are (F-25)");
-        std::fs::write(dir.join("README.txt"), README_0_4_18).unwrap();
-        Library::open(&dir, &prefs).unwrap();
-        assert_eq!(std::fs::read_to_string(dir.join("README.txt")).unwrap(), README);
         assert!(README.contains("\"apart\"") && README.contains("by id"), "the README says what metadata.json holds and how collections refer to items (F-29)");
-        std::fs::write(dir.join("README.txt"), README_0_4_20).unwrap();
-        Library::open(&dir, &prefs).unwrap();
-        assert_eq!(std::fs::read_to_string(dir.join("README.txt")).unwrap(), README);
         assert!(README.contains("Library format 2") && README.contains("Check library"));
-        std::fs::write(dir.join("README.txt"), README_0_4_3).unwrap();
-        Library::open(&dir, &prefs).unwrap();
-        assert_eq!(std::fs::read_to_string(dir.join("README.txt")).unwrap(), README);
         // one the user wrote stays
         std::fs::write(dir.join("README.txt"), "my notes").unwrap();
-        Library::open(&dir, &prefs).unwrap();
+        Library::open(&dir).unwrap();
         assert_eq!(std::fs::read_to_string(dir.join("README.txt")).unwrap(), "my notes");
         let _ = std::fs::remove_dir_all(&dir);
     }
@@ -1610,7 +971,7 @@ mod tests {
         let dir = temp_dir("newer");
         std::fs::create_dir_all(&dir).unwrap();
         std::fs::write(dir.join("library.json"), r#"{"format": 99, "id": "x", "name": "Future"}"#).unwrap();
-        let (lib, _) = Library::open(&dir, &Prefs::new(dir.join("p.json"))).unwrap();
+        let (lib, _) = Library::open(&dir).unwrap();
         assert!(lib.read_only().is_some());
         assert!(lib.put_recipe(&json!({"id": "a", "model": "m/x"})).is_err());
         assert!(lib.set_favourites(&json!(["a"])).is_err());
@@ -1634,7 +995,7 @@ mod tests {
         for (p, t) in files {
             std::fs::write(dir.join(p), t).unwrap();
         }
-        let (lib, m) = Library::open(&dir, &Prefs::new(dir.join("p.json"))).unwrap();
+        let (lib, m) = Library::open(&dir).unwrap();
         let read = |p: &str| -> Value { serde_json::from_slice(&std::fs::read(dir.join(p)).unwrap()).unwrap() };
         assert_eq!(read("library.json")["format"], FORMAT);
         assert_eq!(m.upgraded.len(), 4, "{:?}", m.upgraded);
@@ -1653,7 +1014,7 @@ mod tests {
         assert!(old.contains(r#""version":"v1""#));
         // saved settings read in the one shape, and a second open changes nothing
         assert_eq!(lib.recipes("zip-a/box").unwrap()[0]["project_version"], "v1");
-        let (_, m2) = Library::open(&dir, &Prefs::new(dir.join("p.json"))).unwrap();
+        let (_, m2) = Library::open(&dir).unwrap();
         assert!(m2.upgraded.is_empty());
         // a file a newer version wrote is read, never written over
         std::fs::write(dir.join("recipes/n.json"), r#"{"id":"n","model":"zip-a/box","format":5}"#).unwrap();
@@ -1664,7 +1025,7 @@ mod tests {
     #[test]
     fn trash_round_trip() {
         let dir = temp_dir("trash");
-        let (lib, _) = Library::open(&dir, &Prefs::new(dir.join("p.json"))).unwrap();
+        let (lib, _) = Library::open(&dir).unwrap();
         // your own project: its local/ folder goes to the trash with it
         std::fs::create_dir_all(dir.join("local/bevel")).unwrap();
         std::fs::write(dir.join("local/bevel/gear.scad"), "cube(1);").unwrap();

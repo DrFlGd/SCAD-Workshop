@@ -166,7 +166,7 @@ impl App {
     }
 
     fn open_library(&self, path: &Path) -> Result<Library> {
-        let (lib, _migration) = Library::open(path, &self.prefs())?;
+        let (lib, _migration) = Library::open(path)?;
         if let Some(starter) = &self.paths.starter {
             if let Err(e) = project::sync_starter(&lib, starter) {
                 eprintln!("starter library: {e:#}");

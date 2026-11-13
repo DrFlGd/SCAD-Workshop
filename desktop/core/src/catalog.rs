@@ -8,7 +8,7 @@ use crate::meta::{self, Layers};
 use crate::project::{self, category_label};
 use serde_json::{json, Map, Value};
 use std::collections::{BTreeMap, HashMap};
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
 /// Everything the page reads, built once per change.
 #[derive(Default)]
@@ -45,11 +45,6 @@ pub fn build(lib: &Library, engine: &str, common_files: &Value, url: &str, libs:
     let mut comp_list: Vec<Value> = vec![];
     let mut group_counts: BTreeMap<String, usize> = BTreeMap::new();
     let comp_thumbs = lib.root().join("thumbs/components");
-    if lib.read_only().is_none() {
-        for l in libs.effective {
-            adopt_component_thumbs(&comp_thumbs, l);
-        }
-    }
     let url_of = |rel: &str| format!("{url}{}", rel.split('/').map(urlencode).collect::<Vec<_>>().join("/"));
     for l in libs.effective {
         for (rel, sha) in l.index["files"].as_object().into_iter().flatten() {
@@ -719,24 +714,6 @@ pub fn component_thumb_dir(l: &crate::components::ComponentLibrary) -> String {
     format!("{}/{}", crate::library::slug(&l.info.name), l.copy())
 }
 
-/// Thumbnails kept before 0.4.9 (thumbs/components/<library>/<module>.webp, with nothing saying
-/// which copy made them) are taken as the copy in use's.
-fn adopt_component_thumbs(root: &Path, l: &crate::components::ComponentLibrary) {
-    let old = root.join(crate::library::slug(&l.info.name));
-    let Ok(rd) = std::fs::read_dir(&old) else { return };
-    let loose: Vec<PathBuf> = rd.flatten().map(|e| e.path()).filter(|p| p.is_file() && p.extension().is_some_and(|x| x == "webp")).collect();
-    if loose.is_empty() {
-        return;
-    }
-    let new = root.join(component_thumb_dir(l));
-    if std::fs::create_dir_all(&new).is_err() {
-        return;
-    }
-    for p in loose {
-        let _ = std::fs::rename(&p, new.join(p.file_name().unwrap()));
-    }
-}
-
 /// A project whose models include a library from somewhere else than where it would come from now
 /// (the bundled copy changed with the app, or the switch between your copy and the bundled one).
 fn libraries_changed(derived: &Value, libs: Libs) -> Option<String> {
@@ -802,13 +779,6 @@ fn pinned_derived(lib: &Library, id: &str, models: &HashMap<String, Value>) -> V
             }
             problems.push(json!({ "kind": "pin_library", "model": format!("{id}/{pid}"), "message": format!("{}: {message}", pin["name"].as_str().unwrap_or(&pid)) }));
             d["pin_changed"] = json!({ "message": message, "gone": gone });
-        } else if !pin["from"].is_object() && lib.read_only().is_none() {
-            // a pin made before 0.4.9: from now on it records the copy in use
-            if let Some(p) = lib.source_dir(id).ok().map(|d| d.join("pins").join(format!("{pid}.json"))) {
-                let mut pin = pin.clone();
-                pin["from"] = json!({ "library": base["component"]["library"], "copy": now });
-                let _ = crate::config::write_json(&p, &pin);
-            }
         }
         let params: Vec<Value> = d["parameters"].as_array().cloned().unwrap_or_default();
         let groups: Vec<String> = serde_json::from_value(d["groups"].clone()).unwrap_or_default();

@@ -15,14 +15,9 @@ pub fn home_dir() -> PathBuf {
         .unwrap_or_else(|| PathBuf::from("."))
 }
 
-/// `~/SCAD Workshop`; a folder from before the rename (`~/Claude Grid Workshop`) keeps being used.
+/// `~/SCAD Workshop`.
 pub fn default_library_path() -> PathBuf {
-    let new = home_dir().join("SCAD Workshop");
-    let old = home_dir().join("Claude Grid Workshop");
-    if !new.exists() && old.join("settings").is_dir() {
-        return old;
-    }
-    new
+    home_dir().join("SCAD Workshop")
 }
 
 /// App config, in the OS's per-user config folder.
