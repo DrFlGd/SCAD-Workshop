@@ -9,7 +9,7 @@ import { Icon } from "./icons.js";
 import { Inspector } from "./inspector.js";
 import { Home } from "./home.js";
 import { LICENSE_TEXT, AGE_TEXT, KINDS, STATUS_TEXT } from "./index-local.js";
-import { SourcePanel, isDesktop, sourceById } from "./library.js";
+import { SourcePanel, sourceById } from "./library.js";
 import { CollectionPage } from "./collections.js";
 import { plural } from "../lib/util.js";
 
@@ -74,12 +74,12 @@ function Thumb({ item, cls = "thumb" }) {
   return html`<span class=${`${cls} thumb-none`} aria-hidden="true">${letters}</span>`;
 }
 
-function Badges({ item, favs }) {
+/** (Review 7, item 8) the part badge only where parts and models mix: Recent, Favourites, search, a project */
+function Badges({ item, favs, mixed }) {
   return html`${favs.includes(item.id) ? html`<span class="badge-fav" title="Favourite">${Icon.star(12, true)}</span>` : null}
     ${item.broken ? html`<span class="badge-mini broken" title=${item.broken.note ? `Flagged as broken: ${item.broken.note}` : "Flagged as broken"}>broken</span>` : null}
     ${item.hidden ? html`<span class="badge-mini hidden" title="Hidden">hidden</span>` : null}
-    ${item.desktopOnly && !isDesktop() ? html`<span class="badge-mini" title="Needs native OpenSCAD (desktop app)">desktop</span>` : null}
-    ${item.kind === "part" ? html`<span class="badge-mini">part</span>` : null}
+    ${item.kind === "part" && mixed ? html`<span class="badge-mini">part</span>` : null}
     ${item.needs?.length ? html`<span class="badge-mini" title=${`Set ${item.needs.join(", ")} first`}>needs values</span>` : null}`;
 }
 
@@ -138,7 +138,7 @@ function useWindow(scrollRef, count, rowH, enabled) {
 }
 
 // ---------------------------------------------------------------- views
-function GridView({ groups, size, sel, favs, onPick, onOpen, cols }) {
+function GridView({ groups, size, sel, favs, mixed, onPick, onOpen, cols }) {
   return groups.map((g) => html`<section class="result-group" key=${g.key || "all"}>
     ${g.key ? html`<h2 class="group-head">${g.key} <span>${g.items.length}</span></h2>` : null}
     <div class="grid-view" style=${`--card:${SIZES[size]}px`}>
@@ -147,13 +147,13 @@ function GridView({ groups, size, sel, favs, onPick, onOpen, cols }) {
         <${Thumb} item=${it} />
         <span class="card-name">${it.name}</span>
         <span class="card-sub">${it.sub || it.project}</span>
-        <span class="card-badges"><${Badges} item=${it} favs=${favs} /></span>
+        <span class="card-badges"><${Badges} item=${it} favs=${favs} mixed=${mixed} /></span>
       </div>`)}
     </div>
   </section>`);
 }
 
-function ListView({ items, sel, favs, onPick, onOpen, scrollRef }) {
+function ListView({ items, sel, favs, mixed, onPick, onOpen, scrollRef }) {
   const ROW = 52;
   const virt = items.length > 300;
   const w = useWindow(scrollRef, items.length, ROW, virt);
@@ -161,7 +161,7 @@ function ListView({ items, sel, favs, onPick, onOpen, scrollRef }) {
     ${items.slice(w.start, w.end).map((it) => html`<div role="option" aria-selected=${sel.includes(it.id) ? "true" : "false"} tabindex="-1"
       class="row" data-item=${it.id} data-hidden=${it.hidden ? "" : null} key=${it.id} onClick=${(e) => onPick(it, e)} onDblClick=${() => onOpen(it)}>
       <${Thumb} item=${it} cls="thumb thumb-sm" />
-      <span class="row-name">${it.name} <${Badges} item=${it} favs=${favs} /></span>
+      <span class="row-name">${it.name} <${Badges} item=${it} favs=${favs} mixed=${mixed} /></span>
       <span class="row-project">${it.project}</span>
       <span class="row-cat">${it.subcategory || it.categoryLabel}</span>
       <span class="row-tags">${it.tags.slice(0, 4).join(", ")}</span>
@@ -169,7 +169,7 @@ function ListView({ items, sel, favs, onPick, onOpen, scrollRef }) {
   </div>`;
 }
 
-function TableView({ items, sel, favs, columns: wanted, sort, onSort, onPick, onOpen, scrollRef }) {
+function TableView({ items, sel, favs, mixed, columns: wanted, sort, onSort, onPick, onOpen, scrollRef }) {
   const ROW = 38;
   const COLUMNS = allColumns();
   const columns = wanted.filter((c) => COLUMNS[c]);
@@ -183,7 +183,7 @@ function TableView({ items, sel, favs, columns: wanted, sort, onSort, onPick, on
       ${virt && w.start ? html`<tr aria-hidden="true" style=${`height:${w.start * ROW}px`}><td colspan=${columns.length + 1}></td></tr>` : null}
       ${items.slice(w.start, w.end).map((it) => html`<tr role="option" aria-selected=${sel.includes(it.id) ? "true" : "false"} tabindex="-1"
         data-item=${it.id} data-hidden=${it.hidden ? "" : null} key=${it.id} onClick=${(e) => onPick(it, e)} onDblClick=${() => onOpen(it)}>
-        <td class="td-name"><${Thumb} item=${it} cls="thumb thumb-xs" /> ${it.name} <${Badges} item=${it} favs=${favs} /></td>
+        <td class="td-name"><${Thumb} item=${it} cls="thumb thumb-xs" /> ${it.name} <${Badges} item=${it} favs=${favs} mixed=${mixed} /></td>
         ${columns.map((c) => html`<td class=${COLUMNS[c].num ? "num" : COLUMNS[c].nowrap ? "nowrap" : ""}>${COLUMNS[c].badge
           ? html`${COLUMNS[c].get(it)} ${it.licenseStatus !== "ok" ? html`<span class=${`badge ${it.licenseStatus}`}>${LICENSE_TEXT[it.licenseStatus]}</span>` : null}`
           : COLUMNS[c].get(it)}</td>`)}
@@ -206,7 +206,7 @@ function groupIcon(group, g) {
 const GROUP_NOUN = { project: "projects", cat: "categories", kind: "kinds", license: "licenses" };
 
 function CondensedView({ groups, group, size }) {
-  const projects = group === "project" && isDesktop();
+  const projects = group === "project";
   return html`<div class="grid-view condensed" style=${`--card:${SIZES[size]}px`}>
     ${groups.map((g) => {
       const icon = groupIcon(group, g);
@@ -315,10 +315,10 @@ export function Browser() {
   // the table lists items as sorted; the other views by group
   shownRef.current = overview ? [] : s.layout === "table" ? shownItems : groups.flatMap((g) => g.items);
   // a project opened from its tile shows the project's page (details, files, versions, updates)
-  const openProject = condensing && s.openGroup && s.group === "project" && isDesktop() ? groups[0]?.items[0]?.projectId : null;
+  const openProject = condensing && s.openGroup && s.group === "project" ? groups[0]?.items[0]?.projectId : null;
   const panelSource = info.source || (openProject && sourceById(openProject) ? openProject : null);
   const sourceHidden = panelSource && s.sourceTab && s.sourceTab !== "items";
-  const props = { sel: s.selection, favs: s.favs, onPick, onOpen: openItem, scrollRef };
+  const props = { sel: s.selection, favs: s.favs, mixed: new Set(items.map((i) => i.kind)).size > 1, onPick, onOpen: openItem, scrollRef };
   const title = s.q ? `“${s.q}”` : info.label;
   const typed = Object.entries(res.parsed?.filters || {});
   const noun = GROUP_NOUN[s.group] || "groups";

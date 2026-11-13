@@ -3,9 +3,8 @@
 
     python3 tools/build_desktop.py --site _site --out build/desktop [--fetch-fonts] [--cli workshop-cli]
 
-  ui/       the front end loaded in the app window (HTML, JS, CSS, three.js, and
-            the WebAssembly engine, which the Windows app races against native
-            OpenSCAD because it is faster for some projects there)
+  ui/       the front end loaded in the app window (HTML, JS, CSS, three.js; of the
+            site's WebAssembly engine only its licence, engine/COPYING and NOTICE.txt)
   site/     the app's own files: data/catalog.json (engine version, common files)
             and fs/ (the fonts every render gets)
   starter/  the starter library: every generator and parts pack of the site,
@@ -47,6 +46,13 @@ for item in sorted(a.site.iterdir()):
     if item.name in DATA:
         continue
     dest = a.out / "ui" / item.name
+    if item.name == "engine":
+        # the app renders with native OpenSCAD only (Review 7, item 1): the licence the Licenses page links to
+        dest.mkdir()
+        for name in ("COPYING", "NOTICE.txt"):
+            if (item / name).exists():
+                shutil.copy2(item / name, dest / name)
+        continue
     (shutil.copytree if item.is_dir() else shutil.copy2)(item, dest)
 
 # the app's own files: engine version and the fonts every model gets

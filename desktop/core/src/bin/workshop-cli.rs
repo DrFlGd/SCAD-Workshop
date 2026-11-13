@@ -404,7 +404,7 @@ async fn site_finish(mut a: Args) -> Result<()> {
         for m in native {
             let mut files = plan.common_files.clone();
             files.extend(m.files.clone());
-            let req = workshop_core::RenderRequest { model: m.key.clone(), entry: m.entry.clone(), files, values: Default::default(), defines: vec![], call: None, format: None, engine: None };
+            let req = workshop_core::RenderRequest { model: m.key.clone(), entry: m.entry.clone(), files, values: Default::default(), defines: vec![], call: None, format: None };
             let v = match r.export_params(&req).await {
                 Ok(v) => v,
                 Err(e) => json!({ "error": format!("{}\n{}", e.message, e.logs.join("\n")) }),
@@ -468,6 +468,34 @@ async fn library_summary(mut a: Args) -> Result<()> {
     Ok(())
 }
 
+/// A binary STL's volume, surface area and size. Not its bytes' hash: OpenSCAD can triangulate
+/// the same flat face differently from one run to the next (Manifold's threads), so two renders
+/// of one model can differ in their triangles but not in these.
+fn mesh_measures(stl: &[u8]) -> Option<serde_json::Value> {
+    let n = stl_triangles(stl)? as usize;
+    let body = stl.get(84..84 + 50 * n)?;
+    let (mut volume, mut area) = (0f64, 0f64);
+    let (mut lo, mut hi) = ([f64::MAX; 3], [f64::MIN; 3]);
+    for t in body.chunks_exact(50) {
+        let f = |i: usize| f32::from_le_bytes(t[i..i + 4].try_into().unwrap()) as f64;
+        let v: [[f64; 3]; 3] = std::array::from_fn(|k| std::array::from_fn(|j| f(12 + 12 * k + 4 * j)));
+        let cross = |a: [f64; 3], b: [f64; 3]| [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+        let sub = |a: [f64; 3], b: [f64; 3]| [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+        let c = cross(v[1], v[2]);
+        volume += (v[0][0] * c[0] + v[0][1] * c[1] + v[0][2] * c[2]) / 6.0;
+        let c = cross(sub(v[1], v[0]), sub(v[2], v[0]));
+        area += (c[0] * c[0] + c[1] * c[1] + c[2] * c[2]).sqrt() / 2.0;
+        for p in v {
+            for j in 0..3 {
+                lo[j] = lo[j].min(p[j]);
+                hi[j] = hi[j].max(p[j]);
+            }
+        }
+    }
+    let size: Vec<f64> = (0..3).map(|j| if n > 0 { hi[j] - lo[j] } else { 0.0 }).collect();
+    Some(json!({ "volume": volume, "area": area, "size": size }))
+}
+
 /// Render every model in a starter library, the way the app does (from library files).
 async fn bench_library(mut a: Args) -> Result<()> {
     let app_site = PathBuf::from(a.need("--app-site")?);
@@ -493,16 +521,17 @@ async fn bench_library(mut a: Args) -> Result<()> {
         let req = default_request(model, &c.catalog["common_files"])?;
         let t0 = Instant::now();
         let res = r.render(&format!("bench-{}", key.replace('/', "-")), &req, |_| {}).await;
-        let (status, tris, err) = match res {
-            Ok(o) => ("pass", stl_triangles(&o.stl).unwrap_or(0), None),
+        let (status, tris, sha, err) = match res {
+            // (the mesh's measures: the same model gives the same, with or without include once)
+            Ok(o) => ("pass", stl_triangles(&o.stl).unwrap_or(0), mesh_measures(&o.stl), None),
             Err(e) => {
                 failed += 1;
-                ("fail", 0, Some(e.message))
+                ("fail", 0, None, Some(e.message))
             }
         };
         let secs = (t0.elapsed().as_millis() as f64 / 10.0).round() / 100.0;
         eprintln!("{status:<5} {key:<44} {secs:>7}s  {tris} tris");
-        results.push(json!({ "key": key, "status": status, "seconds": secs, "triangles": tris, "error": err }));
+        results.push(json!({ "key": key, "status": status, "seconds": secs, "triangles": tris, "mesh": sha, "error": err }));
     }
     let report = json!({ "library": true, "os": std::env::consts::OS, "models": keys.len(), "failed": failed, "results": results });
     if let Some(out) = out {
@@ -655,7 +684,7 @@ async fn serve(mut a: Args) -> Result<()> {
                             match res {
                                 Ok(out) => {
                                     let mut evs = events.lock().unwrap().clone();
-                                    evs.push(json!({ "type": "done", "ms": out.ms, "cached": out.cached, "format": out.format, "warning": out.warning, "logs": out.logs.iter().rev().take(50).rev().collect::<Vec<_>>() }));
+                                    evs.push(json!({ "type": "done", "ms": out.ms, "cached": out.cached, "format": out.format, "logs": out.logs.iter().rev().take(50).rev().collect::<Vec<_>>() }));
                                     respond(&mut stream, 200, "application/octet-stream", &[("x-events", serde_json::to_string(&evs)?)], &out.stl)
                                 }
                                 // a cancelled render isn't a server error (the page cancels when you move on)

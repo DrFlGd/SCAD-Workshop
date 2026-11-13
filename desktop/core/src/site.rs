@@ -41,7 +41,7 @@ impl SiteDir {
     }
 
     pub fn json(&self, rel: &str) -> Result<Value> {
-        Ok(serde_json::from_slice(&self.read(rel)?).with_context(|| format!("{rel} is not valid JSON"))?)
+        serde_json::from_slice(&self.read(rel)?).with_context(|| format!("{rel} is not valid JSON"))
     }
 
     /// Path of a content-addressed source file.

@@ -102,6 +102,17 @@
     "futabas3003": {
       "position": "[0, 0, 0]",
       "rotation": "[0, 0, 0]"
+    },
+    "donutSlice": {
+      "innerSize": "10",
+      "outerSize": "20",
+      "start_angle": "0",
+      "end_angle": "90"
+    },
+    "pieSlice": {
+      "size": "20",
+      "start_angle": "0",
+      "end_angle": "90"
     }
   },
   "Round-Anything": {
@@ -126,6 +137,34 @@
       "p1": "[0, 0]",
       "p2": "[20, 10]",
       "width": "2"
+    }
+  },
+  "NopSCADlib": {
+    "atx_psu_cutout": {
+      "type": "ATX300"
+    },
+    "battery_contact": {
+      "type": "bcontact"
+    },
+    "iec_inserts": {
+      "type": "IEC_inlet"
+    },
+    "motor_faceplate": {
+      "type": "servo_motor_faceplate(Lichuan_M01330_80ST)"
+    },
+    "motor_shaft": {
+      "type": "servo_motor_shaft(Lichuan_M01330_80ST)"
+    },
+    "pot_nut": {
+      "type": "KY_040_encoder"
+    },
+    "rounded_rectangle": {
+      "size": "[30, 20, 5]",
+      "r": "3"
+    },
+    "rounded_square": {
+      "size": "[30, 20]",
+      "r": "3"
     }
   },
   "$no_guess": {
@@ -156,10 +195,14 @@
       "extrusion_corner_bracket_assembly",
       "poly_cylinder",
       "poly_drill",
+      "poly_ring",
+      "poly_tube",
+      "ribbon_cable",
       "screw_countersink",
       "screw_polysink",
       "screw_tearsink",
       "sector",
+      "sliding_ball_t_nut",
       "slot",
       "smd_coax",
       "solder",

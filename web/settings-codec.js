@@ -1,5 +1,4 @@
-// Settings as data: what differs from the defaults, share-link codes, and
-// OpenSCAD's own parameter-set files (the .json the Customizer reads and writes).
+// Settings as data: what differs from the defaults, and OpenSCAD's own parameter-set files (the .json the Customizer reads and writes).
 
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 
@@ -32,37 +31,6 @@ export function withChanges(model, changes) {
     if (p && fits(p, v)) { values[k] = structuredClone(v); applied++; } else skipped.push(k);
   }
   return { values, applied, skipped };
-}
-
-// ---------------------------------------------------------------- share links
-const b64url = (bytes) => {
-  let s = "";
-  for (let i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
-  return btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-};
-const unb64url = (s) => Uint8Array.from(atob(s.replace(/-/g, "+").replace(/_/g, "/")), (c) => c.charCodeAt(0));
-
-async function pipe(bytes, stream) {
-  return new Uint8Array(await new Response(new Blob([bytes]).stream().pipeThrough(stream)).arrayBuffer());
-}
-
-/** Changed settings -> short URL-safe code ("z" = deflated JSON, "j" = plain JSON). */
-export async function encodeShare(changes) {
-  const json = new TextEncoder().encode(JSON.stringify(changes));
-  if (typeof CompressionStream === "function") {
-    try { return "z" + b64url(await pipe(json, new CompressionStream("deflate-raw"))); } catch { /* fall through */ }
-  }
-  return "j" + b64url(json);
-}
-
-export async function decodeShare(code) {
-  const kind = code[0];
-  let bytes = unb64url(code.slice(1));
-  if (kind === "z") bytes = await pipe(bytes, new DecompressionStream("deflate-raw"));
-  else if (kind !== "j") throw new Error("Unknown link format.");
-  const obj = JSON.parse(new TextDecoder().decode(bytes));
-  if (!obj || typeof obj !== "object" || Array.isArray(obj)) throw new Error("The link holds no settings.");
-  return obj;
 }
 
 // ---------------------------------------------------------------- OpenSCAD parameter files

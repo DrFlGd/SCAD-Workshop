@@ -1,5 +1,5 @@
-// OpenSCAD WebAssembly runner shared by the build tools (Node) and mirrored by
-// web/render-worker.js (browser). One fresh engine instance per run: the WASM
+// OpenSCAD WebAssembly runner for the build tools (Node; the site build reads models'
+// settings with it until Review 7's item 12). One fresh engine instance per run: the WASM
 // build aborts its runtime after a render, and a fresh instance also gives each
 // model an empty virtual file system.
 import fs from "node:fs";

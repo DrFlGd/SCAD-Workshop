@@ -15,14 +15,9 @@ pub fn home_dir() -> PathBuf {
         .unwrap_or_else(|| PathBuf::from("."))
 }
 
-/// `~/SCAD Workshop`; a folder from before the rename (`~/Claude Grid Workshop`) keeps being used.
+/// `~/SCAD Workshop`.
 pub fn default_library_path() -> PathBuf {
-    let new = home_dir().join("SCAD Workshop");
-    let old = home_dir().join("Claude Grid Workshop");
-    if !new.exists() && old.join("settings").is_dir() {
-        return old;
-    }
-    new
+    home_dir().join("SCAD Workshop")
 }
 
 /// App config, in the OS's per-user config folder.
@@ -43,10 +38,6 @@ pub struct AppConfig {
     /// For GitHub's API (raises the hourly limit; needed for private repositories).
     #[serde(default)]
     pub github_token: Option<String>,
-    /// MitCad's `mitcad-cli` (or its folder) for Fusion 360 files, when chosen in Settings › Engine;
-    /// otherwise the app looks on PATH and where the installers put it (experimental, 0.4.27).
-    #[serde(default)]
-    pub mitcad_cli: Option<PathBuf>,
 }
 
 impl AppConfig {

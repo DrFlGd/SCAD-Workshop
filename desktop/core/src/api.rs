@@ -140,29 +140,6 @@ impl App {
             .clone()
     }
 
-    /// Where Download MitCad puts it (0.4.28).
-    fn mitcad_dir(&self) -> PathBuf {
-        self.paths.data_dir.join("mitcad")
-    }
-
-    /// Settings › Engine's MitCad line: where it was found (or why not), whether that's the app's
-    /// own download, and the download on offer (the release our copy of its reader comes from).
-    fn mitcad_info(&self, found: Option<&Result<crate::mitcad::MitCad, String>>) -> Value {
-        let configured = self.config().mitcad_cli.is_some();
-        let own = crate::mitcad::downloaded(&self.mitcad_dir());
-        let release = crate::mitcad::pinned_release();
-        let mut v = match found {
-            Some(Ok(m)) => json!({ "path": m.exe.display().to_string(), "downloaded": own.as_ref().is_some_and(|p| std::path::absolute(p).unwrap_or(p.clone()) == m.exe) }),
-            Some(Err(e)) => json!({ "error": e }),
-            None => json!({ "error": "The render engine isn't ready." }),
-        };
-        v["configured"] = json!(configured);
-        if let Some(r) = release {
-            v["download"] = json!({ "version": r.version, "mb": r.size >> 20, "page": r.page, "done": own.is_some() });
-        }
-        v
-    }
-
     pub async fn renderer(&self) -> Result<Arc<Renderer>, String> {
         let mut g = self.renderer.lock().await;
         if let Some(r) = g.as_ref() {
@@ -171,7 +148,6 @@ impl App {
         let engine = self.engine().await?;
         let jobs = self.config().concurrency.unwrap_or_else(default_concurrency);
         let r = Arc::new(Renderer::new(engine, self.site.clone(), self.paths.data_dir.join("cache"), jobs).map_err(e2s)?);
-        r.set_mitcad(crate::mitcad::locate(self.config().mitcad_cli.as_deref(), Some(&self.mitcad_dir())));
         *g = Some(r.clone());
         drop(g);
         if let Ok(c) = self.catalog() {
@@ -190,7 +166,7 @@ impl App {
     }
 
     fn open_library(&self, path: &Path) -> Result<Library> {
-        let (lib, _migration) = Library::open(path, &self.prefs())?;
+        let (lib, _migration) = Library::open(path)?;
         if let Some(starter) = &self.paths.starter {
             if let Err(e) = project::sync_starter(&lib, starter) {
                 eprintln!("starter library: {e:#}");
@@ -351,23 +327,6 @@ impl App {
         let jid = id.clone();
         tokio::spawn(async move {
             let _g = app.busy.lock().await;
-            let r = work(app.clone(), jid.clone()).await;
-            app.job_done(&jid, r);
-        });
-        json!({ "job": id })
-    }
-
-    /// [`Self::spawn`] for work that leaves the library alone (downloading MitCad): it doesn't
-    /// wait for, or hold up, the library's jobs.
-    fn spawn_aside<F, Fut>(self: &Arc<Self>, label: &str, work: F) -> Value
-    where
-        F: FnOnce(Arc<Self>, String) -> Fut + Send + 'static,
-        Fut: std::future::Future<Output = Result<Value>> + Send + 'static,
-    {
-        let id = self.start_job(label);
-        let app = self.clone();
-        let jid = id.clone();
-        tokio::spawn(async move {
             let r = work(app.clone(), jid.clone()).await;
             app.job_done(&jid, r);
         });
@@ -552,44 +511,7 @@ impl App {
                     "concurrency": r.as_ref().map(|r| r.concurrency()),
                     "cache_bytes": r.as_ref().map(|r| r.cache_size()),
                     "starter": self.paths.starter.as_ref().is_some_and(|s| s.join("starter.json").is_file()),
-                    // MitCad, for Fusion 360 files (experimental, 0.4.27): where it is, or why not
-                    "mitcad": self.mitcad_info(r.as_ref().map(|r| r.mitcad()).as_ref()),
                 }))
-            }
-            "mitcad_set" => {
-                // Settings › Engine: where mitcad-cli is (a file or its folder), or nothing to look for it again
-                let path = args["path"].as_str().filter(|p| !p.trim().is_empty()).map(PathBuf::from);
-                let mut cfg = self.config();
-                cfg.mitcad_cli = path;
-                cfg.save(&self.config_path()).map_err(e2s)?;
-                let found = crate::mitcad::locate(cfg.mitcad_cli.as_deref(), Some(&self.mitcad_dir()));
-                if let Ok(r) = self.renderer().await {
-                    r.set_mitcad(found.clone());
-                }
-                j(self.mitcad_info(Some(&found)))
-            }
-            "mitcad_install" => {
-                // Settings › Engine › Download MitCad (0.4.28): the release PIN.json names, into the app's
-                // data folder; then it's the MitCad the app uses (unless one is chosen in Settings)
-                let version = crate::mitcad::pinned_release().map(|r| r.version).unwrap_or_default();
-                Ok(Reply::Json(self.spawn_aside(&format!("Downloading MitCad {version}"), move |app, job| async move {
-                    let root = app.mitcad_dir();
-                    let app2 = app.clone();
-                    let job2 = job.clone();
-                    tokio::task::spawn_blocking(move || {
-                        crate::mitcad::install(
-                            &root,
-                            |stage| app2.job_stage(&job2, stage),
-                            || app2.job_cancelled(&job2),
-                        )
-                    })
-                    .await??;
-                    let found = crate::mitcad::locate(app.config().mitcad_cli.as_deref(), Some(&app.mitcad_dir()));
-                    if let Ok(r) = app.renderer().await {
-                        r.set_mitcad(found.clone());
-                    }
-                    Ok(app.mitcad_info(Some(&found)))
-                })))
             }
             "read" => self.read_file(arg(&args, "path").map_err(e2s)?).map(Reply::Bytes).map_err(e2s),
             "to_3mf" => {
@@ -1642,12 +1564,6 @@ impl App {
                     app.read_project(&id, None, Some(&job)).await
                 })))
             }
-            "defaults_clear" => {
-                let lib = self.library()?;
-                lib.clear_checks(arg(&args, "source").map_err(e2s)?).map_err(e2s)?;
-                self.invalidate();
-                j(Value::Null)
-            }
             "icon_import" => {
                 // { category, path }: an image of your own as a category's icon, copied into the library's icons/ folder
                 let lib = self.library()?;
@@ -1732,17 +1648,6 @@ impl App {
                 crate::merge::resolve(&lib, &args["choices"]).map_err(e2s)?;
                 self.invalidate();
                 j(Value::Null)
-            }
-            "render_default" => {
-                // render a model at its defaults (tests and the starter check)
-                let key = arg(&args, "key").map_err(e2s)?;
-                let c = self.catalog()?;
-                let model = c.models.get(key).ok_or_else(|| format!("no model {key}"))?;
-                let req = crate::render::default_request(model, &c.catalog["common_files"]).map_err(e2s)?;
-                let r = self.renderer().await?;
-                r.add_blobs(catalog::blob_list(&c));
-                let out = r.render(&format!("default-{}", key.replace('/', "-")), &req, |_| {}).await.map_err(|e| e.message)?;
-                j(json!({ "key": key, "triangles": crate::render::stl_triangles(&out.stl), "bytes": out.stl.len(), "ms": out.ms, "cached": out.cached }))
             }
             "cache_clear" => {
                 let r = self.renderer().await?;
@@ -1912,12 +1817,24 @@ impl App {
             let dir = lib.version_dir(&src, src["version"].as_str().unwrap_or(""))?;
             return Ok(std::fs::read(dir.join(library::rel_inside(inner)?))?);
         }
+        if let Some(rest) = rel.strip_prefix(APP_LIBS) {
+            // the component pictures made when the app was built
+            let inner = rest.trim_start_matches('/');
+            let libs = self.paths.libs.as_deref().context("the app has no libraries")?;
+            if !inner.starts_with("thumbs/") {
+                bail!("not an app picture");
+            }
+            return Ok(std::fs::read(libs.join(library::rel_inside(inner)?))?);
+        }
         Ok(std::fs::read(lib.resolve(&rel)?)?)
     }
 }
 
 /// Library paths under this name are a linked project's own folder: `~linked/<id>/<path>`.
 const LINKED: &str = "~linked";
+/// Library paths under this name are the app's own libraries folder (libs/), for the component
+/// pictures made when the app was built: `~app/thumbs/<library>/<module>.webp`.
+pub(crate) const APP_LIBS: &str = "~app";
 
 /// A project's folder as a library path (for its pictures and files in the side viewer): inside
 /// the library, or a linked project's folder through `~linked/<id>`.

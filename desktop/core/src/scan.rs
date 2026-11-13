@@ -12,6 +12,9 @@ use sha2::{Digest, Sha256};
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
 
+/// The files a model reads: path in the project -> (file on disk, the library it came from).
+pub type Collected = BTreeMap<String, (PathBuf, Option<usize>)>;
+
 /// Folders never read (version control, tooling, dependencies).
 const SKIP_DIRS: [&str; 8] = [".git", ".github", ".hg", ".svn", "node_modules", "__pycache__", ".vscode", ".idea"];
 /// Model files shown as ready-made parts.
@@ -163,8 +166,7 @@ pub fn shape(text: &str) -> Shape {
         stmt.clear();
         true
     };
-    let mut chars = src.chars().peekable();
-    while let Some(c) = chars.next() {
+    for c in src.chars() {
         // include <...> at depth 0 ends at '>', not ';'
         if depth == 0 && c == '>' {
             let t = stmt.trim_start();
@@ -679,7 +681,7 @@ impl LibResolver {
     }
 
     /// Like [`ingest::collect_files`], with named libraries.
-    pub fn collect(&self, entry: &str) -> (BTreeMap<String, (PathBuf, Option<usize>)>, Vec<String>) {
+    pub fn collect(&self, entry: &str) -> (Collected, Vec<String>) {
         let mut files: BTreeMap<String, (PathBuf, Option<usize>)> = BTreeMap::new();
         let mut missing: std::collections::BTreeSet<String> = Default::default();
         let mut todo = vec![format!("/{}", entry.trim_start_matches('/'))];

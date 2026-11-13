@@ -2,8 +2,6 @@
 // reached through the app's commands (desktop/core/src/api.rs, called through
 // Tauri's "api" / "api_bytes" commands in desktop/src-tauri/src/main.rs).
 
-import { EngineClient } from "./engine-client.js";
-
 const tauri = globalThis.__TAURI__;
 const invoke = (cmd, args, opts) => tauri.core.invoke(cmd, args, opts);
 /** One of the app's commands, answered as JSON. */
@@ -17,87 +15,21 @@ const newId = () => (crypto.randomUUID ? crypto.randomUUID() : `${Date.now().toS
 const cancelledError = () => Object.assign(new Error("Render cancelled."), { cancelled: true });
 
 /**
- * Native OpenSCAD, plus (on Windows) the same WebAssembly engine as the website.
- * Native OpenSCAD on Windows is slow with projects made of many `use`d files
- * (Gridfinity Extended: ~10 s vs ~1 s in WebAssembly), while it's much faster
- * for heavy geometry. So on Windows the first render of each model races both
- * engines, keeps the faster one's result and remembers the winner for that model.
+ * Native OpenSCAD. (Until Review 7's item 1, the Windows app also raced the website's
+ * WebAssembly engine, which was faster there for projects made of many files; native
+ * renders now leave out repeated includes, desktop/core/src/includes.rs, and are faster.)
  */
 class DesktopEngine {
-  constructor(info, catalog, prefs) {
+  constructor(info, catalog) {
     this.common = catalog.common_files || {};
     this.info = info;
-    this.prefs = prefs;
     this.concurrency = info.concurrency || 1;
     this.label = info.engine ? `OpenSCAD ${info.engine}, native` : "OpenSCAD not available";
     this.n = 0;
-    this.hybrid = info.os === "windows";
-    this.wasm = null;
-  }
-
-  wasmEngine() {
-    this.wasm ||= new EngineClient({
-      commonFiles: this.common,
-      readFile: async (sha) => new Uint8Array(await apiBytes("blob", { sha })),
-    });
-    return this.wasm;
-  }
-
-  picks() { return this.prefs.get("gw-engine-pick", {}) || {}; }
-
-  remember(key, engine) {
-    if (this.picks()[key] !== engine) this.prefs.set("gw-engine-pick", { ...this.picks(), [key]: engine });
   }
 
   render(model, values, onEvent = () => {}) {
-    // (a Fusion 360 file goes to MitCad, through the native path; 0.4.27)
-    if (!this.hybrid || model.browser === false || !this.info.engine || model.engine === "mitcad") return this.renderNative(model, values, onEvent);
-    const pick = this.picks()[model.key];
-    if (pick === "native") return this.renderNative(model, values, onEvent);
-    if (pick === "wasm") return this.withFallback(this.wasmEngine().render(model, values, onEvent), model, values, onEvent);
-    return this.race(model, values, onEvent);
-  }
-
-  /** WebAssembly first; if it fails (memory, crash), native. */
-  withFallback(job, model, values, onEvent) {
-    let current = job;
-    const promise = job.promise.then((r) => ({ ...r, engine: "wasm" }), (e) => {
-      if (e.cancelled) throw e;
-      current = this.renderNative(model, values, onEvent);
-      return current.promise;
-    });
-    return { promise, cancel: () => current.cancel() };
-  }
-
-  race(model, values, onEvent) {
-    const jobs = { native: this.renderNative(model, values, onEvent), wasm: this.wasmEngine().render(model, values, () => {}) };
-    let settled = false, rejectRace;
-    const promise = new Promise((resolve, reject) => {
-      rejectRace = reject;
-      const errors = {};
-      for (const [name, job] of Object.entries(jobs)) {
-        job.promise.then((result) => {
-          if (settled) return;
-          settled = true;
-          for (const [other, j] of Object.entries(jobs)) if (other !== name) j.cancel();
-          if (!result.cached) this.remember(model.key, name); // a cache hit says nothing about speed
-          resolve({ ...result, engine: name });
-        }, (e) => {
-          if (settled || e.cancelled) return;
-          errors[name] = e;
-          if (Object.keys(errors).length === 2) { settled = true; reject(errors.native); }
-        });
-      }
-    });
-    return {
-      promise,
-      cancel() {
-        if (settled) return;
-        settled = true;
-        for (const j of Object.values(jobs)) j.cancel();
-        rejectRace(cancelledError());
-      },
-    };
+    return this.renderNative(model, values, onEvent);
   }
 
   renderNative(model, values, onEvent = () => {}) {
@@ -108,7 +40,7 @@ class DesktopEngine {
     let settled = false;
     const promise = new Promise((resolve, reject) => {
       rejectRun = reject;
-      if (!this.info.engine && model.engine !== "mitcad") {
+      if (!this.info.engine) {
         reject(Object.assign(new Error(this.info.engine_error || "OpenSCAD isn't available."), { logs: [] }));
         return;
       }
@@ -121,7 +53,6 @@ class DesktopEngine {
         defines: (model.parameters || []).filter((p) => p.define).map((p) => p.name),
         call: model.call || null, // a component: the app writes the call with these values
         format: model.format || null, // "3mf": OpenSCAD's own, objects apart and colours kept (0.4.19); "svg"/"dxf": a drawing
-        engine: model.engine || null, // "mitcad": a Fusion 360 file, generated with MitCad (experimental, 0.4.27)
       };
       // edited files (the Code tab): stored by their hash in the app's data folder, used in place of the originals
       const edited = Object.entries(model.edits || {});
@@ -131,8 +62,7 @@ class DesktopEngine {
         const ms = meta?.ms ?? performance.now() - started;
         // (a 2D model asked for as STL comes back as its SVG drawing, 0.4.23)
         const format = meta?.format || model.format || "stl";
-        resolve({ blob: new Blob([buf], { type: MIME[format] || "model/stl" }), format, ms, cached: meta ? !!meta.cached : ms < 40, logs: meta?.logs || [], engine: "native",
-          warning: meta?.warning || null }); // the model came out incomplete (MitCad's failed features, 0.4.29)
+        resolve({ blob: new Blob([buf], { type: MIME[format] || "model/stl" }), format, ms, cached: meta ? !!meta.cached : ms < 40, logs: meta?.logs || [], engine: "native" });
       }, (e) => {
         settled = true;
         reject(Object.assign(new Error(e?.message || String(e)), { logs: e?.logs || [], cancelled: !!e?.cancelled }));
@@ -154,7 +84,6 @@ export async function createPlatform() {
   let prefs = await api("prefs_get").catch(() => ({}));
   let timer = null;
   const settings = {
-    async persistent() { return true; },
     list: (model) => api("settings_list", { model }),
     get: (id) => api("settings_get", { id }),
     async save(rec) {
@@ -213,7 +142,7 @@ export async function createPlatform() {
     modelFile: async (sha) => new TextDecoder().decode(await apiBytes("blob", { sha })),
     /** A web link in the default browser. */
     openUrl: (url) => invoke("open_url", { url }).catch((err) => console.warn("open_url", err)),
-    makeEngine: (catalog) => new DesktopEngine(info, catalog, store.prefs),
+    makeEngine: (catalog) => new DesktopEngine(info, catalog),
     /** App files and the library's catalog, model pages and files (by relative path). */
     async fetch(path) {
       try {

@@ -39,7 +39,7 @@ jobs:
   site:
     name: Build site data
     runs-on: ubuntu-24.04
-    timeout-minutes: 40
+    timeout-minutes: 75
     defaults:
       run: { shell: bash }
     outputs:
@@ -81,6 +81,11 @@ jobs:
           python tools/fetch_libraries.py --out build/desktop/libs
           pip install fonttools   # cuts Layer Line's heading font to the letters the app uses
           python tools/build_desktop.py --site _site --out build/desktop --fetch-fonts
+      - name: Pictures of the components (the app's own previews, shipped in libs/thumbs/)
+        run: |
+          python tools/component_thumbs.py --cli desktop/target/release/workshop-cli --desktop build/desktop \
+            --engine build/native/squashfs-root 2>&1 | tee component-thumbs.log
+          echo "::notice title=Component pictures::$(tail -1 component-thumbs.log)"
       - uses: actions/upload-artifact@v4
         with:
           name: desktop-site
@@ -154,6 +159,7 @@ jobs:
           dpkg -c "$deb" > ci-out/deb-contents.txt
           if grep -q '/starter/' ci-out/deb-contents.txt; then echo "::error title=Installer::the .deb still ships starter/"; exit 1; fi
           grep -q '/libs/' ci-out/deb-contents.txt || { echo "::error title=Installer::the .deb has no libs/"; exit 1; }
+          grep -q '/libs/thumbs/bosl2/' ci-out/deb-contents.txt || { echo "::error title=Installer::the .deb has no component pictures"; exit 1; }
       - uses: actions/upload-artifact@v4
         with: { name: bundles-linux, path: dist/, retention-days: 3 }
       - name: Start the app once (startup log)
@@ -239,6 +245,27 @@ jobs:
         run: |
           desktop/target/release/workshop-cli.exe bench --app-site build/desktop/site --starter build/desktop/starter \
             --engine build/desktop/engine --out ci-out/bench-native-windows.json 2>&1 | tee ci-out/bench-native-windows.log
+      - name: Include once (Review 7, item 1), the same models without it, meshes compared
+        run: |
+          WORKSHOP_INCLUDE_ONCE=0 desktop/target/release/workshop-cli.exe bench --app-site build/desktop/site --starter build/desktop/starter \
+            --engine build/desktop/engine --out ci-out/bench-native-windows-plain.json 2>&1 | tail -1
+          python - <<'EOF'
+          import json
+          once, plain = (json.load(open(f"ci-out/bench-native-windows{s}.json"))["results"] for s in ("", "-plain"))
+          p = {r["key"]: r for r in plain}
+          # volume, area and size: OpenSCAD can triangulate a flat face differently from run to run
+          def same(a, b):
+              if not a or not b:
+                  return a == b
+              x = [a["volume"], a["area"], *a["size"]]
+              y = [b["volume"], b["area"], *b["size"]]
+              return all(abs(u - v) <= 1e-6 * max(1, abs(u), abs(v)) for u, v in zip(x, y))
+          differ = [r["key"] for r in once if not same(r["mesh"], p[r["key"]]["mesh"])]
+          t1, t0 = sum(r["seconds"] for r in once), sum(r["seconds"] for r in plain)
+          print(f"::notice title=Include once::{t0:.1f} s without it, {t1:.1f} s with it; meshes that differ: {differ or 'none'}")
+          if differ:
+              raise SystemExit(f"include once changed {differ}")
+          EOF
       - name: Components on Windows (a sample from each library)
         run: |
           desktop/target/release/workshop-cli.exe components-check --libs build/desktop/libs --app-site build/desktop/site \

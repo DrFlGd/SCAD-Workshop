@@ -33,35 +33,14 @@
 
   <main id="view-model" class="workbench" hidden>
     <aside class="rail" aria-label="Model settings">
-      <div class="rail-head">
-        <h1 id="model-title"></h1>
-        <p id="model-project" class="model-project"></p>
-        <p id="model-summary" class="muted"></p>
-        <p id="model-credit" class="credit"></p>
-        <!-- one row on every model and component page: Code, README, then the rest under ⋯ (Review 2, UI-16) -->
-        <div class="model-extra">
-          <span id="model-extra" class="model-extra-side"></span>
-          <button type="button" id="model-about" class="ghost small" hidden title="The author's notes on this model">About this model</button>
-          <details class="menu" id="model-more"><summary class="ghost small" title="More" aria-label="More">⋯</summary>
-            <div class="menu-panel">
-              <div id="model-more-own" class="menu-group"></div>
-              <button type="button" id="batch-open" title="Make many variations at once: download them as a ZIP, or keep them in the Parts Library">Batch generate…</button>
-              <button type="button" id="help-toggle" aria-pressed="false" title="Show the explanation under each setting">Help under each setting</button>
-            </div>
-          </details>
-        </div>
-      </div>
+      <div class="rail-head" id="model-head"></div>
       <div class="rail-tools">
         <label class="search small">
           <span class="visually-hidden">Find a setting</span>
           <input id="param-search" type="search" placeholder="Find a setting" autocomplete="off">
         </label>
       </div>
-      <details id="model-notes" class="model-notes" hidden><summary>About this model</summary><div id="model-notes-body"></div></details>
-      <details id="model-own-notes" class="model-notes own-notes" hidden><summary>Your notes</summary>
-        <div><textarea id="model-own-notes-text" rows="5" aria-label="Your notes"></textarea>
-        <p class="help" id="model-own-notes-state">Kept with the model in the library, and found by search. Saved when you click away.</p></div></details>
-      <div id="model-alerts" class="model-alerts" aria-live="polite"></div>
+      <div id="model-notes-root" class="contents"></div>
       <form id="params" class="params" novalidate></form>
       <div class="actionbar">
         <div id="status" class="status" role="status" aria-live="polite"></div>
@@ -104,30 +83,7 @@
   </main>
 
   <main id="view-library" class="workbench" hidden>
-    <aside class="rail" aria-label="Parts">
-      <div class="rail-head">
-        <h1 id="lib-title"></h1>
-        <p id="lib-summary" class="muted"></p>
-        <p id="lib-credit" class="credit"></p>
-        <div id="lib-extra" class="lib-extra"></div>
-      </div>
-      <div class="rail-tools">
-        <label class="search small">
-          <span class="visually-hidden">Find a part</span>
-          <input id="part-search" type="search" placeholder="Find a part" autocomplete="off">
-        </label>
-      </div>
-      <nav id="part-list" class="part-list" aria-label="Parts"></nav>
-      <div class="actionbar">
-        <div id="part-status" class="part-status"></div>
-        <div id="part-downloads" class="downloads"></div>
-        <div class="part-row"><button type="button" id="part-collect" class="ghost" hidden title="Add this part to one of your collections">Add to collection…</button>
-        <details class="menu" id="part-more" hidden><summary class="ghost" aria-label="More" title="More">⋯</summary><div class="menu-panel">
-          <button type="button" id="part-reveal" title="Show the part's file in its folder">Show in folder</button>
-          <button type="button" id="part-picture" title="Show another picture for it: one from its project, or your own">Choose picture…</button>
-          <button type="button" id="part-content" title="Add a file or a link to it: a build video, an assembly guide, photos">Add content…</button></div></details></div>
-      </div>
-    </aside>
+    <aside class="rail" aria-label="Parts" id="parts-rail"></aside>
   </main>
 
   <main id="view-about" class="pages" hidden>
@@ -146,45 +102,9 @@
 
   <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
 
-  <dialog id="save-dialog" class="batch save-dialog" aria-labelledby="save-title">
-    <form method="dialog" id="save-form">
-      <h2 id="save-title">Save settings</h2>
-      <label class="batch-list" for="save-name">Name</label>
-      <input id="save-name" type="text" maxlength="80" required autocomplete="off">
-      <p id="save-note" class="muted"></p>
-      <div class="batch-actions">
-        <button type="button" class="ghost" id="save-cancel">Cancel</button>
-        <button type="button" class="ghost" id="save-alt" hidden>Save as new</button>
-        <button type="submit" class="primary" id="save-primary">Save</button>
-      </div>
-    </form>
-  </dialog>
+  <dialog id="save-dialog" class="batch save-dialog" aria-labelledby="save-title"></dialog>
   <input type="file" id="settings-import" accept=".json,application/json" hidden>
-  <dialog id="batch" class="batch" aria-labelledby="batch-title">
-    <form method="dialog" id="batch-form">
-      <h2 id="batch-title">Batch generate</h2>
-      <div class="batch-mode" id="batch-mode" role="radiogroup" aria-label="What to make" hidden>
-        <label><input type="radio" name="batch-mode" value="vary" checked> Vary settings</label>
-        <label><input type="radio" name="batch-mode" value="saved"> Your saved settings</label>
-      </div>
-      <div id="batch-vary">
-        <p class="muted">Every other setting stays as it is in the form. Each combination becomes its own part.</p>
-        <div id="batch-rows"></div>
-        <button type="button" class="ghost" id="batch-add">Vary a second setting</button>
-      </div>
-      <div id="batch-saved" class="batch-saved" hidden></div>
-      <p id="batch-count" class="batch-count"></p>
-      <div class="batch-progress" id="batch-progress" hidden>
-        <div class="progress-bar"><span id="batch-bar"></span></div>
-        <p id="batch-progress-text"></p>
-      </div>
-      <div class="batch-actions">
-        <button type="button" class="ghost" id="batch-close">Close</button>
-        <button type="button" class="secondary" id="batch-keep" hidden>Save to the Parts Library</button>
-        <button type="button" class="primary" id="batch-run">Generate</button>
-      </div>
-    </form>
-  </dialog>
+  <dialog id="batch" class="batch" aria-labelledby="batch-title"></dialog>
 
   <noscript><p class="noscript">This generator needs JavaScript to build its forms and 3D preview.</p></noscript>
   <script type="module" src="app.js"></script>

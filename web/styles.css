@@ -275,8 +275,6 @@ body.show-help .field .help { display: block; }
 .status.ok::before { background: var(--ok); }
 .status.stale::before { background: var(--tool); }
 .status.busy::before { background: var(--focus); animation: pulse 1s infinite; }
-.status.warn::before { background: var(--tool); }
-.status.warn { color: var(--danger); }
 .status.error { color: var(--danger); }
 .status.error::before { background: var(--danger); }
 @keyframes pulse { 50% { opacity: .3; } }
@@ -350,6 +348,7 @@ body.show-help .field .help { display: block; }
 .model-notes > div { padding: 0 16px 10px; max-height: 26vh; overflow: auto; line-height: 1.45; }
 .model-alerts { padding: 0 16px; }
 .model-alerts:empty { display: none; }
+.contents { display: contents; }
 .model-alerts .alert { display: block; padding: 7px 10px; border-radius: var(--radius-s); border: 1px solid; margin: 8px 0 0; font-size: 12.5px; }
 .model-alerts .alert-warning { color: var(--warn-ink); background: var(--warn-bg); border-color: var(--warn-border); }
 .model-alerts .alert-danger { color: var(--danger); background: transparent; border-color: var(--danger); }

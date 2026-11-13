@@ -65,3 +65,33 @@ export function compileCondition(expr, names) {
 export const STATUS_TEXT = { ok: "OK to share", review: "Check license", blocked: "License unclear" };
 export const spdx = (l) => (!l?.spdx || l.spdx === "NOASSERTION" ? "Not stated" : l.spdx);
 export const FORMAT_LABEL = { "3mf": "3MF", stl: "STL", step: "STEP", shapr: "Shapr3D", pdf: "PDF", obj: "OBJ", svg: "SVG", dxf: "DXF" };
+
+// ---------------------------------------------------------------- naming what a model makes
+/** Settings that are sizes (grid units, width, depth...), for naming what a model makes. */
+export const SIZE_KEYS = ["gridx", "gridy", "gridz", "Width", "Depth", "Height", "Width_Units", "Length_Units",
+  "Board_Width", "Board_Height", "shelf_width", "shelf_depth", "GridSize", "plate_size"];
+
+/** The sizes among a model's settings, for naming what it makes. */
+export function sizesOf(values) {
+  const dims = [];
+  for (const k of SIZE_KEYS) {
+    if (k in values) [].concat(values[k]).forEach((x) => { if (typeof x === "number") dims.push(String(x)); });
+  }
+  return dims;
+}
+
+/** A file name for what a model makes: "gridfinity-bin-3x2.stl". */
+export function friendlyName(model, values) {
+  let base = model.kind === "component" ? `${model.component?.library || "component"}-${model.id}` : `${model.family}-${model.id}`;
+  const dims = sizesOf(values);
+  const part = model.part_parameter;
+  if (part && ["string", "number"].includes(typeof values[part])) base += `-${values[part]}`;
+  return (base + (dims.length ? "-" + dims.slice(0, 4).join("x") : "")).replace(/[^A-Za-z0-9._-]+/g, "_").slice(0, 120) + ".stl";
+}
+
+/** "Basic Bin 3×2": the model's name and the part and sizes it's set to. */
+export function partName(model, values) {
+  const part = model.part_parameter && ["string", "number"].includes(typeof values[model.part_parameter]) ? ` ${values[model.part_parameter]}` : "";
+  const dims = sizesOf(values).slice(0, 3);
+  return `${model.name}${part}${dims.length ? ` ${dims.join("×")}` : ""}`;
+}

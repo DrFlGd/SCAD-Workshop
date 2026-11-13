@@ -20,7 +20,7 @@ const ago = (t) => {
 
 export function Home() {
   const s = useStore(ui, (st) => ({ favs: st.favs, recent: st.recent, collections: st.collections || [] }));
-  const { index, catalog, platform } = ctx;
+  const { index, catalog } = ctx;
   const recent = s.recent.map((r) => ({ ...index.get(r.id), t: r.t })).filter((i) => i.id).slice(0, 8);
   const favs = s.favs.map((id) => index.get(id)).filter(Boolean);
   const tile = (scope, label, sub, thumb, fallback = null) => html`<a class="tile" href=${scopeHash(scope)} data-scope=${scope}>
@@ -31,10 +31,9 @@ export function Home() {
   const gens = shown.filter((i) => i.kind === "generator").length;
   const parts = shown.filter((i) => i.kind === "part").length;
   const comps = shown.filter((i) => i.kind === "component").length;
-  const where = platform.kind === "desktop" ? "on this computer" : "right here in your browser";
   const counts = [gens && plural(gens, "parametric model"), comps && plural(comps, "component"), parts && plural(parts, "part")].filter(Boolean);
-  const intro = `Pick a model, set the sizes and save a print-ready file, made ${where} with OpenSCAD. ` + (counts.length
-    ? `${counts.length > 1 ? `${counts.slice(0, -1).join(", ")} and ${counts.at(-1)}` : counts[0]} ${platform.kind === "desktop" ? "in this library" : "here"}, each credited to its author.`
+  const intro = `Pick a model, set the sizes and save a print-ready file, made on this computer with OpenSCAD. ` + (counts.length
+    ? `${counts.length > 1 ? `${counts.slice(0, -1).join(", ")} and ${counts.at(-1)}` : counts[0]} in this library, each credited to its author.`
     : "Your library is empty: add a project to start.");
   /** Category tiles for one kind, in the library's category order. */
   const categories = (kind) => {
@@ -51,7 +50,7 @@ export function Home() {
     <header class="home-head">
       <h1>Make things that fit</h1>
       <p>${intro}</p>
-      ${platform.kind === "desktop" && !catalog.library?.read_only ? html`<div class="home-actions">
+      ${!catalog.library?.read_only ? html`<div class="home-actions">
         <button type="button" class="primary" id="home-add-project" onClick=${() => ui.set({ dialog: { type: "add-project" } })}>${Icon.plus(16)} Add a project</button>
         <span class="muted">From a GitHub link, a ZIP file or a folder. Its models and parts join the library.</span>
       </div>` : null}
@@ -72,8 +71,7 @@ export function Home() {
       })}
     </div></section>` : null}
     <section data-home="models"><h2>Parametric Models</h2>${gens ? html`<div class="home-tiles">${categories("generator")}</div>`
-      : html`<p class="muted section-note" id="home-no-models">No parametric models yet. ${platform.kind === "desktop"
-        ? "Add a project from a GitHub link, a ZIP file or a folder, or put your own .scad files in a folder inside the library's local/ folder." : ""}</p>
+      : html`<p class="muted section-note" id="home-no-models">No parametric models yet. Add a project from a GitHub link, a ZIP file or a folder, or put your own .scad files in a folder inside the library's local/ folder.</p>
 `}</section>
     ${comps ? html`<section data-home="components"><h2>Components</h2>
       <p class="muted section-note">Modules from ${(catalog.component_libraries || []).filter((l) => l.active).map((l) => l.name).join(", ")}, as forms. Search for one (“bevel gear”, “threaded rod”) or pick a topic.</p>

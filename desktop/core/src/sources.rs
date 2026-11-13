@@ -788,18 +788,6 @@ pub fn normalise(lib: &Library) -> Result<Vec<String>> {
         if s["origin"]["type"].is_null() {
             s["origin"]["type"] = json!(origin_type(s["kind"].as_str().unwrap_or("")));
         }
-        // (0.4.9) a GitHub project's origin: `requested` became `added_from` (history, not a target),
-        // and `track` says what it follows ("branch:<name>" or "releases")
-        if s["kind"] == "github" {
-            if let Some(o) = s["origin"].as_object_mut() {
-                if let Some(r) = o.remove("requested") {
-                    o.entry("added_from").or_insert(r);
-                }
-                if let Some(t) = o.get("track").and_then(Value::as_str).filter(|t| *t != "releases" && !t.starts_with("branch:")).map(String::from) {
-                    o.insert("track".into(), json!(format!("branch:{t}")));
-                }
-            }
-        }
         let fallback = s["version_date"].clone();
         let added = s["added"].clone();
         let kind = s["kind"].as_str().unwrap_or("").to_string();
@@ -811,7 +799,7 @@ pub fn normalise(lib: &Library) -> Result<Vec<String>> {
             if v["added"].is_null() {
                 v["added"] = added.clone();
             }
-            // (projects read before 0.4.7: what Scan for changes kept, and a count of the files)
+            // (a local project's version: what Scan for changes kept, and a count of the files)
             let vid = v["id"].as_str().unwrap_or("").to_string();
             if v["content"].is_null() {
                 if let Some(fp) = lib.derived(&id, &vid).and_then(|d| d["files_fp"].as_str().map(String::from)) {
@@ -904,7 +892,7 @@ pub fn fetch_update(lib: &Library, src: &Value, token: Option<String>) -> Result
     }
     let o = &src["origin"];
     let (owner, repo) = (o["owner"].as_str().unwrap_or(""), o["repo"].as_str().unwrap_or(""));
-    // "branch:<name>", "releases", or (before 0.4.9) a plain branch name
+    // "branch:<name>" or "releases"
     let track = o["track"].as_str().unwrap_or("main");
     let gh = GitHub::new(token);
     let what = format!("{owner}/{repo}");

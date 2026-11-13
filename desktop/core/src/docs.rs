@@ -252,9 +252,7 @@ pub fn convert_all(root: &Path, docs: &mut [Value], out_dir: &Path, rel_prefix: 
         let id = d["id"].as_str().unwrap_or("readme").to_string();
         let src = d["src"].as_str().unwrap_or("").to_string();
         let from = d["from"].as_str().unwrap_or("markdown").to_string();
-        let res = crate::library::rel_inside(&src)
-            .map_err(anyhow::Error::from)
-            .and_then(|rel| html_from_file(&root.join(rel), &from, base))
+        let res = crate::library::rel_inside(&src).and_then(|rel| html_from_file(&root.join(rel), &from, base))
             .and_then(|h| {
                 std::fs::create_dir_all(out_dir)?;
                 crate::config::write_atomic(&out_dir.join(format!("{id}.html")), h.as_bytes())?;

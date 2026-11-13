@@ -159,12 +159,12 @@ try:
     open_model("gridfinity-rebuilt/bin")
     time.sleep(1)
     shot("01-rebuilt-bin")
-    open_model("underware/t-channel")  # crashes the WebAssembly engine; native only
+    open_model("underware/t-channel")
     time.sleep(1)
     shot("02-underware-t-channel")
-    open_model("minimalist-kitchen-gridfinity/bin")  # ~25 s in the browser
+    open_model("minimalist-kitchen-gridfinity/bin")
     report["kitchen_status"] = text("#status")
-    # many `use`d files: slow with native OpenSCAD on Windows, where the app races both engines
+    # many files, one included by most of the others: slow with native OpenSCAD on Windows until include once (Review 7, item 1)
     for i, w in enumerate(("2", "3")):
         if i == 0:
             open_model("gridfinity-extended/bin")
@@ -173,7 +173,7 @@ try:
               i.dispatchEvent(new Event('input', {{bubbles: true}})); document.querySelector('#generate').click();""")
             time.sleep(0.5)
             wait(DONE, 120, "extended bin re-render")
-        report[f"extended_bin_{i + 1}"] = {"status": text("#status"), "engine": d.execute_script("return document.body.dataset.engine || 'native'")}
+        report[f"extended_bin_{i + 1}"] = {"status": text("#status")}
         print("extended bin:", report[f"extended_bin_{i + 1}"], flush=True)
 
     # saved settings go to the library as files

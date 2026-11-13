@@ -288,6 +288,16 @@ async def main():
             libs = await pg.evaluate("() => window.__workshop.catalog.component_libraries.map((l) => [l.name, l.provider, l.active])")
             check("Components: modules of the bundled libraries, your BOSL2 in use", comps > 700 and ["BOSL2", "project", True] in libs
                   and ["BOSL2", "bundled", False] in libs and ["NopSCADlib", "bundled", True] in libs, (comps, libs))
+            # the app's own pictures of its copies' components, made when it was built (tools/component_thumbs.py; Review 7, item 6)
+            if (Path(a.app_site).parent / "libs/thumbs/summary.json").is_file():
+                pics = await pg.evaluate("""async () => {
+                    const app = window.__workshop.index.items.filter((i) => i.kind === 'component' && i.thumb?.includes('/~app/'));
+                    const r = app.length ? await fetch(app[0].thumb) : null;
+                    return { nop: app.filter((i) => i.project === 'NopSCADlib').length, bosl2: app.filter((i) => i.project === 'BOSL2').length,
+                             bytes: r?.ok ? (await r.arrayBuffer()).byteLength : 0 };
+                }""")
+                check("components of the app's libraries have the pictures it came with (not your BOSL2's)",
+                      pics["nop"] > 100 and pics["bosl2"] == 0 and pics["bytes"] > 500, pics)
             # the bevel-gear flow: search, open the first result (a doc example's values), change teeth and module, preview, download
             t0 = time.time()
             await pg.goto(B + "#/")
@@ -1139,8 +1149,9 @@ async def main():
                 await pg.get_by_role("button", name="Guide", exact=True).click()
                 await pg.wait_for_selector("#attachment-remove")
                 await pg.click("#attachment-remove")
+                # (the list is saved before the file is moved aside: wait for both)
                 for _ in range(40):
-                    if len(meta_of()["items"]["box"].get("attachments", [])) == 1:
+                    if len(meta_of()["items"]["box"].get("attachments", [])) == 1 and any((library / "backups" / "removed").glob(f"*-{sid}-Guide.pdf")):
                         break
                     await asyncio.sleep(0.25)
                 m6["left"] = [a.get("name") for a in meta_of()["items"]["box"].get("attachments", [])]
@@ -1173,13 +1184,30 @@ async def main():
             await pg.goto(B + "#/settings")
             await pg.wait_for_selector("#ls-appearance")
             toc = await pg.eval_on_selector_all("#about-body .ls-toc a", "els => els.map((e) => e.textContent)")
+            # (Review 7, item 13) Settings and Licenses are Preact pages; a licence row asked for is marked
+            await pg.goto(B + "#/licenses/components-BOSL2")
+            await pg.wait_for_selector("#lic-components-BOSL2.focus")
+            lic = await pg.evaluate("() => [[...document.querySelectorAll('#about-body h2')].map((h) => h.textContent), document.querySelector('#lic-components-BOSL2 td').textContent]")
+            check("Licenses lists the projects, parts packs and component libraries, the one asked for marked",
+                  lic[0] == ["Parametric Models", "Parts Library", "Components", "This app"] and lic[1] != "Not stated", lic)
             await pg.goto(B + "#/m/anylid/lid")
             await pg.wait_for_selector("#p-Mirror_X")
             cols = await pg.evaluate("() => ['#p-Mirror_X', '#p-Width_Units'].map((s) => Math.round(document.querySelector(s).getBoundingClientRect().left))")
             readme = (library / "README.txt").read_text()
             check("Settings is laid out like Library settings; a yes/no setting's box is in the value column; the library's README explains pins, your own projects and old versions",
-                  toc[:5] == ["Appearance", "Printer profile", "Downloads", "Library", "Engine"] and abs(cols[0] - cols[1]) <= 2
+                  toc[:4] == ["Appearance", "Printer profile", "Downloads", "Engine"] and abs(cols[0] - cols[1]) <= 2
                   and "sources/pinned/pins/" in readme and "Remove versions not in use" in readme, (toc, cols))
+
+            # (Review 7, items 3 and 8) a model that isn't in the library gets a page saying so, with nothing
+            # to make; everything in the Parts Library is a part, so no "part" badges there
+            await pg.goto(B + "#/m/anylid/no-such-model")
+            await pg.wait_for_selector("#model-missing")
+            missing = await pg.evaluate("() => [document.querySelector('#view-model').hidden, document.querySelector('#about-title').textContent]")
+            await pg.goto(B + "#/browse/parts")
+            await pg.wait_for_selector("[data-item]")
+            part_badges = await pg.evaluate("() => [document.querySelectorAll('[data-item]').length, [...document.querySelectorAll('.badge-mini')].filter((b) => b.textContent === 'part').length]")
+            check("a model that isn't in the library gets a page saying so, with nothing to make; no part badges in the Parts Library",
+                  missing == [True, "This model isn't in the library"] and part_badges[0] > 0 and part_badges[1] == 0, (missing, part_badges))
 
             # 13e. (0.4.9, F-1) the starter projects that are on GitHub as the app had them become GitHub projects
             # at the same commit, in upstream's own layout: same model ids, saved settings' code edits moved to
@@ -1342,6 +1370,20 @@ async def main():
             await pg.click("#batch-close")
             check("Batch generate saves each part to the Parts Library with its recipe, named from what varies",
                   len(several) == 4 and several_recipes.count("local-bevel/bevel-gear") == 4, several)
+            # (Review 7, item 2) a bin's Width is a pair (units, mm): each number can be varied, Width in units is
+            # the first guess, the settings come in the form's groups, and debug settings aren't offered
+            await pg.goto(B + "#/m/gridfinity-extended/bin")
+            await pg.wait_for_function("()=>document.body.dataset.model==='gridfinity-extended/bin'", timeout=60000)
+            await pg.click("#model-more summary")
+            await pg.click("#batch-open")
+            await pg.wait_for_selector("#batch[open] #batch-rows select")
+            vary = await pg.evaluate("""() => { const s = document.querySelector('#batch-rows select');
+                return [s.value, s.selectedOptions[0].textContent, s.selectedOptions[0].parentElement.label || '',
+                  [...s.options].some((o) => /^(Fa|Fn|Fs|Random seed|Enable help|Cut \\()/.test(o.textContent)),
+                  [...document.querySelectorAll('.batch-range input')].map((i) => i.value)] }""")
+            await pg.click("#batch-close")
+            check("Batch generate offers each number of a paired setting (a bin's Width in units first), in the form's groups, without debug settings",
+                  vary[:3] == ["width[0]", "Width (units)", "General Cup"] and vary[3] is False and vary[4][0] == "2", vary)
             # (0.4.13, UI-28) the Made parts shelf: no source line, Read again or Versions; cards say what each was made from
             await pg.goto(B + "#/browse/source/local-made-parts")
             await pg.wait_for_selector(".source-panel[data-source=local-made-parts]", timeout=20000)
@@ -1378,7 +1420,8 @@ async def main():
             check("the status line reads a job and its time with a space before the timer",
                   bool(re.search(r"\S · \d+ s", job_text)), job_text)
             try:
-                await pg.wait_for_function(f"() => ({count_js})()[1] >= 22", timeout=300000)
+                # (the thumbnails of every project added so far are made first: about 180, 5 minutes on a slow machine)
+                await pg.wait_for_function(f"() => ({count_js})()[1] >= 22", timeout=600000)
             except Exception:
                 pass
             counts = await pg.evaluate(count_js)
