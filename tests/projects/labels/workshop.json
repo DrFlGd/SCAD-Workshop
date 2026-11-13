@@ -1,0 +1,13 @@
+{
+  "format": 1,
+  "name": "Test labels",
+  "summary": "A text label and a hanging tag, made for SCAD Workshop's tests.",
+  "category": "labels",
+  "tags": ["labels", "text", "test"],
+  "license": "CC0-1.0",
+  "authors": [{ "name": "SCAD Workshop's tests" }],
+  "models": [
+    { "id": "label", "name": "Label", "entrypoint": "label.scad" },
+    { "id": "tag", "name": "Tag", "entrypoint": "tag.scad" }
+  ]
+}

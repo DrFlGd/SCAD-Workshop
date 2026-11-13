@@ -1,7 +1,7 @@
 name: Native OpenSCAD engines
 
-# Finds the native OpenSCAD snapshots (Linux AppImage, Windows ZIP) matching the
-# WebAssembly version pinned in engine.json, records their checksums and checks
+# Finds the native OpenSCAD snapshots (Linux AppImage, Windows ZIP) of the
+# version pinned in engine.json, records their checksums and checks
 # they run headless. Results go to the engine-cache-native branch, so they can be
 # pinned in engine.json for the desktop app.
 on:

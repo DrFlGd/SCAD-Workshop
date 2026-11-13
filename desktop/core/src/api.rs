@@ -27,8 +27,6 @@ pub struct AppPaths {
     pub data_dir: PathBuf,
     /// the app's own files: data/catalog.json (common files, engine) and fs/ (fonts)
     pub site: PathBuf,
-    /// the starter library shipped with the app (sources/<id>/...)
-    pub starter: Option<PathBuf>,
     /// bundled OpenSCAD (folder or executable)
     pub engine: PathBuf,
     /// OpenSCAD libraries shipped with the app (libs/: libraries.json, <Name>/, index/)
@@ -156,7 +154,7 @@ impl App {
         Ok(r)
     }
 
-    /// The open library (opening the configured one, with the starter projects, on first use).
+    /// The open library (opening the configured one on first use).
     pub fn library(&self) -> Result<Library, String> {
         if let Some(l) = self.library.read().unwrap().as_ref() {
             return Ok(l.clone());
@@ -167,11 +165,6 @@ impl App {
 
     fn open_library(&self, path: &Path) -> Result<Library> {
         let (lib, _migration) = Library::open(path)?;
-        if let Some(starter) = &self.paths.starter {
-            if let Err(e) = project::sync_starter(&lib, starter) {
-                eprintln!("starter library: {e:#}");
-            }
-        }
         let _ = sources::sync_local(&lib);
         if let Err(e) = sources::normalise(&lib) {
             eprintln!("library: {e:#}");
@@ -510,7 +503,6 @@ impl App {
                     "github_token": self.config().github_token().is_some(),
                     "concurrency": r.as_ref().map(|r| r.concurrency()),
                     "cache_bytes": r.as_ref().map(|r| r.cache_size()),
-                    "starter": self.paths.starter.as_ref().is_some_and(|s| s.join("starter.json").is_file()),
                 }))
             }
             "read" => self.read_file(arg(&args, "path").map_err(e2s)?).map(Reply::Bytes).map_err(e2s),
@@ -540,7 +532,7 @@ impl App {
                 let p = c.blobs.get(sha).ok_or_else(|| format!("file {sha} isn't in the library"))?;
                 let data = std::fs::read(p).map_err(|e| e.to_string())?;
                 let scad = p.extension().is_some_and(|e| e.eq_ignore_ascii_case("scad"));
-                Ok(Reply::Bytes(if scad { crate::sitebuild::replace_crlf(&data) } else { data }))
+                Ok(Reply::Bytes(if scad { crate::assemble::replace_crlf(&data) } else { data }))
             }
             "jobs" => j(self.jobs_json()),
             "job_cancel" => {
@@ -589,7 +581,7 @@ impl App {
                 // an edited file's text (the Code tab): kept in the app's data folder by its hash, so a
                 // render can use it in place of the original (the original is never written to)
                 let text = args["text"].as_str().ok_or("no text")?;
-                let bytes = crate::sitebuild::replace_crlf(text.as_bytes());
+                let bytes = crate::assemble::replace_crlf(text.as_bytes());
                 let sha = { use sha2::Digest; hex::encode(sha2::Sha256::digest(&bytes)) };
                 let p = self.edit_blob(&sha).ok_or("bad hash")?;
                 if !p.is_file() {
@@ -1100,13 +1092,6 @@ impl App {
                 lib.writable().map_err(e2s)?;
                 let id = arg(&args, "id").map_err(e2s)?;
                 let src = lib.source(id).map_err(e2s)?;
-                if src["kind"] == "bundled" {
-                    let mut removed = lib.meta()["removed_starter"].as_array().cloned().unwrap_or_default();
-                    if !removed.iter().any(|v| v == id) {
-                        removed.push(json!(id));
-                    }
-                    lib.update_meta(json!({ "removed_starter": removed })).map_err(e2s)?;
-                }
                 // into the library's trash/ folder (with your own project's local/ folder), until the trash is emptied
                 let name = self.catalog().ok().and_then(|c| catalog::sorted_sources(&c).get(id).and_then(|s| s["name"].as_str().map(String::from)))
                     .or_else(|| src["detected"]["name"].as_str().map(String::from))
@@ -1119,11 +1104,6 @@ impl App {
             "trash_restore" => {
                 let lib = self.library()?;
                 let info = lib.trash_restore(arg(&args, "entry").map_err(e2s)?).map_err(e2s)?;
-                if info["source_kind"] == "bundled" {
-                    let mut removed = lib.meta()["removed_starter"].as_array().cloned().unwrap_or_default();
-                    removed.retain(|v| *v != info["id"]);
-                    lib.update_meta(json!({ "removed_starter": if removed.is_empty() { Value::Null } else { json!(removed) } })).map_err(e2s)?;
-                }
                 self.invalidate();
                 j(info)
             }
@@ -1131,16 +1111,6 @@ impl App {
                 let lib = self.library()?;
                 let n = lib.trash_empty(args["entry"].as_str()).map_err(e2s)?;
                 j(json!({ "removed": n }))
-            }
-            "source_restore_starter" => {
-                let lib = self.library()?;
-                lib.update_meta(json!({ "removed_starter": Value::Null })).map_err(e2s)?;
-                let r = match &self.paths.starter {
-                    Some(s) => project::sync_starter(&lib, s).map_err(e2s)?,
-                    None => (vec![], vec![]),
-                };
-                self.invalidate();
-                j(json!({ "installed": r.0 }))
             }
             "starter_convert" => {
                 // { ids?: [..] } -> job { converted: [{ id, name }], failed: [{ id, name, message }] }: starter

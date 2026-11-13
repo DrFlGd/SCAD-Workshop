@@ -3,10 +3,13 @@
 (`workshop-cli serve`, the same command table as the Tauri app), in Chromium.
 
     python3 tests/desktop_page.py --cli desktop/target/release/workshop-cli --ui build/desktop/ui \\
-        --app-site build/desktop/site --starter build/desktop/starter --engine build/native/squashfs-root \\
+        --app-site build/desktop/site --engine build/native/squashfs-root \\
         --home /tmp/home --out shots [--github-api http://127.0.0.1:8795]
 
-Checks: the starter library; adding three public GitHub projects by URL (one
+The library starts as a copy of tests/old-library (two starter projects of an earlier
+app) with the test projects (tests/projects) in its local/ folder.
+
+Checks: the test library; adding three public GitHub projects by URL (one
 pinned to an old commit, one a library); a local project that includes the
 library; search; a render from library files; an upstream change detected and
 summarised, accepted, with edits surviving; a project-wide license with one item
@@ -51,7 +54,6 @@ ap = argparse.ArgumentParser()
 ap.add_argument("--cli", required=True)
 ap.add_argument("--ui", required=True)
 ap.add_argument("--app-site", required=True)
-ap.add_argument("--starter", required=True)
 ap.add_argument("--engine", required=True)
 ap.add_argument("--home", required=True)
 ap.add_argument("--out", default="shots")
@@ -63,6 +65,11 @@ out.mkdir(parents=True, exist_ok=True)
 home = Path(a.home).resolve()
 shutil.rmtree(home, ignore_errors=True)
 library = home / "library"
+TESTS = Path(__file__).resolve().parent
+shutil.copytree(TESTS / "old-library", library)
+for project in sorted((TESTS / "projects").iterdir()):
+    if project.is_dir():
+        shutil.copytree(project, library / "local" / project.name)
 B = f"http://127.0.0.1:{a.port}/"
 SHIM = Path(__file__).with_name("tauri_shim.js")
 OLD = "af95c658fdd11e56bbc826b68ac13022c8bc79e4"  # vector76/gridfinity_openscad, Oct 2022 (newer commits exist)
@@ -92,7 +99,7 @@ def start_server():
         for k in ("HTTPS_PROXY", "HTTP_PROXY", "https_proxy", "http_proxy", "ALL_PROXY", "all_proxy"):
             env.pop(k, None)
     log = open(out / "serve.log", "w")
-    p = subprocess.Popen([a.cli, "serve", "--ui", a.ui, "--app-site", a.app_site, "--starter", a.starter, "--engine", a.engine,
+    p = subprocess.Popen([a.cli, "serve", "--ui", a.ui, "--app-site", a.app_site, "--engine", a.engine,
                           "--home", str(home), "--library", str(library), "--port", str(a.port)], stdout=log, stderr=log, env=env)
     for _ in range(100):
         try:
@@ -137,11 +144,14 @@ async def main():
             await pg.wait_for_selector(".home .tile", timeout=120000)
             await pg.wait_for_function("() => !!window.__workshop", timeout=10000)
 
-            # 1. the starter library
+            # 1. the test library: the old library's starter projects, and the test projects in local/ (read when the app starts)
+            await pg.wait_for_function("() => ['gen:local-bins/bin', 'gen:local-labels/tag', 'part:local-parts/hook'].every((k) => window.__workshop.index.get(k))", timeout=180000)
             n = await pg.evaluate("() => window.__workshop.index.items.filter((i) => i.kind === 'generator').length")
             parts = await pg.evaluate("() => window.__workshop.index.items.filter((i) => i.kind === 'part').length")
-            projects = await pg.evaluate("() => window.__workshop.catalog.sources.length")
-            check("starter library installed", n == 58 and parts == 44 and projects == 19, f"{n} generators, {parts} parts, {projects} projects")
+            projects = await pg.evaluate("() => window.__workshop.catalog.sources.map((s) => [s.id, s.kind])")
+            check("the test library opens: two starter projects of an earlier app, and the test projects read as your own",
+                  n == 8 and parts == 3 and sorted(projects) == [["gridfinity-basket", "bundled"], ["hsw", "bundled"], ["local-bins", "local"], ["local-labels", "local"], ["local-parts", "local"]],
+                  f"{n} models, {parts} parts, {projects}")
             await pg.screenshot(path=str(out / "p2-00-home.png"))
             # the left menu: the three sections; the one being browsed shows its categories in a panel beside it
             sections = await pg.eval_on_selector_all(".sidebar [data-section-row] .nav-label", "els => els.map(e => e.textContent.trim())")
@@ -527,10 +537,10 @@ async def main():
             await pg.wait_for_selector(".side-panel .code .cl.mark")
             marked = await pg.inner_text(".side-panel .code .cl.mark")
             await pg.screenshot(path=str(out / "p4-02-component-code.png"))
-            await pg.goto(B + "#/m/gridfinity-extended/bin")
-            await pg.wait_for_function("()=>document.body.dataset.model==='gridfinity-extended/bin'")
+            await pg.goto(B + "#/m/local-bins/bin")
+            await pg.wait_for_function("()=>document.body.dataset.model==='local-bins/bin'")
             await pg.click("[data-side-tab=readme]")
-            await pg.wait_for_function("() => /Gridfinity Extended/.test(document.querySelector('.doc-frame')?.contentDocument?.querySelector('h1')?.textContent || '')")
+            await pg.wait_for_function("() => /Test bins/.test(document.querySelector('.doc-frame')?.contentDocument?.querySelector('h1')?.textContent || '')")
             await pg.click("[data-side-tab=readme]")
             await pg.wait_for_selector(".side-panel", state="detached")
             await pg.goto(B + f"#/browse/source/{gears}")
@@ -541,7 +551,7 @@ async def main():
             from_files = await pg.inner_text(".side-head")
             await pg.click(".side-close")
             await pg.wait_for_selector(".side-panel", state="detached")
-            check("side viewer: a component's generated code and its module's file, the BOSL2 and Gridfinity Extended READMEs, a project file",
+            check("side viewer: a component's generated code and its module's file, the READMEs of BOSL2 and of one of your own projects, a project file",
                   "bevel_gear(" in generated and "module bevel_gear(" in marked and ".scad" in from_files, (generated[:80], marked[:60], from_files))
 
             # 6. upstream change: edit first, then detect, summarise, accept; edits survive
@@ -727,6 +737,7 @@ async def main():
             await pg.fill("#category-new", "Kitchen")
             await pg.click("#category-add")
             await pg.wait_for_selector('[data-category="kitchen"]')
+            before = await pg.evaluate("() => window.__workshop.index.items.filter((i) => i.category === 'labels').length")
             await pg.click('[data-category="labels"] [data-act=remove-category]')
             await pg.click('[data-category="labels"] #category-move-to')
             await pg.click('.catpick-opt[data-cat="gridfinity"]')
@@ -737,7 +748,7 @@ async def main():
             await pg.click("[data-act=restore-category]")
             await pg.wait_for_selector('[data-category="labels"]')
             back = await pg.evaluate("() => window.__workshop.index.items.filter((i) => i.category === 'labels').length")
-            check("categories: add, remove (items move), bring back", left == 0 and back >= 5, (left, back))
+            check("categories: add, remove (items move), bring back", before >= 2 and left == 0 and back == before, (before, left, back))
             # a picture of your own as a category's icon (the file dialog answered through /test/pick)
             icon_src = home / "kitchen.svg"
             icon_src.write_text('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="#f2b705"/></svg>')
@@ -855,13 +866,13 @@ async def main():
             await pg.click('[data-source="local-scanned"] [data-act=delete-project]')
 
             # 13b. (0.4.6) defaults that work: a number without a Customizer comment whose default is a
-            # fraction is accepted at its default (Gridfinity Anylid's width units, 1.5); a default off its
+            # fraction is accepted at its default (as Gridfinity Anylid's width units, 1.5, were); a default off its
             # slider's step is reported; every model is rendered once at its defaults (with its thumbnail)
             # and one that fails is marked in Library settings and on its page, with OpenSCAD's message
-            await pg.goto(B + "#/m/anylid/lid")
-            await pg.wait_for_selector("#p-Width_Units")
+            await pg.goto(B + "#/m/local-bins/lid")
+            await pg.wait_for_selector("#p-lid_width")
             invalid = await pg.evaluate("() => [...document.querySelectorAll('.field input')].filter((i) => !i.checkValidity()).map((i) => i.id)")
-            check("Gridfinity Anylid opens with no setting marked invalid at its defaults (1.5 and 2.5 units)", not invalid, invalid)
+            check("a model whose sizes default to fractions, without a Customizer comment, opens with no setting marked invalid (1.5 and 2.5 units)", not invalid, invalid)
             (library / "local/defaults").mkdir(parents=True, exist_ok=True)
             (library / "local/defaults/tray.scad").write_text("// width in grid units\nunits = 1.5;\n// height\nheight = 2.5; // [0:1:10]\ncube([units * 42, 42, height]);\n")
             (library / "local/defaults/broken.scad").write_text("size = 10;\nassert(size < 5, \"size must be under 5\");\ncube(size);\n")
@@ -1190,9 +1201,9 @@ async def main():
             lic = await pg.evaluate("() => [[...document.querySelectorAll('#about-body h2')].map((h) => h.textContent), document.querySelector('#lic-components-BOSL2 td').textContent]")
             check("Licenses lists the projects, parts packs and component libraries, the one asked for marked",
                   lic[0] == ["Parametric Models", "Parts Library", "Components", "This app"] and lic[1] != "Not stated", lic)
-            await pg.goto(B + "#/m/anylid/lid")
-            await pg.wait_for_selector("#p-Mirror_X")
-            cols = await pg.evaluate("() => ['#p-Mirror_X', '#p-Width_Units'].map((s) => Math.round(document.querySelector(s).getBoundingClientRect().left))")
+            await pg.goto(B + "#/m/local-bins/lid")
+            await pg.wait_for_selector("#p-notch")
+            cols = await pg.evaluate("() => ['#p-notch', '#p-lid_width'].map((s) => Math.round(document.querySelector(s).getBoundingClientRect().left))")
             readme = (library / "README.txt").read_text()
             check("Settings is laid out like Library settings; a yes/no setting's box is in the value column; the library's README explains pins, your own projects and old versions",
                   toc[:4] == ["Appearance", "Printer profile", "Downloads", "Engine"] and abs(cols[0] - cols[1]) <= 2
@@ -1200,7 +1211,7 @@ async def main():
 
             # (Review 7, items 3 and 8) a model that isn't in the library gets a page saying so, with nothing
             # to make; everything in the Parts Library is a part, so no "part" badges there
-            await pg.goto(B + "#/m/anylid/no-such-model")
+            await pg.goto(B + "#/m/local-bins/no-such-model")
             await pg.wait_for_selector("#model-missing")
             missing = await pg.evaluate("() => [document.querySelector('#view-model').hidden, document.querySelector('#about-title').textContent]")
             await pg.goto(B + "#/browse/parts")
@@ -1211,8 +1222,9 @@ async def main():
 
             # 13e. (0.4.9, F-1) the starter projects that are on GitHub as the app had them become GitHub projects
             # at the same commit, in upstream's own layout: same model ids, saved settings' code edits moved to
-            # the new paths, thumbnails kept, update checks possible; the others stay as they are
-            on_github = ["cullenect-label", "gridfinity-basket", "gridfinity-extended", "gridfinity-rebuilt", "label-generator-gridfinity", "underware"]
+            # the new paths, thumbnails kept, update checks possible; the others stay as they are (the old
+            # library's Gridfinity Basket, and Honeycomb Storage Wall, whose first model is from an older commit)
+            on_github = ["gridfinity-basket"]
             def model_ids(i):
                 sj = json.loads((library / f"sources/{i}/source.json").read_text())
                 d = library / f"sources/{i}/derived/{sj['version']}.json"
@@ -1244,14 +1256,14 @@ async def main():
                            model_ids(i) == ids_before[i], len(list((library / f"sources/{i}/thumbs").glob("*.webp"))) >= thumbs_before[i]]   # (more: made meanwhile)
             print("the app's old copies:", old_copy)
             print("after converting:", toast)
-            if conv["gridfinity-extended"][0] != "github":   # (diagnosis: what the conversion said, and what's in the project)
+            if conv["gridfinity-basket"][0] != "github":   # (diagnosis: what the conversion said, and what's in the project)
                 jobs = await pg.evaluate("() => window.__workshop.platform.api('jobs', {})")
                 print("conversion job:", [j.get("result") or j.get("error") for j in jobs if j.get("label") == "Getting projects from GitHub"])
-                ge = library / "sources/gridfinity-extended"
-                print("gridfinity-extended:", sorted(p.name for p in ge.iterdir()), sorted(p.name for p in (ge / "files").iterdir()) if (ge / "files").is_dir() else None,
-                      sorted(p.name for p in (ge / "derived").iterdir()) if (ge / "derived").is_dir() else None)
+                gb = library / "sources/gridfinity-basket"
+                print("gridfinity-basket:", sorted(p.name for p in gb.iterdir()), sorted(p.name for p in (gb / "files").iterdir()) if (gb / "files").is_dir() else None,
+                      sorted(p.name for p in (gb / "derived").iterdir()) if (gb / "derived").is_dir() else None)
             edit_keys = list(json.loads((library / "recipes/f1-edit.json").read_text())["edits"])
-            others = {json.loads((library / f"sources/{i}/source.json").read_text())["kind"] for i in ("hsw", "gridflock", "anylid")}
+            others = {json.loads((library / f"sources/{i}/source.json").read_text())["kind"] for i in ("hsw",)}
             await pg.goto(B + "#/m/gridfinity-basket/basket")
             try:
                 await pg.wait_for_function("() => /\\d/.test(document.querySelector('.hud-dims')?.textContent || '')", timeout=180000)
@@ -1260,7 +1272,7 @@ async def main():
             dims = await pg.inner_text(".hud-dims")
             await pg.screenshot(path=str(out / "p6-03-from-github.png"))
             check("starter projects on GitHub become GitHub projects at the same commit (same models, edits moved to upstream's paths, thumbnails kept); the others stay as they are",
-                  "Gridfinity Rebuilt" in offer and "checked at their default settings" in unchecked
+                  "Gridfinity Basket" in offer and "checked at their default settings" in unchecked
                   and all(v == "removed" or v.startswith("The app's copy of") for v in old_copy.values())
                   and all(v == ["github", "branch:", "description.json", True, True] for v in conv.values())
                   and edit_keys == ["/gridfinityBasket.scad"] and others == {"bundled"} and "mm" in dims, (conv, old_copy, edit_keys, others, dims, toast, unchecked[:120]))
@@ -1372,8 +1384,8 @@ async def main():
                   len(several) == 4 and several_recipes.count("local-bevel/bevel-gear") == 4, several)
             # (Review 7, item 2) a bin's Width is a pair (units, mm): each number can be varied, Width in units is
             # the first guess, the settings come in the form's groups, and debug settings aren't offered
-            await pg.goto(B + "#/m/gridfinity-extended/bin")
-            await pg.wait_for_function("()=>document.body.dataset.model==='gridfinity-extended/bin'", timeout=60000)
+            await pg.goto(B + "#/m/local-bins/bin")
+            await pg.wait_for_function("()=>document.body.dataset.model==='local-bins/bin'", timeout=60000)
             await pg.click("#model-more summary")
             await pg.click("#batch-open")
             await pg.wait_for_selector("#batch[open] #batch-rows select")
@@ -1383,7 +1395,7 @@ async def main():
                   [...document.querySelectorAll('.batch-range input')].map((i) => i.value)] }""")
             await pg.click("#batch-close")
             check("Batch generate offers each number of a paired setting (a bin's Width in units first), in the form's groups, without debug settings",
-                  vary[:3] == ["width[0]", "Width (units)", "General Cup"] and vary[3] is False and vary[4][0] == "2", vary)
+                  vary[:3] == ["width[0]", "Width (units)", "General"] and vary[3] is False and vary[4][0] == "2", vary)
             # (0.4.13, UI-28) the Made parts shelf: no source line, Read again or Versions; cards say what each was made from
             await pg.goto(B + "#/browse/source/local-made-parts")
             await pg.wait_for_selector(".source-panel[data-source=local-made-parts]", timeout=20000)
@@ -1654,7 +1666,7 @@ async def main():
             # can't be read leaves them as for any ZIP
             pz = home / "printables"
             pz.mkdir(exist_ok=True)
-            page_pdf = Path(__file__).resolve().parent.parent / "libraries/opengrid-official/printables-model-page.pdf"
+            page_pdf = Path(__file__).resolve().parent.parent / "tests/fixtures/printables-opengrid.pdf"
             model_files.write_stl(pz / "connector.stl")
             with zipfile.ZipFile(pz / "opengrid.zip", "w") as z:
                 z.write(pz / "connector.stl", "files/opengrid-connector-test.stl")

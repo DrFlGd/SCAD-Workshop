@@ -1065,7 +1065,7 @@ mod tests {
     use super::*;
 
     fn sample() -> Vec<u8> {
-        std::fs::read(concat!(env!("CARGO_MANIFEST_DIR"), "/../../libraries/opengrid-official/printables-model-page.pdf")).unwrap()
+        std::fs::read(concat!(env!("CARGO_MANIFEST_DIR"), "/../../tests/fixtures/printables-opengrid.pdf")).unwrap()
     }
 
     #[test]

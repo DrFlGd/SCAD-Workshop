@@ -1,9 +1,9 @@
 //! Reading a project folder the user added: which `.scad` files are models (and
 //! which are library code), its README and license, preset files, editor.toml,
 //! and ready-made model files (STL, 3MF, STEP...) grouped one item per name.
-//! The result is a family manifest in the same shape as catalog/families/*.json,
-//! so the website build's model assembly ([`crate::sitebuild::assemble_model`])
-//! turns it into model pages.
+//! The result is a family manifest (the shape of a workshop.json, with what was
+//! read from the files), which [`crate::assemble::assemble_model`] turns into
+//! model pages.
 
 use crate::ingest::{self, Resolver};
 use crate::library::slug;

@@ -33,13 +33,10 @@ The map of the code, the conventions and how to build and test in a cloud sessio
 Build it yourself (needs Rust, Node, Python and on Linux the WebKitGTK development packages; see the Linux job in `.github/workflows/desktop.yml` for the exact list):
 
 ```sh
-python3 tools/fetch_engine.py --out build/engine
 python3 tools/fetch_native_engine.py --out build/desktop/engine --extract build/native
 (cd desktop && cargo build --release -p workshop-core)
-python3 tools/build_site.py --engine build/engine --out _site --native-engine build/native/squashfs-root/AppRun
-python3 tools/thumbnails.py --site _site --native-engine build/native/squashfs-root/AppRun
 python3 tools/fetch_libraries.py --out build/desktop/libs   # the bundled OpenSCAD libraries (or --from-git <folder of clones>)
-python3 tools/build_desktop.py --site _site --out build/desktop --fetch-fonts   # ui/, site/, starter/ (tests only), libs/index/
+python3 tools/build_desktop.py --out build/desktop --fetch-fonts   # ui/, site/ (the app's own files), libs/index/
 python3 tools/component_thumbs.py --cli desktop/target/release/workshop-cli --engine build/native/squashfs-root   # libs/thumbs/ (needs Playwright)
 cd desktop && npx @tauri-apps/cli@2 build          # installers in desktop/target/release/bundle/
 ```
@@ -48,9 +45,9 @@ cd desktop && npx @tauri-apps/cli@2 build          # installers in desktop/targe
 
 ```sh
 cli=desktop/target/release/workshop-cli
-$cli bench --app-site build/desktop/site --starter build/desktop/starter --engine build/native/squashfs-root   # every model, from the starter library
-$cli render --site _site --engine build/native/squashfs-root --model gridfinity-rebuilt/bin --set gridx=3 --out bin.stl
-$cli serve --ui build/desktop/ui --app-site build/desktop/site --starter build/desktop/starter \
+$cli bench --app-site build/desktop/site --engine build/native/squashfs-root \
+    --seed tests/old-library --projects tests/projects --out bench.json   # every test model, rendered as the app does
+$cli serve --ui build/desktop/ui --app-site build/desktop/site \
     --engine build/native/squashfs-root --home /tmp/workshop-home     # the app's page and backend in a browser
 $cli components --libs build/desktop/libs --library BOSL2                       # what each module becomes (topic, start values)
 $cli components-check --libs build/desktop/libs --app-site build/desktop/site --engine build/native/squashfs-root --library BOSL2
@@ -62,13 +59,10 @@ $cli library-call --library ~/"SCAD Workshop" --app-site build/desktop/site --en
 
 ## Test projects
 
-`vendor/`, `adapters/`, `catalog/`, `libraries/`, `sources/` and `schema/` hold the generators and parts packs from the website era, vendored unmodified and hash-checked. They're test projects now: CI builds them into a starter library that the tests use, and the app doesn't ship them. Their sources and licences: [docs/SOURCE_AUDIT.md](docs/SOURCE_AUDIT.md).
+The tests use small projects in `tests/`: `tests/projects/` (a few bins, labels and ready-made parts written for the tests, CC0), `tests/old-library/` (a library with two of the starter projects apps before 0.4.4 came with) and `tests/fixtures/`. CI's bench also adds three projects from GitHub at pinned commits. Their sources and licences: [docs/SOURCE_AUDIT.md](docs/SOURCE_AUDIT.md). Until Review 7 the tests used the website's generators and parts packs, vendored in this repository; they're at tag `v0.4.30`.
 
 ## Licensing
 
 The app's **Licenses & credits** page (in the menu) lists every project's authors, license, status and source, plus the engine, fonts, three.js, Preact and htm. Model pages only credit the author and link there.
 
-
-No repository-wide license overrides third-party terms. Each `vendor/` project keeps its own notices; see [THIRD_PARTY.md](THIRD_PARTY.md). The OpenSCAD engine is GPL-2.0-or-later (source: https://github.com/openscad/openscad; text in `assets/engine/COPYING`). Original code in `web/`, `tools/`, `adapters/`, `catalog/` and `schema/` is the repository owner's.
-
-Reference: <https://gridfinity.perplexinglabs.com/> (inventory only; no UI code or adapter scripts copied).
+No repository-wide license overrides third-party terms. The test projects in `tests/old-library/` keep their own notices; see [THIRD_PARTY.md](THIRD_PARTY.md). The OpenSCAD engine is GPL-2.0-or-later (source: https://github.com/openscad/openscad; text in `assets/engine/COPYING`). Original code in `web/`, `desktop/`, `tools/`, `tests/` and `schema/` is the repository owner's.

@@ -1,0 +1,19 @@
+{
+  "format": 1,
+  "name": "Test bins",
+  "summary": "Bins, a tray and a lid on a 42 mm grid, made for SCAD Workshop's tests: every file includes the same sizes file, as larger bin projects do.",
+  "category": "gridfinity",
+  "tags": ["bins", "test"],
+  "license": "CC0-1.0",
+  "authors": [{ "name": "SCAD Workshop's tests" }],
+  "ui": {
+    "width": { "axes": ["units", "mm"] },
+    "depth": { "axes": ["units", "mm"] },
+    "height": { "axes": ["units", "mm"] }
+  },
+  "models": [
+    { "id": "bin", "name": "Bin", "entrypoint": "bin.scad" },
+    { "id": "tray", "name": "Tray", "entrypoint": "tray.scad" },
+    { "id": "lid", "name": "Lid", "entrypoint": "lid.scad" }
+  ]
+}

@@ -4,18 +4,23 @@
     tauri-driver &                     # needs WebKitWebDriver (Linux) or msedgedriver (Windows)
     python3 tests/desktop_ui.py --app desktop/target/release/scad-workshop --out shots
 
-Checks: the library interface loads (including desktop-only models, with
-thumbnails), search answers quickly, native renders work (one model the browser
-engine can't render), opened models become tabs, saved settings land in the
-workspace folder, the settings page shows the workspace and engine, a
-ready-made part previews, Components (the bundled libraries' modules: listed by
-topic, a BOSL2 bevel gear and a threads-scad bolt render natively, the libraries
-in Library settings), and the night theme applies. Exits non-zero on any failure.
+Before the app starts, its library (~/SCAD Workshop unless --library) is made from
+tests/old-library (two starter projects of an earlier app) with tests/projects in its
+local/ folder, unless it's there already.
+
+Checks: the library interface loads (every model with a thumbnail), search answers
+quickly, adding a project from GitHub works, native renders work, opened models
+become tabs, saved settings land in the library folder, the settings page shows the
+library and engine, a ready-made part previews, Components (the bundled libraries'
+modules: listed by topic, a BOSL2 bevel gear and a threads-scad bolt render
+natively, the libraries in Library settings), and the night theme applies. Exits
+non-zero on any failure.
 """
 import argparse
 import json
 import os
 import re
+import shutil
 import sys
 import time
 from pathlib import Path
@@ -33,6 +38,12 @@ a = ap.parse_args()
 out = Path(a.out)
 out.mkdir(parents=True, exist_ok=True)
 library = Path(a.library) if a.library else Path.home() / "SCAD Workshop"
+TESTS = Path(__file__).resolve().parent
+if not (library / "library.json").is_file():
+    shutil.copytree(TESTS / "old-library", library, dirs_exist_ok=True)
+    for project in sorted((TESTS / "projects").iterdir()):
+        if project.is_dir():
+            shutil.copytree(project, library / "local" / project.name)
 
 opts = ArgOptions()
 opts.set_capability("browserName", "wry")
@@ -101,17 +112,16 @@ try:
     if "native" not in report["engine"]:
         failures.append(f"engine label: {report['engine']}")
 
-    # the library: every generator (desktop-only ones too) with a thumbnail, in all three views
+    # the library: every model with a thumbnail (your own projects' are made when they're first read), in all three views
     d.execute_script("location.hash = '#/browse/all'")
     wait("document.querySelector('.results [data-item]')", 30, "the generator list")
     shown = d.execute_script("return document.querySelectorAll('.results [data-item]').length")
+    wait("document.querySelectorAll('.results .card img').length >= document.querySelectorAll('.results [data-item]').length", 180, "every model's thumbnail")
     thumbs = d.execute_script("return document.querySelectorAll('.results .card img').length")
     # thumbnails load lazily: the first row must actually have loaded
     loaded = wait("[...document.querySelectorAll('.results .card img')].slice(0, 3).every(i => i.complete && i.naturalWidth > 0)", 15, "thumbnails to load")
     report["library"] = {"generators": shown, "thumbnails": thumbs, "first_row_loaded": loaded}
     print("library:", report["library"], flush=True)
-    if not d.execute_script("return !!document.querySelector('.results [data-item=\"gen:underware/t-channel\"]')"):
-        failures.append("desktop-only model missing from the library")
     if thumbs < shown:
         failures.append(f"thumbnails: {thumbs} of {shown}")
     shot("00-library-grid")
@@ -125,20 +135,20 @@ try:
     d.execute_script("document.querySelector('button[data-layout=\"grid\"]').click()")
 
     # search: typed into the top box, answered from the index
-    d.execute_script("""const i = document.querySelector('#global-search'); i.value = 'channel';
+    d.execute_script("""const i = document.querySelector('#global-search'); i.value = 'tray';
       i.dispatchEvent(new Event('input', {bubbles: true}));""")
     wait("/ms$/.test(document.querySelector('.browse-count')?.textContent || '')", 10, "search results")
-    report["search_channel"] = text(".browse-count")
-    print("search 'channel':", report["search_channel"], flush=True)
-    ms = report["search_channel"].split("·")[-1].strip().split()[0] if "·" in report["search_channel"] else "999"
+    report["search_tray"] = text(".browse-count")
+    print("search 'tray':", report["search_tray"], flush=True)
+    ms = report["search_tray"].split("·")[-1].strip().split()[0] if "·" in report["search_tray"] else "999"
     if float(ms.lstrip("<")) >= 100:
-        failures.append(f"search took {report['search_channel']}")
+        failures.append(f"search took {report['search_tray']}")
 
-    # the starter library is installed into the library folder on first start
+    # the test projects (local/) and the starter projects (sources/) are in the library
     sources = sorted(p.name for p in (library / "sources").iterdir()) if (library / "sources").is_dir() else []
-    report["library_sources"] = len(sources)
-    if len(sources) < 19:
-        failures.append(f"starter library not installed in {library}: {sources}")
+    report["library_sources"] = sources
+    if not {"gridfinity-basket", "hsw", "local-bins", "local-labels", "local-parts"} <= set(sources):
+        failures.append(f"the test projects aren't all in {library}: {sources}")
 
     # adding a project from GitHub: the app's own network access (TLS, GitHub's API, tarball)
     d.execute_script("document.querySelector('#add-project').click()")
@@ -156,30 +166,30 @@ try:
         else:  # leave the page usable for the rest of the checks
             d.execute_script("document.querySelector('.dialog [aria-label=Close]')?.click()")
 
-    open_model("gridfinity-rebuilt/bin")
+    open_model("hsw/grid")
     time.sleep(1)
-    shot("01-rebuilt-bin")
-    open_model("underware/t-channel")
+    shot("01-starter-project")
+    open_model("local-labels/label")
     time.sleep(1)
-    shot("02-underware-t-channel")
-    open_model("minimalist-kitchen-gridfinity/bin")
-    report["kitchen_status"] = text("#status")
-    # many files, one included by most of the others: slow with native OpenSCAD on Windows until include once (Review 7, item 1)
+    shot("02-label")
+    # a file included by the model's others: rendered with include once (Review 7, item 1), again after a change
     for i, w in enumerate(("2", "3")):
         if i == 0:
-            open_model("gridfinity-extended/bin")
+            open_model("local-bins/bin")
         else:
             d.execute_script(f"""const i = document.querySelector('[data-name="width"] input'); i.value = '{w}';
               i.dispatchEvent(new Event('input', {{bubbles: true}})); document.querySelector('#generate').click();""")
             time.sleep(0.5)
-            wait(DONE, 120, "extended bin re-render")
-        report[f"extended_bin_{i + 1}"] = {"status": text("#status")}
-        print("extended bin:", report[f"extended_bin_{i + 1}"], flush=True)
+            wait(DONE, 120, "bin re-render")
+        report[f"bin_{i + 1}"] = {"status": text("#status"), "dims": text("#dims")}
+        print("bin:", report[f"bin_{i + 1}"], flush=True)
+        if "matches" not in report[f"bin_{i + 1}"]["status"]:
+            failures.append(f"bin at width {w}: {report[f'bin_{i + 1}']}")
 
     # saved settings go to the library as files
-    open_model("gridfinity-rebuilt/bin")
+    open_model("local-bins/tray")
     d.execute_script("""
-      const i = document.querySelector('#p-gridx'); i.value = '4'; i.dispatchEvent(new Event('input', {bubbles: true}));""")
+      const i = document.querySelector('#p-units_wide'); i.value = '4'; i.dispatchEvent(new Event('input', {bubbles: true}));""")
     d.find_element(By.ID, "settings-save").click()
     time.sleep(0.3)
     d.execute_script("document.querySelector('#save-name').value = 'CI four wide'")
@@ -208,7 +218,7 @@ try:
         time.sleep(0.5)
         shot("03b-library-settings")
 
-    d.execute_script("location.hash = '#/parts/opengrid-official/mounts-opengrid-wall-mount'")
+    d.execute_script("location.hash = '#/parts/local-parts/hook'")
     if wait("!document.querySelector('#dims').hidden", 60, "part preview"):
         report["part_dims"] = text("#dims")
     time.sleep(0.5)
@@ -252,7 +262,7 @@ try:
     tabs = d.execute_script("return [...document.querySelectorAll('.tabbar [data-tab], .tabbar [data-tab-more]')].map(t => t.dataset.tab || t.dataset.tabMore)")
     report["tabs"] = tabs
     print("tabs:", tabs, flush=True)
-    for key in ("gridfinity-rebuilt/bin", "underware/t-channel", "gridfinity-extended/bin"):
+    for key in ("hsw/grid", "local-labels/label", "local-bins/bin", "local-bins/tray"):
         if key not in tabs:
             failures.append(f"no tab for {key}")
 

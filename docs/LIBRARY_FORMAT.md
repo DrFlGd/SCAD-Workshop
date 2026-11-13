@@ -98,7 +98,7 @@ Collections and favourites refer to items by id, not by copying them:
 - `checks.json` (format 1): `version` and `engine` it was checked with, `models` (`ok`, `message`, `seconds`, `date` per model).
 - `pins/<id>.json` (format 1): `id`, `name`, `component`, `category`, `summary`, `defaults`, `hidden`, `fixed`, `presets`, `from` (`library`, `copy`).
 - `trash/<entry>/trash.json` (format 1): `entry`, `kind`, `id`, `name`, `deleted`, `local`, `source_kind`.
-- `library.json` (format 2): `format`, `id`, `name`, `created`, `favourites`, `categories` (`label`, `icon`, `moved_to`), `metadata` (library-wide defaults), `prefer_bundled`, `removed_starter`.
+- `library.json` (format 2): `format`, `id`, `name`, `created`, `favourites`, `categories` (`label`, `icon`, `moved_to`), `metadata` (library-wide defaults), `prefer_bundled`; `removed_starter` (the starter projects you deleted) is left from earlier versions and no longer used.
 
 ## Check library
 

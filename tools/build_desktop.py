@@ -1,21 +1,20 @@
 #!/usr/bin/env python3
-"""Split a built site into what the desktop app bundles.
+"""Put together what the desktop app bundles, in build/desktop.
 
-    python3 tools/build_desktop.py --site _site --out build/desktop [--fetch-fonts] [--cli workshop-cli]
+    python3 tools/build_desktop.py --out build/desktop [--fetch-fonts] [--cli workshop-cli]
 
-  ui/       the front end loaded in the app window (HTML, JS, CSS, three.js; of the
-            site's WebAssembly engine only its licence, engine/COPYING and NOTICE.txt)
-  site/     the app's own files: data/catalog.json (engine version, common files)
-            and fs/ (the fonts every render gets)
-  starter/  the starter library: every generator and parts pack of the site,
-            packaged as library projects (workshop-cli bundle). The app copies
-            them into the user's library on first start.
+  ui/       the front end loaded in the app window (web/, with OpenSCAD's licence in
+            engine/COPYING for the Licenses page)
+  site/     the app's own files: data/catalog.json (the OpenSCAD version and the
+            files every render gets) and fs/<sha256> (a fontconfig file and the fonts
+            in assets/fonts)
   libs/     the OpenSCAD libraries the app ships with (fetched beforehand by
             tools/fetch_libraries.py --out build/desktop/libs); this adds the index
             of their modules (Components), libs/index/<Name>.json
 The native engine goes in build/desktop/engine (tools/fetch_native_engine.py).
 """
 import argparse
+import hashlib
 import json
 import os
 import shutil
@@ -24,51 +23,55 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / "tools"))
-from build_site import find_cli  # noqa: E402
+
+
+def find_cli(given):
+    """workshop-cli, built from desktop/core (cargo build --release -p workshop-core)."""
+    exe = "workshop-cli.exe" if os.name == "nt" else "workshop-cli"
+    for c in [given, os.environ.get("WORKSHOP_CLI") and Path(os.environ["WORKSHOP_CLI"]),
+              ROOT / "desktop/target/release" / exe, ROOT / "desktop/target/debug" / exe]:
+        if c and Path(c).is_file():
+            return Path(c)
+    raise SystemExit("workshop-cli not found: build it with `cd desktop && cargo build --release -p workshop-core`, "
+                     "or pass --cli / set WORKSHOP_CLI")
+
 
 ap = argparse.ArgumentParser()
-ap.add_argument("--site", type=Path, default=Path("_site"))
 ap.add_argument("--out", type=Path, default=Path("build/desktop"))
 ap.add_argument("--cli", type=Path, help="workshop-cli (default: desktop/target/release, or $WORKSHOP_CLI)")
 ap.add_argument("--fetch-fonts", action="store_true",
                 help="bundle the skins' fonts (SIL OFL, from google/fonts) instead of loading them from Google Fonts")
 a = ap.parse_args()
 
-DATA = {"data", "fs", "parts", "thumbs"}  # library content: goes into the starter library, not the window
-if not (a.site / "data/catalog.json").exists():
-    raise SystemExit(f"{a.site} is not a built site; run tools/build_site.py first")
 for sub in ("ui", "site", "starter"):
     if (a.out / sub).exists():
         shutil.rmtree(a.out / sub)
-(a.out / "ui").mkdir(parents=True)
-for item in sorted(a.site.iterdir()):
-    if item.name in DATA:
-        continue
-    dest = a.out / "ui" / item.name
-    if item.name == "engine":
-        # the app renders with native OpenSCAD only (Review 7, item 1): the licence the Licenses page links to
-        dest.mkdir()
-        for name in ("COPYING", "NOTICE.txt"):
-            if (item / name).exists():
-                shutil.copy2(item / name, dest / name)
-        continue
-    (shutil.copytree if item.is_dir() else shutil.copy2)(item, dest)
+shutil.copytree(ROOT / "web", a.out / "ui")
+(a.out / "ui/engine").mkdir()
+shutil.copy2(ROOT / "assets/engine/COPYING", a.out / "ui/engine/COPYING")
 
-# the app's own files: engine version and the fonts every model gets
-catalog = json.loads((a.site / "data/catalog.json").read_text())
+# the app's own files: the OpenSCAD version and the files every render gets, stored by content hash
 (a.out / "site/data").mkdir(parents=True)
 (a.out / "site/fs").mkdir()
-(a.out / "site/data/catalog.json").write_text(json.dumps({"engine": catalog["engine"], "common_files": catalog["common_files"]}))
-for sha in catalog["common_files"].values():
-    shutil.copy2(a.site / "fs" / sha, a.out / "site/fs" / sha)
+common = {}
 
-# everything else becomes the starter library
-subprocess.run([str(find_cli(a.cli)), "bundle", "--site", str(a.site), "--out", str(a.out / "starter")], check=True)
+
+def store(virtual, data):
+    sha = hashlib.sha256(data).hexdigest()
+    (a.out / "site/fs" / sha).write_bytes(data)
+    common[virtual] = sha
+
+
+store("/fonts/fonts.conf", b'<?xml version="1.0"?>\n<!DOCTYPE fontconfig SYSTEM "urn:fontconfig:fonts.dtd">\n'
+      b"<fontconfig><dir>/fonts</dir><cachedir>/tmp/fontconfig</cachedir></fontconfig>\n")
+for font in sorted((ROOT / "assets/fonts").glob("*.ttf")):
+    store(f"/fonts/{font.name}", font.read_bytes())
+engine_version = json.loads((ROOT / "engine.json").read_text())["version"]
+(a.out / "site/data/catalog.json").write_text(json.dumps({"engine": engine_version, "common_files": common}))
 
 # the bundled libraries' modules (Components)
 if (a.out / "libs/libraries.json").exists():
-    shutil.copy2(ROOT / "catalog/components.json", a.out / "libs/components.json")  # start values for modules without examples
+    shutil.copy2(ROOT / "desktop/core/data/components.json", a.out / "libs/components.json")  # start values for modules without examples
     subprocess.run([str(find_cli(a.cli)), "libs-index", "--libs", str(a.out / "libs")], check=True)
 else:
     print("no bundled libraries (run tools/fetch_libraries.py --out build/desktop/libs first): the app will have no Components", file=sys.stderr)
@@ -143,5 +146,4 @@ index.write_text("\n".join(out_lines) + "\n")
 
 size = lambda p: sum(f.stat().st_size for f in p.rglob("*") if f.is_file())
 print(f"ui {size(a.out / 'ui') / 1e6:.1f} MB, site {size(a.out / 'site') / 1e6:.1f} MB, "
-      f"starter library {size(a.out / 'starter') / 1e6:.1f} MB, "
       f"libraries {size(a.out / 'libs') / 1e6 if (a.out / 'libs').exists() else 0:.1f} MB -> {a.out}")

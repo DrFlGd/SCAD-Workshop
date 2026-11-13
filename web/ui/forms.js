@@ -198,7 +198,7 @@ export function FormEditor({ spec }) {
     setPresetName("");
   };
   const copy = async () => {
-    try { await navigator.clipboard.writeText(JSON.stringify(form || {}, null, 2)); ctx.toast("Copied: paste it as a model entry's ui, hidden, defaults and presets in catalog/families."); }
+    try { await navigator.clipboard.writeText(JSON.stringify(form || {}, null, 2)); ctx.toast("Copied: paste it into the model's entry in its project's workshop.json."); }
     catch { ctx.toast("The clipboard isn't available."); }
   };
   const input = (name, k, attrs = {}) => html`<input value=${rows[name][k]} onInput=${(e) => set(name, k, e.target.value)} data-form=${`${name}.${k}`} ...${attrs} />`;

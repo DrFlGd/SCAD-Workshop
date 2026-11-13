@@ -1434,7 +1434,7 @@ pub struct Component {
     /// text arguments whose docs list their values (their own doc, or the doc it points to)
     #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
     pub listed: BTreeMap<String, Vec<String>>,
-    /// its defaults don't make a shape (catalog/components.json "$no_guess"): wait for values
+    /// its defaults don't make a shape (desktop/core/data/components.json "$no_guess"): wait for values
     #[serde(default)]
     pub hold: bool,
 }
@@ -1660,7 +1660,7 @@ fn type_constants(text: &str) -> Vec<String> {
 }
 
 /// Read a library folder into its component index. `curated`: start values for
-/// modules without examples ({ module: { arg: expression } }, catalog/components.json).
+/// modules without examples ({ module: { arg: expression } }, desktop/core/data/components.json).
 pub fn index_library(info: &LibInfo, root: &Path, curated: Option<&Value>, no_guess: Option<&Value>) -> Result<Value> {
     let name = info.name.clone();
     let mut files: BTreeMap<String, String> = BTreeMap::new();
@@ -2114,7 +2114,7 @@ fn guess_value(name: &str) -> Option<&'static str> {
     })
 }
 
-/// Start values for modules without examples, shipped as libs/components.json (from catalog/components.json).
+/// Start values for modules without examples, shipped as libs/components.json (from desktop/core/data/components.json).
 pub fn curated(libs: &Path) -> Value {
     std::fs::read(libs.join("components.json")).ok().and_then(|b| serde_json::from_slice(&b).ok()).unwrap_or(json!({}))
 }

@@ -530,9 +530,9 @@ pub fn build(lib: &Library, engine: &str, common_files: &Value, url: &str, libs:
         }
     }
     // categories: built-in, found in projects, or made by the user; a removed one points elsewhere
-    let builtin = |c: &str| crate::sitebuild::CATEGORY_LABELS.iter().chain(crate::scan::EXTRA_CATEGORIES.iter()).any(|(id, _)| *id == c);
+    let builtin = |c: &str| crate::assemble::CATEGORY_LABELS.iter().chain(crate::scan::EXTRA_CATEGORIES.iter()).any(|(id, _)| *id == c);
     let order = |c: &str| -> (u8, usize, String) {
-        match crate::sitebuild::CATEGORY_LABELS.iter().position(|(id, _)| *id == c) {
+        match crate::assemble::CATEGORY_LABELS.iter().position(|(id, _)| *id == c) {
             _ if c == "other" => (2, 0, String::new()),
             Some(p) => (0, p, String::new()),
             None => (1, 0, cat_label(c).to_lowercase()),
@@ -551,7 +551,7 @@ pub fn build(lib: &Library, engine: &str, common_files: &Value, url: &str, libs:
             })
         })
         .collect();
-    let mut ids: Vec<String> = crate::sitebuild::CATEGORY_LABELS
+    let mut ids: Vec<String> = crate::assemble::CATEGORY_LABELS
         .iter()
         .chain(crate::scan::EXTRA_CATEGORIES.iter())
         .map(|(id, _)| id.to_string())
@@ -915,10 +915,10 @@ pub fn sorted_sources(c: &Catalog) -> BTreeMap<String, Value> {
 }
 
 
-/// Projects suggested on Home and under Add project (catalog/suggested.json), each with the id of
+/// Projects suggested on Home and under Add project (desktop/core/data/suggested.json), each with the id of
 /// the project already added from the same repository, if there is one.
 fn suggested(lib: &Library) -> Value {
-    let list: Value = serde_json::from_str(include_str!("../../../catalog/suggested.json")).unwrap_or(json!({}));
+    let list: Value = serde_json::from_str(include_str!("../data/suggested.json")).unwrap_or(json!({}));
     let have: Vec<Value> = lib.source_ids().into_iter().filter_map(|id| lib.source(&id).ok()).collect();
     let out: Vec<Value> = list["projects"]
         .as_array()
@@ -988,11 +988,11 @@ mod tests {
         // website: the block in the manifest
         let fam = json!({ "id": "f", "name": "F", "ui": ui });
         let m = json!({ "id": "m", "name": "M", "hidden": ["debug"], "defaults": { "width": 3 } });
-        let (_, site) = crate::sitebuild::assemble_model(&fam, &m, "f/m", "/m.scad", &files, &json!({}), &raw, 0).unwrap();
+        let (_, site) = crate::assemble::assemble_model(&fam, &m, "f/m", "/m.scad", &files, &json!({}), &raw, 0).unwrap();
         // app: the same block as a form edit on a model read without it
         let plain_fam = json!({ "id": "f", "name": "F" });
         let plain_m = json!({ "id": "m", "name": "M" });
-        let (_, mut app) = crate::sitebuild::assemble_model(&plain_fam, &plain_m, "f/m", "/m.scad", &files, &json!({}), &raw, 0).unwrap();
+        let (_, mut app) = crate::assemble::assemble_model(&plain_fam, &plain_m, "f/m", "/m.scad", &files, &json!({}), &raw, 0).unwrap();
         apply_form_overlay(&mut app, &form);
         assert_eq!(site["parameters"], app["parameters"]);
         assert_eq!(site["groups"], app["groups"]);

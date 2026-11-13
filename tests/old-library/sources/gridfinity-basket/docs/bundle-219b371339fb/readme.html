@@ -1,0 +1,70 @@
+<h1 id="gridfinity-basket-in-openscad">Gridfinity Basket in OpenSCAD</h1>
+<p><a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT" loading="lazy"/></a></p>
+<p>An openscad script for stackable baskets with a gridfinity base on the inside. Includes many customization options.</p>
+<p>The model and various example baskets are also available on makerworld/printables. The site on makerworld also supports the parametric model maker to easily create baskets with different options directly on the site.</p>
+<p><a href="https://makerworld.com/en/models/1542416-stackable-gridfinity-storage-basket-parametric">Makerworld site</a></p>
+<p><a href="https://www.printables.com/model/1335756-stackable-gridfinity-storage-basket-parametric">Printables site</a></p>
+<h1 id="customization-options">Customization options</h1>
+<p>Below is a list of all possible customization options. Although it is possible for most options to set a value outside of the allowed range, in almost all cases it is not a good idea.</p>
+<h3 id="general-options">General options</h3>
+<table><thead><tr><th>Parameter</th><th>Description</th><th>Type</th><th>Default</th><th>Allowed Values / Range</th></tr></thead><tbody>
+<tr><td><code>UseMulticolor</code></td><td>Add color to the model in three different sections (Can be used together with the openscad .3mf export for multi-color printing)</td><td><code>bool</code></td><td><code>false</code></td><td><code>true</code>, <code>false</code></td></tr>
+<tr><td><code>UseGridfinityBase</code></td><td>Include a Gridfinity base inside the basket or keep the bottom flat</td><td><code>bool</code></td><td><code>true</code></td><td><code>true</code>, <code>false</code></td></tr>
+<tr><td><code>GridSize</code></td><td>Grid size in <code>[X, Y, Z]</code> format, in multiples of 1U gridfinity units</td><td><code>array</code></td><td><code>[2,2,4]</code></td><td>Integers ≥ 1</td></tr>
+<tr><td><code>Padding</code></td><td>Padding between edge of Gridfinity base and basket walls (zero padding makes bins with the same size as the basket hard to put in/take out)</td><td><code>number</code></td><td><code>1</code></td><td><code>0</code> to <code>10</code>, step <code>0.1</code></td></tr>
+<tr><td><code>WallThickness</code></td><td>Wall thickness of the basket</td><td><code>number</code></td><td><code>1.2</code></td><td><code>0.4</code> to <code>2</code>, step <code>0.1</code></td></tr>
+<tr><td><code>AdditionalFloorHeight</code></td><td>Additional floor height added to bottom of basket</td><td><code>number</code></td><td><code>1</code></td><td><code>0</code> to <code>3</code>, step <code>0.04</code></td></tr>
+<tr><td><code>SolidFloor</code></td><td>Make floor solid (requires <code>FloorHeight &gt; 0</code>)</td><td><code>bool</code></td><td><code>true</code></td><td><code>true</code>, <code>false</code></td></tr>
+<tr><td><code>MagnetDiameter</code></td><td>Diamenter of the magnets. If set to zero, no magnet holes will be created. Increase this value to add some tolerance for magnet insertion.</td><td><code>number</code></td><td><code>6.5</code></td><td><code>0</code> to <code>8</code>, step <code>0.05</code></td></tr>
+<tr><td><code>MagnetHeight</code></td><td>Height of the magnets. If set to zero, no magnet holes will be created. Increase this value to add some tolerance for magnet insertion.</td><td><code>number</code></td><td><code>2.1</code></td><td><code>0</code> to <code>4</code>, step <code>0.05</code></td></tr>
+<tr><td><code>AddMagnetChamfer</code></td><td>Add additional chamfers around magnet holes to help with insertion</td><td><code>bool</code></td><td><code>false</code></td><td><code>true</code>, <code>false</code></td></tr>
+</tbody></table>
+<h3 id="wallpattern-options">WallPattern options</h3>
+<table><thead><tr><th>Parameter</th><th>Description</th><th>Type</th><th>Default</th><th>Allowed Values / Range</th></tr></thead><tbody>
+<tr><td><code>WallPattern</code></td><td>Wall pattern type</td><td><code>int</code></td><td><code>1</code></td><td><code>0: None</code>, <code>1: HexGrid</code>, <code>2: Grid</code></td></tr>
+<tr><td><code>PatternSize</code></td><td>Pattern feature size</td><td><code>number</code></td><td><code>8</code></td><td><code>4</code> to <code>15</code>, step <code>0.5</code></td></tr>
+<tr><td><code>PatternTopDist</code></td><td>Minimum distance from the top of the pattern to the start of the stacking lip</td><td><code>number</code></td><td><code>3</code></td><td><code>0</code> to <code>10</code>, step <code>0.1</code></td></tr>
+<tr><td><code>PatternBotDist</code></td><td>Minimum distance from the bottom of the pattern to the baseplate</td><td><code>number</code></td><td><code>1.5</code></td><td><code>0</code> to <code>10</code>, step <code>0.1</code></td></tr>
+<tr><td><code>PatternSideDist</code></td><td>Minimum distance from the pattern sides to the start of the basket outer corner</td><td><code>number</code></td><td><code>2</code></td><td><code>0</code> to <code>10</code>, step <code>0.1</code></td></tr>
+<tr><td><code>PatternMinDist</code></td><td>Minimum distance between patterns</td><td><code>number</code></td><td><code>2</code></td><td><code>0.5</code> to <code>5</code>, step <code>0.1</code></td></tr>
+<tr><td><code>GridPatternRadius</code></td><td>Outer radius of grid pattern (not applicable to other patterns)</td><td><code>number</code></td><td><code>3</code></td><td><code>0</code> to <code>10</code>, step <code>0.5</code></td></tr>
+</tbody></table>
+<h3 id="handle-options">Handle options</h3>
+<table><thead><tr><th>Parameter</th><th>Description</th><th>Type</th><th>Default</th><th>Allowed Values / Range</th></tr></thead><tbody>
+<tr><td><code>AddHandle</code></td><td>Add a handle to the sides of the basket</td><td><code>bool</code></td><td><code>true</code></td><td><code>true</code>, <code>false</code></td></tr>
+<tr><td><code>HandleWidth</code></td><td>Width of the handle</td><td><code>number</code></td><td><code>35</code></td><td><code>20</code> to <code>100</code>, step <code>1</code></td></tr>
+<tr><td><code>HandleHeight</code></td><td>Height of the handle</td><td><code>number</code></td><td><code>11</code></td><td><code>11</code> to <code>30</code>, step <code>1</code></td></tr>
+<tr><td><code>HandleCorderRadius</code></td><td>Radii of the corners on the inside of the handles</td><td><code>number</code></td><td><code>4</code></td><td><code>0</code> to <code>5</code>, step <code>0.5</code></td></tr>
+<tr><td><code>HandleBorder</code></td><td>Minimum border size around the handle. The border may be larger to accommodate the wall pattern</td><td><code>number</code></td><td><code>3</code></td><td><code>2</code> to <code>5</code>, step <code>0.5</code></td></tr>
+</tbody></table>
+<h3 id="stacking-options">Stacking options</h3>
+<table><thead><tr><th>Parameter</th><th>Description</th><th>Type</th><th>Default</th><th>Allowed Values / Range</th></tr></thead><tbody>
+<tr><td><code>Standoff</code></td><td>Vertical standoff height at the bottom of the basket (the part that sticks into another basket when stacked ontop of eachother)</td><td><code>number</code></td><td><code>1</code></td><td><code>1</code> to <code>2</code>, step <code>0.1</code></td></tr>
+<tr><td><code>TopPadding</code></td><td>Extra room above bins for stacking</td><td><code>number</code></td><td><code>2</code></td><td><code>0.5</code> to <code>5</code>, step <code>0.1</code></td></tr>
+<tr><td><code>XYTolerance</code></td><td>XY-axis tolerance (should keep as-is in most-cases)</td><td><code>number</code></td><td><code>0.5</code></td><td><code>0.2</code> to <code>1</code>, step <code>0.05</code></td></tr>
+<tr><td><code>ZTolerance</code></td><td>Z-axis tolerance (should keep as-is in most-cases)</td><td><code>number</code></td><td><code>0.25</code></td><td><code>0.25</code></td></tr>
+</tbody></table>
+<h1 id="additional-tips">Additional tips</h1>
+<ul>
+<li>The Grid pattern can be quite fragile. Use a large <code>PatternMinDist</code> and possibly a larger <code>WallThickness</code>.</li>
+<li>No need for supports or brim when printing the baskets.</li>
+<li>The HandleBorder sets the lower limits for the border around the handle. It might be increased so that the chosen pattern and the area for the handle line up. Otherwise the border of the handle could be floating and couldn't be printed without support.</li>
+</ul>
+<h1 id="example-baskets">Example baskets</h1>
+<h4 id="animation-of-various-settings">Animation of various settings</h4>
+<p><img src="https://raw.githubusercontent.com/LeKoYa/gridfinity-basket-openscad/549dc4015e4511daeb7b942de96d2531101701db/img/animation.gif" alt="Example Baskets" loading="lazy"/></p>
+<h4 id="3_2_6-basket-with-hexpattern-and-gridfinity-base">3_2_6 Basket with hexpattern and gridfinity base</h4>
+<p><img src="https://raw.githubusercontent.com/LeKoYa/gridfinity-basket-openscad/549dc4015e4511daeb7b942de96d2531101701db/img/3_2_6_hex.jpg" alt="3_2_6_hexpattern" loading="lazy"/></p>
+<h4 id="3_2_4-basket-with-gridpattern-and-without-gridfinity-floor">3_2_4 Basket with gridpattern and without gridfinity floor</h4>
+<p><img src="https://raw.githubusercontent.com/LeKoYa/gridfinity-basket-openscad/549dc4015e4511daeb7b942de96d2531101701db/img/3_2_4_grid_nogridfinity.jpg" alt="3_2_4_gridpattern_nogridfinity" loading="lazy"/></p>
+<h4 id="two-3_2_6-hex-baskets-stacked-on-top-of-each-other">Two 3_2_6 Hex Baskets stacked on top of each other</h4>
+<p><img src="https://raw.githubusercontent.com/LeKoYa/gridfinity-basket-openscad/549dc4015e4511daeb7b942de96d2531101701db/img/stackedbaskets.jpg" alt="Two Baskets stacked on top of each other" loading="lazy"/></p>
+<h4 id="5_3_8-basket-with-hollow-floor-and-no-wall-pattern">5_3_8 Basket with hollow floor and no wall pattern.</h4>
+<p><img src="https://raw.githubusercontent.com/LeKoYa/gridfinity-basket-openscad/549dc4015e4511daeb7b942de96d2531101701db/img/5_3_8_none_nofloor.jpg" alt="5_3_8 Basket with hollow floor and no wall pattern" loading="lazy"/></p>
+<h4 id="optional-magnet-holes-with-the-option-for-additional-chamfers">Optional Magnet holes with the option for additional chamfers</h4>
+<p><img src="https://raw.githubusercontent.com/LeKoYa/gridfinity-basket-openscad/549dc4015e4511daeb7b942de96d2531101701db/img/magnetholes.png" alt="Example basket with magnet holes" loading="lazy"/></p>
+<h4 id="3_3_8-basket-with-hexpattern-and-handles-on-the-sides">3_3_8 Basket with hexpattern and handles on the sides</h4>
+<p><img src="https://raw.githubusercontent.com/LeKoYa/gridfinity-basket-openscad/549dc4015e4511daeb7b942de96d2531101701db/img/handle_example.jpg" alt="3_3_8 Basket with hexpattern and handles" loading="lazy"/></p>
+<h1 id="acknowledgements">Acknowledgements</h1>
+<p>The base generation is inspired and adapted from the <a href="https://github.com/kennetek/gridfinity-rebuilt-openscad">gridfinity-rebuilt-openscad project</a>.</p>
+<p>The general idea is based on the <a href="https://www.printables.com/model/970197-gridfinity-baseplate-basket-parametric">Gridfinity-baseplate-basket-parametric</a> model by Blaise's Workshop. In comparison to that model, the gridfinity basket here offers much more customization options and various improvements like the support for padding and different wall sizes.</p>

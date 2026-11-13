@@ -484,7 +484,7 @@ function thumbViewerFor() {
   return thumbViewer;
 }
 
-/** Draw an STL as a thumbnail (same camera and framing as tools/thumbnails.py). */
+/** Draw an STL as a thumbnail (the camera and framing the website's thumbnails had). */
 async function drawThumb(url) {
   const v = thumbViewerFor();
   v.setColor(ctx.platform.store.prefs.get("gw-filament") || "#f2b705");

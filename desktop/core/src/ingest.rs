@@ -2,8 +2,8 @@
 //! settings, and the metadata layered on top of them (the upstream project's
 //! editor.toml and the catalog's own `ui` overlays).
 //!
-//! One implementation for two users: the website build (`workshop-cli site-*`,
-//! called by tools/build_site.py) and the desktop app's library ingest.
+//! Written for the website's build and kept for the desktop app's reading of
+//! projects (project.rs).
 
 use anyhow::{Context, Result};
 use regex::Regex;
