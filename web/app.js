@@ -6,10 +6,11 @@ import { createPlatform } from "./platform.js";
 import { makeZip } from "./zip.js";
 import { changedValues, withChanges, toOpenSCAD, fromOpenSCAD } from "./settings-codec.js";
 import { editsKey } from "./lib/edits.js";
-import { $, el, humanize, fmt, same, bytes, plural, safeHTML, compileCondition, STATUS_TEXT, spdx, FORMAT_LABEL } from "./lib/util.js";
+import { $, el, humanize, fmt, same, bytes, plural, safeHTML, compileCondition, FORMAT_LABEL } from "./lib/util.js";
 import { LocalIndex } from "./ui/index-local.js";
 import { mountShell } from "./ui/shell.js";
-import { sideModelButtons, openSide, SideButtons } from "./ui/sideview.js";
+import { openSide } from "./ui/sideview.js";
+import { ModelHead } from "./ui/modelhead.js";
 import { setContext } from "./ui/context.js";
 import { html, render } from "./lib/html.js";
 import { LibrarySettingsPage } from "./ui/libsettings.js";
@@ -17,7 +18,7 @@ import { SettingsPage, applyProfile, pickFormat, rememberFormat } from "./ui/set
 import { PartsRail } from "./ui/parts.js";
 import { LicensesPage } from "./ui/licenses.js";
 import { unflagItems } from "./ui/actions.js";
-import { saveComponentThumb, when, sourceById, rescanLocal, madeFrom } from "./ui/library.js";
+import { saveComponentThumb, when, sourceById, rescanLocal } from "./ui/library.js";
 import { ui, recordRecent, setTabs, layoutFor, isDark } from "./ui/state.js";
 import { scopeFromPath } from "./ui/context.js";
 import { scopeInfo } from "./ui/sidebar.js";
@@ -229,32 +230,6 @@ async function loadModel(key) {
 
 function renderModelHeader(detail) {
   document.title = `${detail.name}, ${detail.family_name} | SCAD Workshop`;
-  // the model's own name, as on its card and tab, with its project (or library) on the line under it
-  $("#model-title").textContent = detail.name;
-  const c = detail.component;
-  const from = c ? c.library || detail.family_name : detail.family_name;
-  // a component's module and which copy of its library, beside the library's name (UI-25)
-  const copy = c ? (c.provider === "project" ? "your copy" : "the app's copy") : "";
-  $("#model-project").replaceChildren(detail.source_id
-    ? el("a", { href: `#/browse/source/${encodeURIComponent(detail.source_id)}`, text: from, title: "The project it's from" })
-    : from || "", ...(c ? [" · ", el("code", { text: `${c.module}()` }), ` · ${copy}`] : []));
-  $("#model-summary").textContent = detail.summary;
-  // one credit line on every page: By … · Source · License · Docs
-  const link = (href, text, out = true) => el("a", { href, text, ...(out ? { target: "_blank", rel: "noopener" } : {}) });
-  const credit = [];
-  if (detail.authors?.length) credit.push(["By ", ...detail.authors.flatMap((a, i) => [
-    i ? (i === detail.authors.length - 1 ? " and " : ", ") : "", a.url ? link(a.url, a.name) : a.name])]);
-  if (detail.source?.repository) credit.push([link(detail.source.repository, "Source")]);
-  // always "License <name>" (or "not stated"), linked, and "Check" when it needs checking before sharing prints
-  const lic = detail.license || {};
-  const licId = lic.spdx && lic.spdx !== "NOASSERTION" ? lic.spdx : null;
-  const licHref = c ? `#/licenses/components-${encodeURIComponent(c.library)}` : `#/licenses/${detail.family}`;
-  credit.push([link(licHref, `License ${licId || "not stated"}`, false),
-    ...(lic.public_use && lic.public_use !== "ok" ? [" · ", el("a", { href: licHref, class: "credit-check", id: "credit-check", text: "Check", title: STATUS_TEXT[lic.public_use] || "Check the license" })] : [])]);
-  if (detail.links?.docs) credit.push([link(detail.links.docs, "Docs")]);
-  if (detail.pinned_from) credit.push(["Pinned from ", link(`#/m/${detail.pinned_from}`, "its component", false)]);
-  $("#model-credit").replaceChildren(...credit.flatMap((part, i) => [i ? " · " : "", ...part]).filter((x) => x !== ""));
-  renderModelExtra(detail);
   renderOwnNotes(detail);
   // author notes fold away; their conditional warnings stay visible above the form
   const notesNodes = detail.description_html ? safeHTML(detail.description_html) : [];
@@ -286,62 +261,41 @@ function renderModelHeader(detail) {
   $("#model-alerts").replaceChildren(...alerts);
   const hasNotes = !!holder.textContent.trim();
   // every page has a one-line summary under its name: a component (or a model without one) takes its notes' first sentence
-  if (!detail.summary && hasNotes) {
+  let summary = detail.summary;
+  if (!summary && hasNotes) {
     const text = holder.textContent.replace(/\s+/g, " ").trim();
     const first = (text.match(/^.{20,}?[.!?](?=\s|$)/) || [text])[0];
-    $("#model-summary").textContent = first.length > 180 ? `${first.slice(0, 177).trimEnd()}…` : first;
+    summary = first.length > 180 ? `${first.slice(0, 177).trimEnd()}…` : first;
   }
   $("#model-notes-body").replaceChildren(...holder.childNodes);
   // the author's notes open from About this model, beside Code and README (0.4.26)
   $("#model-notes").hidden = true;
   $("#model-notes").open = false;
-  $("#model-about").hidden = !hasNotes;
+  render(html`<${ModelHead} detail=${detail} summary=${summary || ""} hasNotes=${hasNotes} act=${headActions} />`, $("#model-head"));
 }
 
-/** The row above the form: the side viewer (Code, README), then ⋯ with this item's own actions (in the
- * app: edit the form; a component's code and pin) above Batch generate and Help. */
-function renderModelExtra(detail) {
-  const box = $("#model-extra");
-  if (!box) return;
-  box.replaceChildren();
-  sideModelButtons(box, detail);
-  const own = $("#model-more-own");
-  own.replaceChildren();
-  // ⋯ closes for another model, but stays open when this one's header is drawn again (a catalog reload)
-  const more = $("#model-more");
-  if (more.dataset.key !== detail.key) more.open = false;
-  more.dataset.key = detail.key;
-  const ro = !!state.catalog?.library?.read_only;
-  const btn = (id, text, title, onclick, disabled = false) => el("button", { type: "button", id, text, title, onclick, disabled });
-  const it = state.index?.get(`gen:${detail.key}`);
-  if (it && it.sourceId) {
-    own.append(btn("edit-form", "Edit form…", "Rename settings, add help, choices and conditions, hide settings (saved with this item in the library)", () =>
-      ui.set({ dialog: { type: "form", key: detail.key } }), ro));
-  }
-  // your notes, a picture of its own and content you add (0.4.23, milestone 6)
-  if (it && it.sourceId && detail.kind !== "component" && !detail.pinned_from) {
-    const level = { source: it.sourceId, level: "item", target: detail.id, name: detail.name };
-    own.append(btn("model-notes-open", "Your notes", "Write your own notes on this model (kept in the library)", () => {
-      const box = $("#model-own-notes");
-      box.hidden = false;
-      box.open = true;
-      $("#model-own-notes-text").focus();
-    }), btn("model-picture", "Choose picture…", "Show another picture for it: one from its project, or your own", () =>
-      ui.set({ dialog: { type: "picture", ...level, current: detail.meta?.icon || null } }), ro),
-    btn("model-content", "Add content…", "Add a file or a link to it: a build video, an assembly guide, photos", () =>
-      ui.set({ dialog: { type: "content", ...level } }), ro));
-  }
-  // Show in folder: the model's .scad file where it is on disk (0.4.23)
-  if (detail.source_id && detail.entry) {
-    own.append(btn("model-reveal", "Show in folder", "Show the model's .scad file in its folder", () => revealFile({ source: detail.source_id, rel: detail.entry })));
-  }
-  if (detail.kind === "component") {
-    own.append(btn("copy-code", "Copy code", "Copy the OpenSCAD code for these settings (includes the library, calls the module)", copyComponentCode),
-      btn("pin-component", "Pin as a model…", "Keep this component under Parametric Models, with these settings as its defaults", () =>
-        ui.set({ dialog: { type: "pin", key: detail.key, values: structuredClone(state.values) } }), ro));
-  }
-  if (own.childNodes.length) own.append(el("hr"));
-}
+/** What the head's buttons do (web/ui/modelhead.js). */
+const headActions = {
+  // About this model opens the author's notes above the form
+  about() {
+    const notes = $("#model-notes");
+    notes.hidden = false;
+    notes.open = true;
+    notes.scrollIntoView({ block: "nearest" });
+  },
+  ownNotes() {
+    const box = $("#model-own-notes");
+    box.hidden = false;
+    box.open = true;
+    $("#model-own-notes-text").focus();
+  },
+  reveal: (args) => revealFile(args),
+  copyCode: () => copyComponentCode(),
+  pin: () => ui.set({ dialog: { type: "pin", key: state.model.key, values: structuredClone(state.values) } }),
+  batch: () => openBatch(),
+  help: () => setHelp(!document.body.classList.contains("show-help")),
+};
+
 // your own notes on a model (0.4.23): in its metadata (my_notes), saved when the box loses focus; shown open
 // when there are some, else from ⋯ › Your notes
 function renderOwnNotes(detail) {
@@ -367,14 +321,6 @@ function renderOwnNotes(detail) {
 }
 $("#model-own-notes").addEventListener("toggle", (e) => { if (!e.target.open && !$("#model-own-notes-text").value.trim()) e.target.hidden = true; });
 
-// ⋯ closes once something in it is chosen; About this model opens the author's notes above the form
-$("#model-more").addEventListener("click", (e) => { if (e.target.closest(".menu-panel button")) $("#model-more").open = false; });
-$("#model-about").addEventListener("click", () => {
-  const notes = $("#model-notes");
-  notes.hidden = false;
-  notes.open = true;
-  notes.scrollIntoView({ block: "nearest" });
-});
 $("#model-notes").addEventListener("toggle", (e) => { if (!e.target.open) e.target.hidden = true; });
 
 // a project's file (or the project's folder when the file isn't there) in the system's file manager
@@ -685,13 +631,12 @@ function refreshChanged() {
   });
 }
 
-const helpBtn = $("#help-toggle");
-const setHelp = (on) => {
+/** Help under each setting (⋯ on the model page), kept between sessions. */
+function setHelp(on) {
   document.body.classList.toggle("show-help", on);
-  helpBtn.setAttribute("aria-pressed", String(on));
+  ui.set({ help: on });
   store.prefs.set("gw-help", on);
-};
-helpBtn.addEventListener("click", () => setHelp(!document.body.classList.contains("show-help")));
+}
 setHelp(!!store.prefs.get("gw-help", false));
 
 /** Replace every setting (missing names fall back to defaults) and update the form. */
@@ -1659,7 +1604,8 @@ function updateBatchCount() {
   keep.textContent = n && n <= BATCH_MAX ? `Save ${n} to the Parts Library` : "Save to the Parts Library";
 }
 
-$("#batch-open").addEventListener("click", () => {
+/** Batch generate… (⋯ on the model page). */
+function openBatch() {
   if (!state.model) return;
   const entries = batchEntries();
   if (!batch.rows.length || batch.model !== state.model.key) {
@@ -1681,7 +1627,7 @@ $("#batch-open").addEventListener("click", () => {
   renderBatchSaved();
   setBatchMode(batch.mode);
   $("#batch").showModal();
-});
+}
 $("#batch-add").addEventListener("click", () => {
   const used = new Set(batch.rows.map((r) => r.key));
   const next = batchEntries().find((e) => !used.has(e.key));

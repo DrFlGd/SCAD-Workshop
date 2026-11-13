@@ -20,11 +20,11 @@ After the Fusion support was removed, the owner asked for a review of the app as
 | 2 | Batch generate varies each part of a paired setting (a bin's Width in units), guesses from the first group, leaves out hidden and debug settings | Done |
 | 4 | More components start on their own (NopSCADlib types with their other values guessed; MCAD) | Done: 509 of 800 start (438), none fail (7) |
 | 6 | Component pictures made by CI and shipped with the app | Done |
-| 1 | Windows renders about 8 times slower than Linux: measure on the Windows runner, fix, then drop the race against the WebAssembly engine | Done: include once (see CHANGELOG), all 58 test models 224 s → 87 s on Windows; the race and its Forget button are gone |
+| 1 | Windows renders about 8 times slower than Linux: measure on the Windows runner, fix, then drop the race against the WebAssembly engine | Done: include once (see CHANGELOG), all 58 test models about 225 s → 85 s on Windows; the race and its Forget button are gone |
 | 10 | The website half of the front end removed (`platform.js`'s browser branch, `store-browser.js`) | Done (the WebAssembly engine went with item 1; the site build still uses it until item 12) |
 | 11 | Converters for libraries older than format 2 removed (owner: old libraries can be added again instead) | Done (format 1 to 2 kept; the test library's `fill_in` waits for item 12) |
 | 12 | Small test projects in `tests/` instead of the 81 MB of website-era projects and the site build | |
-| 13 | `app.js` moved to Preact, a page at a time | Settings, Licenses and the parts pages done (`web/ui/settings.js`, `licenses.js`, `parts.js`); the model page next |
+| 13 | `app.js` moved to Preact, a page at a time | Settings, Licenses, the parts pages and the model page's head done (`web/ui/settings.js`, `licenses.js`, `parts.js`, `modelhead.js`); the rest of the model page next |
 
 ## Backlog
 
