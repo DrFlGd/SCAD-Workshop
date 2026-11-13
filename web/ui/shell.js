@@ -66,10 +66,8 @@ export function mountShell(context) {
       undoNow();
     }
   });
-  if (context.platform.kind === "desktop") {
-    refreshCollections();
-    setTimeout(async () => { await rescanLocal(); makeThumbnails(); dailyUpdateCheck(); scanOnFocus(); }, 1500);
-  }
+  refreshCollections();
+  setTimeout(async () => { await rescanLocal(); makeThumbnails(); dailyUpdateCheck(); scanOnFocus(); }, 1500);
 }
 
 export { ui };

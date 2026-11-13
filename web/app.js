@@ -4,7 +4,7 @@
 import { Viewer } from "./viewer.js";
 import { createPlatform } from "./platform.js";
 import { makeZip } from "./zip.js";
-import { changedValues, withChanges, encodeShare, decodeShare, toOpenSCAD, fromOpenSCAD } from "./settings-codec.js";
+import { changedValues, withChanges, toOpenSCAD, fromOpenSCAD } from "./settings-codec.js";
 import { editsKey } from "./lib/edits.js";
 import { $, el, humanize, fmt, same, bytes, plural, safeHTML, compileCondition, STATUS_TEXT, spdx, FORMAT_LABEL } from "./lib/util.js";
 import { LocalIndex } from "./ui/index-local.js";
@@ -57,7 +57,7 @@ function route() {
   // model keys: "<project>/<model>", or "@<library>/<module>" for a component
   const m = path.match(/^m\/(@?[a-z0-9-]+)\/([A-Za-z0-9_-]+)\/?$/);
   const p = path.match(/^parts\/([a-z0-9-]+)(?:\/([a-z0-9-]+))?\/?$/);
-  if (m) openModel(`${m[1]}/${m[2]}`, params.get("s"), params.get("saved"), params.get("part") ? { part: params.get("part"), again: params.has("again") } : null);
+  if (m) openModel(`${m[1]}/${m[2]}`, params.get("saved"), params.get("part") ? { part: params.get("part"), again: params.has("again") } : null);
   else if (p) openLibrary(p[1], p[2]);
   else if (path === "about" || path.startsWith("licenses")) showLicenses(path.split("/")[1]);
   else if (path === "settings") showSettings();
@@ -205,12 +205,12 @@ const isExampleModel = (key) => (state.catalog?.examples_todo || []).some((e) =>
 async function loadDetail(key) {
   // a model that's no longer in the library (an open tab, a list made before a project was read again):
   // say so without asking for it
-  if (platform.kind === "desktop" && !key.startsWith("@") && state.index && !state.index.get(`gen:${key}`) && !isExampleModel(key)) {
+  if (!key.startsWith("@") && state.index && !state.index.get(`gen:${key}`) && !isExampleModel(key)) {
     throw Object.assign(new Error(`${key} isn't in the library`), { status: 404 });
   }
   if (!details.has(key)) {
-    // (on the desktop, asked for in a way that answers "not there" without a failed request)
-    const d = platform.kind === "desktop" ? await platform.api("model_get", { key }) : await getJSON(`data/models/${key.replace("/", "--")}.json`);
+    // (asked for in a way that answers "not there" without a failed request)
+    const d = await platform.api("model_get", { key });
     if (!d) throw Object.assign(new Error(`${key} isn't in the library`), { status: 404 });
     applyProfile(d);
     details.set(key, d);
@@ -308,7 +308,6 @@ function renderModelExtra(detail) {
   const more = $("#model-more");
   if (more.dataset.key !== detail.key) more.open = false;
   more.dataset.key = detail.key;
-  if (platform.kind !== "desktop") return;
   const ro = !!state.catalog?.library?.read_only;
   const btn = (id, text, title, onclick, disabled = false) => el("button", { type: "button", id, text, title, onclick, disabled });
   const it = state.index?.get(`gen:${detail.key}`);
@@ -345,7 +344,7 @@ function renderModelExtra(detail) {
 function renderOwnNotes(detail) {
   const box = $("#model-own-notes"), text = $("#model-own-notes-text");
   const it = state.index?.get(`gen:${detail.key}`);
-  const can = platform.kind === "desktop" && !!it?.sourceId && detail.kind !== "component" && !detail.pinned_from;
+  const can = !!it?.sourceId && detail.kind !== "component" && !detail.pinned_from;
   const saved = detail.meta?.my_notes || "";
   if (box.dataset.key !== detail.key) {
     box.dataset.key = detail.key;
@@ -407,22 +406,18 @@ const currentValues = (key) => (state.model?.key === key ? structuredClone(state
 /** A component that needs values before it can be made: the settings still empty. */
 const missingValues = (model, values) => (model.needs || []).filter((n) => values[n] == null || values[n] === "");
 
-async function openModel(key, shareCode = null, savedId = null, made = null) {
+async function openModel(key, savedId = null, made = null) {
   if (!state.catalog) return;
   showView("model");
   // a made part's "Open with these settings" or "Make again": its recipe, applied once the model is open
   const recipe = made && madeRecipe(made, key);
-  if (shareCode || savedId || made) history.replaceState(null, "", `#/m/${key}`); // the link has done its job; edits shouldn't look shared
+  if (savedId || made) history.replaceState(null, "", `#/m/${key}`); // the link has done its job
   if (state.model?.key === key) {
     addTab(key);
     if (recipe) {
       state.viewerOwner = "model";
       $("#stage-empty").hidden = true;
       applyRecipe(recipe);
-    } else if (shareCode) {
-      const shared = await readShare(shareCode);
-      if (shared && !shared.error) { setAllValues(shared.values); generate(); }
-      if (shared) noteShared(shared);
     } else if (savedId) {
       await loadSaved();
       chooseSettings(`saved:${savedId}`);
@@ -438,13 +433,9 @@ async function openModel(key, shareCode = null, savedId = null, made = null) {
   try {
     detail = await loadDetail(key);
   } catch (e) {
-    if (e.status === 404 && !(platform.kind === "browser" && state.desktopOnly?.has(key))) { showMissing(key); return; }
+    if (e.status === 404) { showMissing(key); return; }
     showView("model");
-    setStatus("error", e.status === 404 ? "This model is too complex for the browser engine. It works in the desktop app." : e.message);
-    return;
-  }
-  if (detail.browser === false && platform.kind === "browser") {
-    setStatus("error", `${detail.family_name} ${detail.name} is too complex for the browser engine. It works in the desktop app.`);
+    setStatus("error", e.message);
     return;
   }
   if (state.model) { cancelJob(); stashTab(); }
@@ -456,7 +447,7 @@ async function openModel(key, shareCode = null, savedId = null, made = null) {
   $("#param-search").value = "";
   renderModelHeader(detail);
   state.usesColour = (await checkUsesColour(detail)) ? key : null;
-  const kept = !shareCode && tabStates.get(key);
+  const kept = tabStates.get(key);
   if (kept) {
     // back to an open tab: its settings and last result, no new render
     Object.assign(state, { model: kept.model, values: kept.values, rendered: kept.rendered, renderedEdits: kept.renderedEdits, lastResult: kept.lastResult, lastResultValues: kept.lastResultValues });
@@ -477,16 +468,12 @@ async function openModel(key, shareCode = null, savedId = null, made = null) {
   state.rendered = null;
   state.renderedEdits = "";
   state.lastResult = null;
-  if (shareCode) setEdits(key, null); // a shared link opens the original code
   state.viewer.clear();
   $("#dims").hidden = true;
   setDownload(null);
   state.values = Object.fromEntries(detail.parameters.map((p) => [p.name, structuredClone(p.default)]));
   saved.active = null;
-  const shared = shareCode ? await readShare(shareCode) : null;
-  if (shared && !shared.error) state.values = shared.values;
   buildForm();
-  if (shared) noteShared(shared);
   if (savedId) { await loadSaved(); chooseSettings(`saved:${savedId}`); }
   else if (recipe) { loadSaved(); applyRecipe(recipe); }
   else {
@@ -750,11 +737,9 @@ function settingsBar(presets) {
   const bar = el("div", { class: "preset-bar" },
     el("label", { for: "settings-pick", class: "visually-hidden", text: "Start from" }), pick,
     el("button", { type: "button", class: "ghost", id: "settings-save", text: "Save",
-      title: platform.kind === "desktop" ? "Save these settings in the library" : "Save these settings in this browser", onclick: () => openSaveDialog("save") }),
+      title: "Save these settings in the library", onclick: () => openSaveDialog("save") }),
     // the app's own address opens nowhere else, so the app copies the settings themselves (UI-22)
-    platform.kind === "desktop"
-      ? el("button", { type: "button", class: "ghost", id: "settings-share", text: "Copy settings", title: "Copy these settings as an OpenSCAD Customizer set; paste them on a model page to use them", onclick: copySettings })
-      : el("button", { type: "button", class: "ghost", id: "settings-share", text: "Share", title: "Copy a link that opens this model with these settings", onclick: shareSettings }),
+    el("button", { type: "button", class: "ghost", id: "settings-share", text: "Copy settings", title: "Copy these settings as an OpenSCAD Customizer set; paste them on a model page to use them", onclick: copySettings }),
     more);
   const note = el("p", { id: "settings-note", class: "settings-note", role: "status", hidden: true });
   const codeNote = el("p", { id: "code-note", class: "settings-note code-note", hidden: true });
@@ -848,13 +833,10 @@ function openSaveDialog(mode) {
   dlg.dataset.updating = updating ? "1" : "";
   $("#save-alt").hidden = !updating; // "Save as new"
   $("#save-primary").textContent = mode === "rename" ? "Rename" : updating ? `Update “${cur.name}”` : "Save";
-  store.settings.persistent().then((keep) => {
-    const files = Object.keys(editsOf(state.model.key)).length;
-    $("#save-note").textContent = mode === "rename" ? "" :
-      (files && !changes ? `Keeps your edits to ${plural(files, "file")} of code (the original stays as it is)`
-        : `Keeps the ${plural(changes, "setting")} you changed from the defaults` + (files ? ` and your edits to ${plural(files, "file")} of code (the original stays as it is)` : "")) +
-      (platform.kind === "browser" ? (keep ? ", in this browser." : ". This browser isn't keeping site data (private window?), so they'll be gone when you close the tab.") : ".");
-  });
+  const files = Object.keys(editsOf(state.model.key)).length;
+  $("#save-note").textContent = mode === "rename" ? "" :
+    (files && !changes ? `Keeps your edits to ${plural(files, "file")} of code (the original stays as it is)`
+      : `Keeps the ${plural(changes, "setting")} you changed from the defaults` + (files ? ` and your edits to ${plural(files, "file")} of code (the original stays as it is)` : "")) + ".";
   dlg.showModal();
   name.select();
 }
@@ -920,19 +902,6 @@ async function deleteSaved() {
   note(`Deleted “${cur.name}”.`);
 }
 
-async function shareSettings() {
-  if (!state.model) return;
-  const changes = changedValues(state.model, state.values);
-  const n = Object.keys(changes).length;
-  const base = `${location.origin}${location.pathname}#/m/${state.model.key}`;
-  const url = n ? `${base}?s=${await encodeShare(changes)}` : base;
-  let copied = false;
-  try { await navigator.clipboard.writeText(url); copied = true; } catch { /* not allowed here */ }
-  if (copied) note(n ? `Link copied. It opens this model with your ${plural(n, "changed setting")}.` : "Link copied. You haven't changed any settings, so it opens the defaults.", "ok");
-  else prompt("Copy this link:", url);
-  document.body.dataset.shareLink = url; // for tests
-}
-
 /** The settings as an OpenSCAD Customizer file's text, which OpenSCAD reads and a paste here takes back. */
 async function copySettings() {
   if (!state.model) return;
@@ -964,20 +933,6 @@ document.addEventListener("paste", (e) => {
   const n = Object.keys(s.changes).length;
   note(`Pasted “${s.name}”: ${plural(n, "setting")} changed from the defaults.${s.skipped ? ` ${plural(s.skipped, "value")} didn't match this model and ${s.skipped === 1 ? "was" : "were"} skipped.` : ""}`, s.skipped ? "warn" : "ok");
 });
-
-async function readShare(code) {
-  try {
-    const changes = await decodeShare(code);
-    return withChanges(state.model || { parameters: [] }, changes);
-  } catch {
-    return { error: true };
-  }
-}
-
-function noteShared(shared) {
-  if (shared.error) { note("That share link is damaged or incomplete, so the defaults are shown.", "warn"); return; }
-  note(`Opened a shared link: ${plural(shared.applied, "setting")} changed from the defaults.${skippedText(shared.skipped.length)}`, shared.skipped.length ? "warn" : "ok");
-}
 
 function exportSettings() {
   const sets = saved.list.map((r) => ({ name: r.name, values: withChanges(state.model, r.values).values }));
@@ -1078,12 +1033,11 @@ function rememberFormat(key, fmt) {
 let formatJob = 0;
 async function applyDownloadFormat() {
   const a = $("#download"), sel = $("#download-format");
-  const desktop = platform.kind === "desktop";
-  sel.hidden = !desktop;
+  sel.hidden = false;
   // a 2D model downloads its drawing as SVG or DXF (0.4.23)
   const formats = isFlat() ? ["svg", "dxf"] : ["stl", "3mf"];
   if ([...sel.options].map((o) => o.value).join() !== formats.join()) sel.replaceChildren(...formats.map((f) => el("option", { value: f, text: FORMAT_LABEL[f] })));
-  const fmt = desktop && state.model ? pickFormat(state.model.key, formats) : formats[0];
+  const fmt = state.model ? pickFormat(state.model.key, formats) : formats[0];
   sel.value = fmt;
   state.downloadFormat = fmt;
   const job = ++formatJob;
@@ -1145,7 +1099,7 @@ async function applyDownloadFormat() {
 /** OpenSCAD's own 3MF of the last render (desktop), or null when it can't be made the same way. */
 async function native3mf() {
   const m = state.model;
-  if (!m || platform.kind !== "desktop" || !state.engine?.info?.engine || !state.lastResultValues) return null;
+  if (!m || !state.engine?.info?.engine || !state.lastResultValues) return null;
   const sent = forRender(m);
   if (editsKey(sent.edits) !== (state.renderedEdits || "")) return null;
   return (await state.engine.render({ ...sent, format: "3mf", browser: false }, renderValues(m, state.lastResultValues)).promise).blob;
@@ -1166,7 +1120,7 @@ function colour3mf() {
 /** Whether a model calls color() in its own file (comments aside): its preview then shows its colours (UI-39). */
 async function checkUsesColour(detail) {
   const sha = detail?.files?.[detail.entry];
-  if (platform.kind !== "desktop" || !sha || detail.kind === "component") return false;
+  if (!sha || detail.kind === "component") return false;
   try {
     const src = (await platform.modelFile(sha)).replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/[^\n]*/g, "");
     return /\bcolou?r\s*\(/.test(src);
@@ -1261,7 +1215,7 @@ async function savePartFile(m, blob, values, { name, category = null, replace = 
 
 /** Whether made parts are kept as OpenSCAD's own 3MF (3MF chosen beside Download, the app's OpenSCAD there; F-28). */
 function partsAs3mf() {
-  return state.downloadFormat === "3mf" && platform.kind === "desktop" && !!state.engine?.info?.engine;
+  return state.downloadFormat === "3mf" && !!state.engine?.info?.engine;
 }
 
 /** After saving: read Made parts again and find a saved part's page (`#/parts/<pack>/<part>`). */
@@ -1424,7 +1378,7 @@ async function presetInstead(model, values, message) {
 
 /** After a failed render (desktop): "Flag as broken", with the error as the note. */
 function offerBrokenFlag(model, message) {
-  if (platform.kind !== "desktop" || state.catalog?.library?.read_only) return;
+  if (state.catalog?.library?.read_only) return;
   const it = state.index?.get(`gen:${model.key}`);
   if (!it || it.broken) return;
   $("#status").append(" ", el("button", { type: "button", class: "link-btn", id: "flag-broken", text: "Flag as broken",
@@ -1736,7 +1690,7 @@ $("#batch-open").addEventListener("click", () => {
   // saved settings as another way to choose (when there are any); the Parts Library as another way out (the app)
   $("#batch-mode").hidden = !saved.list.length;
   if (!saved.list.length) batch.mode = "vary";
-  $("#batch-keep").hidden = platform.kind !== "desktop" || !!state.catalog.library?.read_only || isFlat();
+  $("#batch-keep").hidden = !!state.catalog.library?.read_only || isFlat();
   renderBatchRows();
   renderBatchSaved();
   setBatchMode(batch.mode);
@@ -1932,7 +1886,7 @@ async function showPart(lib, item) {
       made.outdated ? el("p", { class: "help made-outdated", text: made.outdated }) : null,
       made.available ? el("p", { class: "made-actions" },
         el("a", { class: "button secondary", id: "made-open", href: link, text: "Open with these settings" }),
-        platform.kind === "desktop" && !state.catalog.library?.read_only
+        !state.catalog.library?.read_only
           ? el("a", { class: "button secondary", id: "made-again", href: `${link}&again`, title: "Make it with the same settings and replace its files, keeping the name", text: "Make again" }) : null) : null));
   } else if (item.example) {
     // one of a folder of examples made into parts: its own model prints this one size; the main file's model,
@@ -1942,7 +1896,7 @@ async function showPart(lib, item) {
         ? [", or ", el("a", { href: `#/m/${item.main_model}`, id: "example-main", text: `open ${state.catalog.models.find((m) => m.key === item.main_model).name}` }), " to make it at other sizes."] : ["."])));
   } else if (item.generator) status.append(el("p", { class: "help" }, el("a", { href: `#/m/${item.generator}`, text: "Open the parametric model" }), " to print it at any size."));
   // a part made from several files ("Make one part", milestone 5) can be split again
-  if (item.merged?.length && platform.kind === "desktop" && !state.catalog.library?.read_only) {
+  if (item.merged?.length && !state.catalog.library?.read_only) {
     status.append(el("p", { class: "help" }, `Made one part from ${item.merged.length + 1} files. `,
       el("button", { type: "button", class: "link-btn", id: "part-split", text: "Split into separate parts",
         onclick: async () => {
@@ -1955,7 +1909,7 @@ async function showPart(lib, item) {
   }
   // ⋯: Show in folder, Choose picture…, Add content… (0.4.23, milestone 6)
   const more = $("#part-more"), partSource = lib.source_id || lib.id, ro = !!state.catalog.library?.read_only;
-  more.hidden = platform.kind !== "desktop";
+  more.hidden = false;
   more.open = false;
   $("#part-reveal").hidden = !item.files.length;
   $("#part-reveal").onclick = () => { more.open = false; revealFile({ source: partSource, rel: item.files[0].path, examples: !!item.example }); };
@@ -2013,10 +1967,10 @@ async function showPart(lib, item) {
   }
   empty.hidden = true;
   try {
-    const url = platform.kind === "browser" ? item.preview_url : URL.createObjectURL(await (await platform.fetch(item.preview_url)).blob());
+    const url = URL.createObjectURL(await (await platform.fetch(item.preview_url)).blob());
     fileColoursAvailable(false);
     const d = await state.viewer.load(url);
-    if (url !== item.preview_url) URL.revokeObjectURL(url);
+    URL.revokeObjectURL(url);
     if (state.viewerOwner === "library") {
       showDims(d);
       // a 3MF with colours of its own: shown unless Show the file's colours is unticked (UI-39)
@@ -2059,14 +2013,14 @@ function showLicenses(focus) {
     ...(c?.component_libraries?.length ? [el("h2", { text: "Components" }),
       table(c.component_libraries.filter((l) => l.active).map((l) => row(`components-${l.name}`, l.name, l.provider === "project" ? "Your copy" : "Comes with the app",
         (l.authors || []).join(", "), { spdx: l.license || "NOASSERTION", public_use: l.license ? "ok" : "review" }, l.repo ? `https://github.com/${l.repo}` : null)))] : []),
-    el("h2", { text: "This site" }),
+    el("h2", { text: "This app" }),
     el("ul", {},
-      el("li", {}, platform.kind === "desktop" ? `OpenSCAD ${c?.engine || ""} (native, plus the WebAssembly build on Windows) makes every part on this computer. GNU GPL version 2 or later: ` : `OpenSCAD ${c?.engine || ""} (WebAssembly build) makes every part in your browser. GNU GPL version 2 or later: `,
+      el("li", {}, `OpenSCAD ${c?.engine || ""} (native, plus the WebAssembly build on Windows) makes every part on this computer. GNU GPL version 2 or later: `,
         el("a", { href: "https://github.com/openscad/openscad", target: "_blank", rel: "noopener", text: "source code" }), ", ",
         el("a", { href: "engine/COPYING", target: "_blank", text: "license text" }), "."),
       el("li", { text: "3D preview: three.js (MIT). Interface: Preact (MIT) and htm (Apache-2.0)." }),
       el("li", { text: "Fonts for text on parts: Liberation Sans and Liberation Mono (SIL Open Font License 1.1)." }),
-      el("li", { text: "Nothing you configure is sent to a server; once loaded, the site keeps working offline." }))]);
+      el("li", { text: "Nothing you configure is sent to a server; the app works offline, except for adding and updating projects from the web." }))]);
   const target = focus && document.getElementById(`lic-${focus}`);
   if (target) requestAnimationFrame(() => target.scrollIntoView({ block: "center" }));
   else window.scrollTo(0, 0);
@@ -2215,11 +2169,10 @@ function showSettings() {
   const printer = section("profile", "Printer profile", "Models that ask for these start with your values instead of the author's. Leave a value empty to keep the defaults. Magnet and tolerance settings aren't linked: each project measures them differently.",
     el("div", { class: "profile-grid" }, fields),
     el("p", { id: "profile-note", class: "muted", role: "status" }));
-  const downloads = platform.kind === "desktop" ? section("downloads", "Downloads", "Which format a part's Download offers first when it comes in several, and a model's render. What you pick for one part or model is kept for it.",
+  const downloads = section("downloads", "Downloads", "Which format a part's Download offers first when it comes in several, and a model's render. What you pick for one part or model is kept for it.",
     el("div", { class: "theme-pick", id: "format-pref", role: "radiogroup", "aria-label": "Preferred format" }, el("b", { text: "Preferred format" }), PREFERRED.map(([id, label]) => el("label", {},
-      el("input", { type: "radio", name: "format-pref", value: id, checked: preferredFormat() === id, onchange: () => store.prefs.set("gw-format-pref", id) }), " ", label)))) : null;
-  const sections = [appearance, printer, downloads, ...(platform.kind === "desktop" ? desktopSettings()
-    : [section("data", "Your data", "Saved settings and this profile are kept in this browser only. Use Export for OpenSCAD on a model to keep a copy as a file.")])];
+      el("input", { type: "radio", name: "format-pref", value: id, checked: preferredFormat() === id, onchange: () => store.prefs.set("gw-format-pref", id) }), " ", label))));
+  const sections = [appearance, printer, downloads, ...desktopSettings()];
   showPage([el("div", { class: "library-settings" }, settingsToc(sections), sections)]);
 }
 
@@ -2243,7 +2196,6 @@ function showPage(children) {
 }
 
 function showLibrarySettings(section) {
-  if (platform.kind !== "desktop") { location.hash = "#/settings"; return; }
   // #/library-settings/<section> opens at that section, once it's drawn
   if (section) {
     let tries = 0;
@@ -2287,15 +2239,9 @@ function desktopSettings() {
 }
 
 // ---------------------------------------------------------------- boot
-/** The catalog and parts packs (on the website: the built site; in the app: the library). */
+/** The library's catalog and parts packs. */
 async function loadCatalog() {
   const catalog = await getJSON("data/catalog.json");
-  if (platform.kind === "browser") {
-    // models that need native OpenSCAD only appear in the desktop app
-    state.desktopOnly = new Set(catalog.models.filter((m) => m.browser === false).map((m) => m.key));
-    catalog.models = catalog.models.filter((m) => m.browser !== false);
-    for (const c of catalog.categories) c.models = c.models.filter((k) => !state.desktopOnly.has(k));
-  }
   const libraries = await Promise.all((catalog.libraries || []).map((l) => getJSON(`data/libraries/${l.id}.json`)));
   return { catalog, libraries };
 }
@@ -2311,7 +2257,7 @@ async function reloadCatalog() {
   state.index = new LocalIndex(catalog, libraries);
   setContext({ catalog, libraries, index: state.index });
   ui.set((s) => ({ catalogVersion: s.catalogVersion + 1 }));
-  if (platform.kind === "desktop") refreshCollections(); // (a merged library brings its collections)
+  refreshCollections(); // (a merged library brings its collections)
   if (ui.get().view === "library" && location.hash.startsWith("#/parts/")) { state.openLib = null; route(); } // (its list too: parts made one or split)
   // the open model's header (name, credits, a broken flag) follows edits
   // (unless another model has been opened meanwhile: its header isn't this one's to draw)
@@ -2325,10 +2271,10 @@ async function reloadCatalog() {
   try {
     const { catalog, libraries } = await loadCatalog();
     state.catalog = catalog;
-    if (platform.kind !== "browser") document.body.dataset.platform = platform.kind;
+    document.body.dataset.platform = platform.kind;
     state.engine = platform.makeEngine(state.catalog);
     $("#engine").textContent = state.engine.label;
-    $("#save-part").hidden = platform.kind !== "desktop" || !!catalog.library?.read_only;
+    $("#save-part").hidden = !!catalog.library?.read_only;
     $("#model-collect").hidden = $("#part-collect").hidden = $("#save-part").hidden;
     state.libraries = libraries;
     for (const l of state.libraries) state.libDetail[l.id] = l;

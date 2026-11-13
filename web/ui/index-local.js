@@ -83,7 +83,7 @@ export class LocalIndex {
         category: m.category || "other", categoryLabel: label(m.category) || m.category_label,
         tags: m.tags || [], summary: m.summary || "", license: m.license || {}, licenseStatus: m.license?.public_use || "ok",
         authors: names(m.authors || fam.authors), thumb: m.thumb || null, settings: m.settings ?? null,
-        desktopOnly: m.browser === false, terms: m.terms || "", href: `#/m/${m.key}`,
+        terms: m.terms || "", href: `#/m/${m.key}`,
         updated: m.updated || null, updatedFrom: m.updated_from || null,
         folder: m.folder || "", fields: m.fields || {}, hidden: m.hidden || null, broken: m.broken || null,
         check: m.check || null, filesId: m.files_id || null,
@@ -97,7 +97,7 @@ export class LocalIndex {
         id: `comp:${c.key}`, kind: "component", key: c.key, name: c.name, module: c.module, project: c.library, projectId: c.family,
         sourceId: null, category: c.category || "other", categoryLabel: groupLabel[c.category] || c.category_label || "Other",
         tags: c.tags || [], summary: c.summary || "", license: c.license || {}, licenseStatus: c.license?.public_use || "ok",
-        authors: [], thumb: c.thumb || null, settings: c.settings ?? null, desktopOnly: false, terms: c.terms || "",
+        authors: [], thumb: c.thumb || null, settings: c.settings ?? null, terms: c.terms || "",
         href: `#/m/${c.key}`, updated: c.updated || null, updatedFrom: "upstream", folder: "", fields: {}, hidden: null, broken: null,
         needs: c.needs || [], provider: c.provider,
       });

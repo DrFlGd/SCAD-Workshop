@@ -8,13 +8,12 @@ import { useStore } from "../lib/store.js";
 import { ui } from "./state.js";
 import { ctx } from "./context.js";
 import { Icon } from "./icons.js";
-import { api, isDesktop, readOnly } from "./library.js";
+import { api, readOnly } from "./library.js";
 import { plural, FORMAT_LABEL } from "../lib/util.js";
 import { makeZip } from "../zip.js";
 
 /** Read the library's collections into the page's state. */
 export async function refreshCollections() {
-  if (!isDesktop()) return [];
   try {
     const list = await api("collections_list");
     ui.set({ collections: list });

@@ -151,7 +151,6 @@ export async function createPlatform() {
   let prefs = await api("prefs_get").catch(() => ({}));
   let timer = null;
   const settings = {
-    async persistent() { return true; },
     list: (model) => api("settings_list", { model }),
     get: (id) => api("settings_get", { id }),
     async save(rec) {

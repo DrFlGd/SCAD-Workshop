@@ -13,12 +13,11 @@ import { ui, setPref, isDark, resolvedTheme } from "./state.js";
 import { ctx } from "./context.js";
 import { Icon } from "./icons.js";
 
-const isDesktop = () => ctx.platform?.kind === "desktop";
 const MIN_W = 320;
 
 // ---------------------------------------------------------------- what to show
 
-/** Where a model's documents come from: { source } (a library project), { library } (an app library), { family } (website). */
+/** Where a model's documents come from: { source } (a library project) or { library } (an app library). */
 export async function projectRefFor(detail) {
   if (!detail) return null;
   if (detail.kind === "component") {
@@ -29,7 +28,7 @@ export async function projectRefFor(detail) {
     try { return await projectRefFor((await ctx.loadModel(detail.pinned_from)).detail); } catch { return null; }
   }
   const id = detail.key.split("/")[0];
-  return isDesktop() ? { source: id } : { family: id };
+  return { source: id };
 }
 
 /** The same for an item in the library index, without loading its model (null: load it to know). */
@@ -40,7 +39,6 @@ export function refForItem(it) {
     return lib?.provider === "project" && lib.source_id ? { source: lib.source_id } : { library: it.project };
   }
   if (it.sourceId === "pinned") return null; // a pinned component: its library's, known from the model
-  if (!isDesktop()) return it.kind === "part" ? { none: true } : { family: it.sourceId };
   return { source: it.sourceId };
 }
 
@@ -56,12 +54,7 @@ export function listDocs(ref) {
   const k = refKey(ref);
   if (!docCache.has(k)) {
     let p;
-    if (ref.family) {
-      const fam = (ctx.catalog.families || []).find((f) => f.id === ref.family);
-      p = Promise.resolve({ docs: fam?.docs || [] });
-    } else if (isDesktop()) {
-      p = ctx.platform.api("docs_list", ref).catch(() => ({ docs: [] }));
-    } else p = Promise.resolve({ docs: [] });
+    p = ctx.platform.api("docs_list", ref).catch(() => ({ docs: [] }));
     docCache.set(k, p);
   }
   return docCache.get(k);
@@ -336,7 +329,7 @@ hr { border: 0; border-top: 1px solid ${v("--steel-2")}; }
 }
 
 /** The library folder's address (absolute), for a document whose links and pictures are relative to it. */
-const folderUrl = (info) => (info?.folder != null && isDesktop() ? new URL(`${ctx.platform.library.url(info.folder)}/`, location.href).href : null);
+const folderUrl = (info) => (info?.folder != null ? new URL(`${ctx.platform.library.url(info.folder)}/`, location.href).href : null);
 
 /** Relative pictures and links made absolute against the project's folder (the frame's own <base>
  *  comes too late for the browser's preloader). Parsed inertly: nothing loads here. */
@@ -430,7 +423,7 @@ function DocView({ refObj, doc, info, onOpenCode }) {
   if (!data) return html`<p class="side-empty">Loading…</p>`;
   if (data.kind === "text") return html`<pre class="doc-text">${data.text}</pre>`;
   if (data.kind === "pdf") {
-    const external = isDesktop() && info?.path && doc.src ? html`<button type="button" class="ghost small" id="side-pdf-open"
+    const external = info?.path && doc.src ? html`<button type="button" class="ghost small" id="side-pdf-open"
       onClick=${() => ctx.platform.library.openPath(`${info.path}/${doc.src}`)}>Open in your PDF viewer</button>` : null;
     if (navigator.pdfViewerEnabled === false) {
       return html`<div class="side-empty"><p>This window can't show PDFs.</p>${external}</div>`;

@@ -9,7 +9,7 @@ import { Icon } from "./icons.js";
 import { Inspector } from "./inspector.js";
 import { Home } from "./home.js";
 import { LICENSE_TEXT, AGE_TEXT, KINDS, STATUS_TEXT } from "./index-local.js";
-import { SourcePanel, isDesktop, sourceById } from "./library.js";
+import { SourcePanel, sourceById } from "./library.js";
 import { CollectionPage } from "./collections.js";
 import { plural } from "../lib/util.js";
 
@@ -79,7 +79,6 @@ function Badges({ item, favs, mixed }) {
   return html`${favs.includes(item.id) ? html`<span class="badge-fav" title="Favourite">${Icon.star(12, true)}</span>` : null}
     ${item.broken ? html`<span class="badge-mini broken" title=${item.broken.note ? `Flagged as broken: ${item.broken.note}` : "Flagged as broken"}>broken</span>` : null}
     ${item.hidden ? html`<span class="badge-mini hidden" title="Hidden">hidden</span>` : null}
-    ${item.desktopOnly && !isDesktop() ? html`<span class="badge-mini" title="Needs native OpenSCAD (desktop app)">desktop</span>` : null}
     ${item.kind === "part" && mixed ? html`<span class="badge-mini">part</span>` : null}
     ${item.needs?.length ? html`<span class="badge-mini" title=${`Set ${item.needs.join(", ")} first`}>needs values</span>` : null}`;
 }
@@ -207,7 +206,7 @@ function groupIcon(group, g) {
 const GROUP_NOUN = { project: "projects", cat: "categories", kind: "kinds", license: "licenses" };
 
 function CondensedView({ groups, group, size }) {
-  const projects = group === "project" && isDesktop();
+  const projects = group === "project";
   return html`<div class="grid-view condensed" style=${`--card:${SIZES[size]}px`}>
     ${groups.map((g) => {
       const icon = groupIcon(group, g);
@@ -316,7 +315,7 @@ export function Browser() {
   // the table lists items as sorted; the other views by group
   shownRef.current = overview ? [] : s.layout === "table" ? shownItems : groups.flatMap((g) => g.items);
   // a project opened from its tile shows the project's page (details, files, versions, updates)
-  const openProject = condensing && s.openGroup && s.group === "project" && isDesktop() ? groups[0]?.items[0]?.projectId : null;
+  const openProject = condensing && s.openGroup && s.group === "project" ? groups[0]?.items[0]?.projectId : null;
   const panelSource = info.source || (openProject && sourceById(openProject) ? openProject : null);
   const sourceHidden = panelSource && s.sourceTab && s.sourceTab !== "items";
   const props = { sel: s.selection, favs: s.favs, mixed: new Set(items.map((i) => i.kind)).size > 1, onPick, onOpen: openItem, scrollRef };

@@ -12,7 +12,6 @@ import { bytes, plural } from "../lib/util.js";
 import { hideProject, deleteProject, hideItems } from "./actions.js";
 import { SideButtons, openSide } from "./sideview.js";
 
-export const isDesktop = () => ctx.platform?.kind === "desktop";
 export const api = (cmd, args) => ctx.platform.api(cmd, args);
 export const readOnly = () => !!ctx.catalog?.library?.read_only;
 
@@ -543,7 +542,7 @@ function drawThumbLocked(url) {
 /** Keep a component's render as its thumbnail (thumbs/components/ in the library), shown at once. */
 export async function saveComponentThumb(key, blob) {
   const it = ctx.index?.get(`comp:${key}`);
-  if (!isDesktop() || readOnly() || !it || it.thumb) return;
+  if (readOnly() || !it || it.thumb) return;
   const url = URL.createObjectURL(blob);
   try {
     const data = await drawThumbLocked(url);
@@ -583,7 +582,7 @@ export function uncheckedModels() {
 }
 
 export async function makeThumbnails({ components = false, source = null, unchecked = false } = {}) {
-  if (!isDesktop() || readOnly()) return;
+  if (readOnly()) return;
   // asked while thumbnails are being made (a project added meanwhile): go round again after
   if (thumbRunning) { if (!components && !source && !unchecked) thumbAgain = true; return; }
   if (components) return componentThumbnails();
@@ -756,7 +755,7 @@ export function MergeConflicts({ result }) {
 let scanning = null;
 let lastScan = 0;
 export async function rescanLocal(quiet = true) {
-  if (!isDesktop() || readOnly()) return;
+  if (readOnly()) return;
   if (scanning) return scanning;
   lastScan = Date.now();
   scanning = (async () => {
@@ -792,7 +791,6 @@ export function listText(names) {
 
 /** Scan again when the app's window comes back into focus (files may have been changed elsewhere), at most once a minute. */
 export function scanOnFocus() {
-  if (!isDesktop()) return;
   window.addEventListener("focus", () => {
     if (Date.now() - lastScan < 60_000 || ui.get().dialog) return;
     rescanLocal(true);
@@ -801,7 +799,7 @@ export function scanOnFocus() {
 
 /** Check GitHub projects for updates at most once a day (desktop). */
 export function dailyUpdateCheck() {
-  if (!isDesktop() || readOnly()) return;
+  if (readOnly()) return;
   const prefs = ctx.platform.store.prefs;
   const last = prefs.get("gw-update-check", 0) || 0;
   if (Date.now() - last < 864e5) return;
