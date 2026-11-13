@@ -1,5 +1,6 @@
-// Mounts the interface islands into the page. The workbench (model form and
-// 3D view), the parts page and the text pages stay as they were (app.js).
+// Mounts the interface's lasting parts into the page: the top bar, sidebar, tabs, browser, status
+// bar, palette, quick look, dialogs and side viewer. app.js mounts the pages it routes to (a model's,
+// a parts pack's, Settings, Licenses, Library settings).
 import { html, render, useEffect } from "../lib/html.js";
 import { ui, initState } from "./state.js";
 import { setContext, ctx } from "./context.js";

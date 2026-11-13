@@ -1,16 +1,18 @@
-// SCAD Workshop's page script: routing, the model page (settings form, 3D preview,
-// downloads, Batch generate, saved settings), Settings and Licenses & credits. The
-// browse views, sidebar, tabs and dialogs are Preact islands in web/ui/.
+// SCAD Workshop's page script: routing, and the open model's state and what's done with it
+// (its values, saved settings and code edits, rendering and the 3D preview, downloads, saving
+// parts, making a batch). Every page and dialog is drawn by Preact components in web/ui/.
 import { Viewer } from "./viewer.js";
 import { createPlatform } from "./platform.js";
 import { makeZip } from "./zip.js";
 import { changedValues, withChanges, toOpenSCAD, fromOpenSCAD } from "./settings-codec.js";
 import { editsKey } from "./lib/edits.js";
-import { $, el, humanize, fmt, same, bytes, plural, safeHTML, compileCondition, FORMAT_LABEL } from "./lib/util.js";
+import { $, el, humanize, fmt, same, bytes, plural, safeHTML, compileCondition, FORMAT_LABEL, partName, friendlyName } from "./lib/util.js";
 import { LocalIndex } from "./ui/index-local.js";
 import { mountShell } from "./ui/shell.js";
-import { openSide } from "./ui/sideview.js";
-import { ModelHead } from "./ui/modelhead.js";
+import { ModelHead, ModelNotes } from "./ui/modelhead.js";
+import { Batch } from "./ui/batch.js";
+import { SaveDialog } from "./ui/savedsettings.js";
+import { ModelForm, compileConditions } from "./ui/modelform.js";
 import { setContext } from "./ui/context.js";
 import { html, render } from "./lib/html.js";
 import { LibrarySettingsPage } from "./ui/libsettings.js";
@@ -18,7 +20,7 @@ import { SettingsPage, applyProfile, pickFormat, rememberFormat } from "./ui/set
 import { PartsRail } from "./ui/parts.js";
 import { LicensesPage } from "./ui/licenses.js";
 import { unflagItems } from "./ui/actions.js";
-import { saveComponentThumb, when, sourceById, rescanLocal } from "./ui/library.js";
+import { saveComponentThumb, sourceById, rescanLocal } from "./ui/library.js";
 import { ui, recordRecent, setTabs, layoutFor, isDark } from "./ui/state.js";
 import { scopeFromPath } from "./ui/context.js";
 import { scopeInfo } from "./ui/sidebar.js";
@@ -137,17 +139,7 @@ function setEdits(key, edits) {
   if (edits && Object.keys(edits).length) codeEdits.set(key, edits);
   else codeEdits.delete(key);
   ui.set((s) => ({ codeRev: (s.codeRev || 0) + 1 }));
-  if (state.model?.key === key) { updateStatusForEdits(); renderSettingsPick(); renderCodeNote(); }
-}
-
-/** Above the form while the code is edited: where a setting's default now comes from. */
-function renderCodeNote() {
-  const n = $("#code-note");
-  if (!n || !state.model) return;
-  const files = Object.keys(editsOf(state.model.key)).length;
-  n.hidden = !files;
-  if (files) n.replaceChildren(`Code edited (${plural(files, "file")}): settings left at their defaults take the code's values. `,
-    el("button", { type: "button", class: "link-btn", text: "Show the code", onclick: () => openSide("code", { sideFile: null }) }));
+  if (state.model?.key === key) { updateStatusForEdits(); drawForm(); }
 }
 
 /** One file's edit (null: back to the original). */
@@ -230,35 +222,11 @@ async function loadModel(key) {
 
 function renderModelHeader(detail) {
   document.title = `${detail.name}, ${detail.family_name} | SCAD Workshop`;
-  renderOwnNotes(detail);
-  // author notes fold away; their conditional warnings stay visible above the form
-  const notesNodes = detail.description_html ? safeHTML(detail.description_html) : [];
+  // the author's notes fold away under About this model; their warnings stay visible above the form
   const holder = document.createElement("div");
-  holder.append(...notesNodes);
+  holder.append(...(detail.description_html ? safeHTML(detail.description_html) : []));
   const alerts = [...holder.querySelectorAll("[class^=alert]")];
   alerts.forEach((a) => a.remove());
-  // every notice that applies, stacked (Review 3, UI-26): red for broken or failed, the note style for heads-ups
-  const notices = [];
-  // flagged as broken in the library (desktop)
-  const broken = detail.meta?.broken;
-  if (broken) notices.push(el("div", { class: "alert-broken", role: "note" }, `Flagged as broken${broken.date ? ` on ${when(broken.date)}` : ""}${broken.note ? `: ${broken.note}` : "."} `,
-    el("button", { type: "button", class: "link-btn", text: "Remove the flag", onclick: async () => {
-      const it = state.index.get(`gen:${detail.key}`);
-      if (it) await unflagItems([it]);
-    } })));
-  // rendered at its defaults when the project was added (desktop), and failed
-  if (detail.check?.ok === false) notices.push(el("div", { class: "alert-broken", role: "note", id: "default-check" },
-    `Didn't render at its default settings when it was checked${detail.check.message ? `: ${detail.check.message.replace(/[^.!?]$/, "$&.")}` : "."} Changing the settings may help; Check defaults in the project's ⋯ menu tries again.`));
-  // a pinned component whose library is another copy or version now (F-9)
-  if (detail.pin_changed) notices.push(el("div", { class: "alert-note", role: "note", id: "pin-changed" }, `${detail.pin_changed.message} `,
-    el("button", { type: "button", class: "link-btn", text: "Keep it with this copy", onclick: async () => {
-      try { await platform.api("pin_accept", { key: detail.key }); await reloadCatalog(); refreshModel(detail.key); } catch (e) { toast(String(e.message || e)); }
-    } }), " · ", el("a", { href: "#/library-settings/libraries", text: "Choose which copy is used (Library settings)" })));
-  // defaults the form's own limits don't allow (D-3)
-  if (detail.limits?.length) notices.push(el("div", { class: "alert-note", role: "note", id: "limits-note" },
-    `Its defaults are outside the form's limits: ${detail.limits.join("; ")}. The form keeps them as they are until you change them.`));
-  alerts.unshift(...notices);
-  $("#model-alerts").replaceChildren(...alerts);
   const hasNotes = !!holder.textContent.trim();
   // every page has a one-line summary under its name: a component (or a model without one) takes its notes' first sentence
   let summary = detail.summary;
@@ -267,28 +235,19 @@ function renderModelHeader(detail) {
     const first = (text.match(/^.{20,}?[.!?](?=\s|$)/) || [text])[0];
     summary = first.length > 180 ? `${first.slice(0, 177).trimEnd()}…` : first;
   }
-  $("#model-notes-body").replaceChildren(...holder.childNodes);
-  // the author's notes open from About this model, beside Code and README (0.4.26)
-  $("#model-notes").hidden = true;
-  $("#model-notes").open = false;
   render(html`<${ModelHead} detail=${detail} summary=${summary || ""} hasNotes=${hasNotes} act=${headActions} />`, $("#model-head"));
+  const it = state.index?.get(`gen:${detail.key}`);
+  const own = { can: !!it?.sourceId && detail.kind !== "component" && !detail.pinned_from, readOnly: !!state.catalog?.library?.read_only,
+    save: (v) => saveOwnNotes(it, detail, v) };
+  render(html`<${ModelNotes} key=${detail.key} detail=${detail} notes=${[...holder.childNodes]} alerts=${alerts} own=${own} act=${{
+    unflag: async () => { if (it) await unflagItems([it]); },
+    keepPin: async () => {
+      try { await platform.api("pin_accept", { key: detail.key }); await reloadCatalog(); refreshModel(detail.key); } catch (e) { toast(String(e.message || e)); }
+    } }} />`, $("#model-notes-root"));
 }
 
 /** What the head's buttons do (web/ui/modelhead.js). */
 const headActions = {
-  // About this model opens the author's notes above the form
-  about() {
-    const notes = $("#model-notes");
-    notes.hidden = false;
-    notes.open = true;
-    notes.scrollIntoView({ block: "nearest" });
-  },
-  ownNotes() {
-    const box = $("#model-own-notes");
-    box.hidden = false;
-    box.open = true;
-    $("#model-own-notes-text").focus();
-  },
   reveal: (args) => revealFile(args),
   copyCode: () => copyComponentCode(),
   pin: () => ui.set({ dialog: { type: "pin", key: state.model.key, values: structuredClone(state.values) } }),
@@ -296,32 +255,14 @@ const headActions = {
   help: () => setHelp(!document.body.classList.contains("show-help")),
 };
 
-// your own notes on a model (0.4.23): in its metadata (my_notes), saved when the box loses focus; shown open
-// when there are some, else from ⋯ › Your notes
-function renderOwnNotes(detail) {
-  const box = $("#model-own-notes"), text = $("#model-own-notes-text");
-  const it = state.index?.get(`gen:${detail.key}`);
-  const can = !!it?.sourceId && detail.kind !== "component" && !detail.pinned_from;
-  const saved = detail.meta?.my_notes || "";
-  if (box.dataset.key !== detail.key) {
-    box.dataset.key = detail.key;
-    box.open = !!saved;
-  }
-  box.hidden = !can || (!saved && !box.open);
-  if (document.activeElement !== text) text.value = saved;
-  text.disabled = !!state.catalog?.library?.read_only;
-  text.onchange = async () => {
-    const v = text.value;
-    try {
-      await platform.api("meta_set", { source: it.sourceId, level: "item", target: detail.id, patch: { my_notes: v.trim() ? v : null } });
-      await reloadCatalog();
-      toast(v.trim() ? "Notes saved." : "Notes removed.");
-    } catch (e) { toast(String(e.message || e)); }
-  };
+/** Your own notes on a model (0.4.23), kept in its metadata (my_notes). */
+async function saveOwnNotes(it, detail, v) {
+  try {
+    await platform.api("meta_set", { source: it.sourceId, level: "item", target: detail.id, patch: { my_notes: v.trim() ? v : null } });
+    await reloadCatalog();
+    toast(v.trim() ? "Notes saved." : "Notes removed.");
+  } catch (e) { toast(String(e.message || e)); }
 }
-$("#model-own-notes").addEventListener("toggle", (e) => { if (!e.target.open && !$("#model-own-notes-text").value.trim()) e.target.hidden = true; });
-
-$("#model-notes").addEventListener("toggle", (e) => { if (!e.target.open) e.target.hidden = true; });
 
 // a project's file (or the project's folder when the file isn't there) in the system's file manager
 function revealFile(args) {
@@ -394,6 +335,7 @@ async function openModel(key, savedId = null, made = null) {
   $("#stage-empty").hidden = true;
   $("#log").hidden = true;
   $("#param-search").value = "";
+  formQuery = "";
   renderModelHeader(detail);
   state.usesColour = (await checkUsesColour(detail)) ? key : null;
   const kept = tabStates.get(key);
@@ -435,200 +377,38 @@ async function openModel(key, savedId = null, made = null) {
 }
 
 // ---------------------------------------------------------------- form
+// The form is web/ui/modelform.js; the author's notes and warnings above it can have display
+// conditions too (shown or hidden as the settings change).
+let formQuery = "";
 function buildForm() {
-  const form = $("#params");
-  form.replaceChildren();
-  const { parameters, groups, tabs = {}, presets = [] } = state.model;
-  form.append(settingsBar(presets));
-  const names = parameters.map((p) => p.name).filter((n) => /^[A-Za-z_$][\w$]*$/.test(n));
-  state.conditions = [];
-  for (const p of parameters) if (p.show_if) state.conditions.push({ test: compileCondition(p.show_if, names), name: p.name });
-  for (const node of document.querySelectorAll("#model-alerts [data-display-condition], #model-notes-body [data-display-condition]")) {
-    state.conditions.push({ test: compileCondition(node.dataset.displayCondition, names), node });
-  }
-  groups.forEach((g, gi) => {
-    const tab = tabs[g] || {};
-    const fields = parameters.filter((p) => p.group === g && !p.hidden && p.name !== tab.control);
-    const control = tab.control && parameters.find((p) => p.name === tab.control);
-    const body = el("div", { class: "group-body" },
-      tab.description_html ? el("div", { class: "group-note" }, safeHTML(tab.description_html)) : null,
-      fields.map(buildField));
-    const title = el("span", { class: "group-title", text: g === "Parameters" ? "Settings" : g });
-    const summary = el("summary", {}, title);
-    if (control) {
-      const box = el("input", { type: "checkbox", class: "group-switch", "aria-label": `Use ${g.toLowerCase()}`,
-        onclick: (e) => e.stopPropagation(),
-        onchange: (e) => { setValue(control, e.target.checked); det.open = e.target.checked; } });
-      box.checked = !!state.values[control.name];
-      summary.prepend(box);
-    }
-    if (tab.help_link) summary.append(el("a", { class: "help-link", href: tab.help_link, target: "_blank", rel: "noopener", text: "?", title: "Documentation", "aria-label": `Documentation for ${g}`, onclick: (e) => e.stopPropagation() }));
-    summary.append(el("span", { class: "changed-count" }));
-    const open = control ? !!state.values[control.name] : tab.collapsed ? false : gi < 2 || groups.length <= 3;
-    const det = el("details", { class: "group", "data-group": g, open }, summary, body);
-    if (!fields.length && !control) return;
-    form.append(det);
-  });
-  refreshChanged();
-  applyConditions();
+  const { names } = compileConditions(state.model);
+  state.nodeConditions = [...document.querySelectorAll("#model-alerts [data-display-condition], #model-notes-body [data-display-condition]")]
+    .map((node) => ({ test: compileCondition(node.dataset.displayCondition, names), node }));
+  drawForm();
+  applyNodeConditions();
 }
 
-/** A setting's step, or "any" when its own default isn't on it (reported when the project is
- * read), so the form never calls a default invalid. */
-function fitStep(p) {
-  if (typeof p.default !== "number" || !(p.step > 0)) return p.step;
-  const n = (p.default - (p.min ?? 0)) / p.step;
-  return Math.abs(n - Math.round(n)) < 1e-6 ? p.step : "any";
-}
-
-function buildField(p) {
-  const id = `p-${p.name}`;
-  // (components read before 0.4.6 have their code names as labels)
-  const label = p.label && p.label !== p.name ? p.label : humanize(p.name);
-  // a default outside its own range widens it (reported when the project is read)
-  const lo = typeof p.default === "number" && p.min != null ? Math.min(p.min, p.default) : p.min;
-  const hi = typeof p.default === "number" && p.max != null ? Math.max(p.max, p.default) : p.max;
-  const helpNodes = [];
-  if (p.description_html) helpNodes.push(el("div", { class: "help", id: `${id}-help` }, safeHTML(p.description_html)));
-  else if (p.description) helpNodes.push(el("p", { class: "help", id: `${id}-help`, text: p.description }));
-  const reset = el("button", { type: "button", class: "reset", text: "↺", hidden: true, title: `Reset to ${JSON.stringify(p.default)}`,
-    "aria-label": `Reset ${label}`, onclick: () => { setValue(p, structuredClone(p.default)); syncField(p); } });
-  const helpLink = p.help_link ? el("a", { class: "help-link", href: p.help_link, target: "_blank", rel: "noopener", text: "?",
-    title: "Documentation", "aria-label": `Documentation for ${label}` }) : null;
-  const tip = p.description || (p.description_html ? helpNodes[0].textContent : null);
-  const head = (labelNode) => {
-    // short labels; full explanation and the name in the code on hover (or with Help on)
-    const code = label !== p.name ? `In the code: ${p.name}` : null;
-    if (tip || code) labelNode.title = [tip, code].filter(Boolean).join("\n\n");
-    const prof = p.profiled ? el("a", { class: "profile-tag", href: "#/settings", text: "profile",
-      title: "Starts from your printer profile (Settings)" }) : null;
-    return el("div", { class: "field-head" }, labelNode, prof, helpLink, reset);
-  };
-  const wrap = el("div", { class: "field", "data-name": p.name, "data-search": `${p.name} ${label} ${p.description || ""}`.toLowerCase() });
-  const describedby = helpNodes.length ? `${id}-help` : null;
-
-  if (p.widget === "checkbox") {
-    wrap.classList.add("check");
-    wrap.append(head(el("label", { for: id, text: label })),
-      el("input", { type: "checkbox", id, "aria-describedby": describedby, onchange: (e) => setValue(p, e.target.checked) }), ...helpNodes);
-  } else if (p.widget === "dropdown") {
-    const sel = el("select", { id, "aria-describedby": describedby,
-      onchange: (e) => setValue(p, p.options[e.target.selectedIndex].value) },
-      p.options.map((o) => el("option", { text: o.label })));
-    // choices longer than half the column get the whole row under the label
-    if (p.options.some((o) => String(o.label).length > 24)) wrap.classList.add("wide");
-    wrap.append(head(el("label", { for: id, text: label })), sel, ...helpNodes);
-  } else if (p.widget === "slider" && !Array.isArray(p.default)) {
-    const step = p.step != null ? fitStep(p) : (Number.isInteger(p.default) && Number.isInteger(p.min ?? 0) && Number.isInteger(p.max ?? 0) ? 1 : "any");
-    const range = el("input", { type: "range", min: lo, max: hi, step: step === "any" ? (hi - lo) / 100 : step,
-      "aria-hidden": "true", tabindex: "-1", oninput: (e) => { setValue(p, +e.target.value); syncField(p, "range"); } });
-    const num = el("input", { type: "number", id, min: lo, max: hi, step, "aria-describedby": describedby,
-      oninput: (e) => { if (e.target.value !== "" && e.target.checkValidity()) { setValue(p, +e.target.value); syncField(p, "number"); } } });
-    wrap.append(head(el("label", { for: id, text: label })), el("div", { class: "slider" }, range, num), ...helpNodes);
-  } else if (Array.isArray(p.default)) {
-    const axes = p.axes || (p.default.length <= 3 ? ["X", "Y", "Z"] : p.default.map((_, i) => `${i + 1}`));
-    const editable = p.default.every((v) => typeof v !== "object");
-    const inputs = p.default.map((v, i) => {
-      const t = typeof v === "boolean" ? "checkbox" : typeof v === "number" ? "number" : "text";
-      const ax = axes[i] || `${i + 1}`;
-      return el("label", { "data-axis": ax, style: `--ax:${ax.length}` }, ax, el("input", { type: t, "data-i": i, "aria-label": `${label} ${axes[i] || i + 1}`, step: "any", min: p.min, max: p.max, disabled: !editable,
-        oninput: (e) => {
-          const next = structuredClone(state.values[p.name]);
-          next[i] = t === "checkbox" ? e.target.checked : t === "number" ? (e.target.value === "" ? next[i] : +e.target.value) : e.target.value;
-          setValue(p, next);
-        } }));
-    });
-    wrap.append(head(el("span", { class: "label", id, text: label })),
-      el("div", { class: p.default.length >= 3 && axes.some((a) => a.length > 2) ? "vector named" : "vector", role: "group", "aria-labelledby": id, style: `--n:${Math.min(p.default.length, 4)}` }, inputs), ...helpNodes);
-  } else {
-    // optional settings (components) can be left empty: the module's own default applies
-    const t = p.type === "number" ? "number" : "text";
-    const expr = p.type === "expression";
-    wrap.append(head(el("label", { for: id, text: label })),
-      el("input", { type: t, id, step: p.step != null ? fitStep(p) : "any", min: lo, max: hi, maxlength: t === "text" ? (expr ? 2000 : 200) : null, "aria-describedby": describedby,
-        placeholder: p.placeholder || (p.optional ? "(default)" : null), class: expr ? "expr" : null, spellcheck: expr ? "false" : null,
-        oninput: (e) => {
-          const v = e.target.value;
-          if (t === "number") {
-            if (v === "" && p.optional) setValue(p, null);
-            else if (v !== "" && e.target.checkValidity()) setValue(p, +v);
-          } else setValue(p, v === "" && p.optional ? null : v);
-        } }), ...helpNodes);
-    if (expr) wrap.classList.add("field-expr");
-  }
-  if ((state.model.needs || []).includes(p.name)) wrap.classList.add("needed");
-  if (p.presets) {
-    const sel = el("select", { class: "presets", "aria-label": `${p.presets.label} for ${label}`,
-      onchange: (e) => {
-        const pick = p.presets.values[e.target.selectedIndex - 1];
-        if (pick) { setValue(p, structuredClone(pick.value)); syncField(p); }
-      } },
-      el("option", { text: `${p.presets.label}…` }), p.presets.values.map((v) => el("option", { text: v.label })));
-    wrap.insertBefore(sel, wrap.querySelector(".help") || null);
-  }
-  queueMicrotask(() => syncField(p));
-  return wrap;
-}
-
-function syncField(p, skip) {
-  const wrap = $(`.field[data-name="${CSS.escape(p.name)}"]`);
-  if (!wrap) return;
-  const v = state.values[p.name];
-  if (p.widget === "checkbox") $("input", wrap).checked = v;
-  else if (p.widget === "dropdown") $("select", wrap).selectedIndex = Math.max(0, p.options.findIndex((o) => same(o.value, v)));
-  else if (p.widget === "slider" && !Array.isArray(p.default)) {
-    if (skip !== "range") $('input[type="range"]', wrap).value = v;
-    if (skip !== "number") $('input[type="number"]', wrap).value = v;
-  } else if (Array.isArray(p.default)) {
-    wrap.querySelectorAll("input[data-i]").forEach((inp) => {
-      const x = v[+inp.dataset.i];
-      if (inp.type === "checkbox") inp.checked = x; else if (document.activeElement !== inp) inp.value = typeof x === "object" ? JSON.stringify(x) : x;
-    });
-  } else {
-    const inp = $("input", wrap);
-    if (document.activeElement !== inp) inp.value = v ?? "";
-  }
-  if (p.presets) {
-    const i = p.presets.values.findIndex((x) => same(x.value, v));
-    $(".presets", wrap).selectedIndex = i + 1;
-  }
-  refreshChanged();
+/** The form, drawn again when a setting, the saved settings or Find a setting change. */
+function drawForm() {
+  if (!state.model) return;
+  render(html`<${ModelForm} key=${state.model.key} model=${state.model} values=${state.values} q=${formQuery} set=${setValue}
+    bar=${{ presets: state.model.presets || [], list: saved.list, active: saved.active || "default", note: saved.note,
+      edited: Object.keys(editsOf(state.model.key)).length, act: barActions }} />`, $("#params"));
 }
 
 function setValue(p, v) {
   state.values[p.name] = v;
-  refreshChanged();
-  applyConditions();
+  drawForm();
+  applyNodeConditions();
   updateStatusForEdits();
 }
 
-function applyConditions() {
-  for (const c of state.conditions) {
+function applyNodeConditions() {
+  for (const c of state.nodeConditions || []) {
     const show = c.test(state.values);
-    if (c.node) c.node.hidden = !show, c.node.style.display = show ? "" : "none";
-    else $(`.field[data-name="${CSS.escape(c.name)}"]`)?.classList.toggle("cond-hidden", !show);
+    c.node.hidden = !show;
+    c.node.style.display = show ? "" : "none";
   }
-  // a section whose settings are all switched off by conditions disappears too
-  document.querySelectorAll("#params .group").forEach((g) => {
-    const fields = g.querySelectorAll(".field");
-    g.classList.toggle("cond-hidden", !g.querySelector(".group-switch") && fields.length > 0 &&
-      [...fields].every((f) => f.classList.contains("cond-hidden")));
-  });
-}
-
-function refreshChanged() {
-  if (!state.model) return;
-  for (const p of state.model.parameters) {
-    const wrap = $(`.field[data-name="${CSS.escape(p.name)}"]`);
-    if (!wrap) continue;
-    const changed = !same(state.values[p.name], p.default);
-    wrap.classList.toggle("changed", changed);
-    $(".reset", wrap).hidden = !changed;
-  }
-  document.querySelectorAll(".group").forEach((g) => {
-    const n = g.querySelectorAll(".field.changed").length;
-    $(".changed-count", g).textContent = n ? `${n} changed` : "";
-  });
 }
 
 /** Help under each setting (⋯ on the model page), kept between sessions. */
@@ -641,98 +421,43 @@ setHelp(!!store.prefs.get("gw-help", false));
 
 /** Replace every setting (missing names fall back to defaults) and update the form. */
 function setAllValues(values) {
-  for (const p of state.model.parameters) {
-    state.values[p.name] = structuredClone(p.name in values ? values[p.name] : p.default);
-    syncField(p);
-  }
-  document.querySelectorAll(".group-switch").forEach((b) => {
-    const g = b.closest(".group"); const tab = state.model.tabs?.[g.dataset.group];
-    if (tab?.control) { b.checked = !!state.values[tab.control]; g.open = b.checked; }
-  });
-  applyConditions();
+  for (const p of state.model.parameters) state.values[p.name] = structuredClone(p.name in values ? values[p.name] : p.default);
+  drawForm();
+  applyNodeConditions();
   updateStatusForEdits();
 }
 
-$("#param-search").addEventListener("input", (e) => {
-  const q = e.target.value.trim().toLowerCase();
-  document.querySelectorAll(".group").forEach((g) => {
-    let any = false;
-    g.querySelectorAll(".field").forEach((f) => {
-      const hit = !q || f.dataset.search.includes(q);
-      f.classList.toggle("search-hidden", !hit);
-      any ||= hit && !f.classList.contains("cond-hidden");
-    });
-    g.hidden = q ? !any : false;
-    if (q && any) g.open = true;
-  });
-});
+$("#param-search").addEventListener("input", (e) => { formQuery = e.target.value; drawForm(); });
 
 // ---------------------------------------------------------------- saved settings and share links
 // saved.active: "default" | "preset:<i>" | "saved:<id>" (what the picker shows)
-const saved = { list: [], active: null };
+const saved = { list: [], active: null, note: null };
 
-function settingsBar(presets) {
-  const pick = el("select", { id: "settings-pick", "aria-label": "Start from defaults, a preset or your saved settings",
-    onchange: (e) => chooseSettings(e.target.value) });
-  const more = el("details", { class: "menu", id: "settings-more" },
-    el("summary", { class: "ghost", "aria-label": "Saved settings: rename, delete, export, import", title: "Saved settings: rename, delete, export for OpenSCAD, import", text: "⋯" }),
-    el("div", { class: "menu-panel", role: "menu" },
-      el("button", { type: "button", role: "menuitem", id: "settings-rename", text: "Rename…", onclick: () => { closeMenu(); openSaveDialog("rename"); } }),
-      el("button", { type: "button", role: "menuitem", id: "settings-delete", text: "Delete", onclick: () => { closeMenu(); deleteSaved(); } }),
-      el("hr"),
-      el("button", { type: "button", role: "menuitem", id: "settings-export", text: "Export for OpenSCAD", title: "All saved settings for this model, as an OpenSCAD Customizer file", onclick: () => { closeMenu(); exportSettings(); } }),
-      el("button", { type: "button", role: "menuitem", id: "settings-import-btn", text: "Import OpenSCAD file…", onclick: () => { closeMenu(); $("#settings-import").click(); } })));
-  const bar = el("div", { class: "preset-bar" },
-    el("label", { for: "settings-pick", class: "visually-hidden", text: "Start from" }), pick,
-    el("button", { type: "button", class: "ghost", id: "settings-save", text: "Save",
-      title: "Save these settings in the library", onclick: () => openSaveDialog("save") }),
-    // the app's own address opens nowhere else, so the app copies the settings themselves (UI-22)
-    el("button", { type: "button", class: "ghost", id: "settings-share", text: "Copy settings", title: "Copy these settings as an OpenSCAD Customizer set; paste them on a model page to use them", onclick: copySettings }),
-    more);
-  const note = el("p", { id: "settings-note", class: "settings-note", role: "status", hidden: true });
-  const codeNote = el("p", { id: "code-note", class: "settings-note code-note", hidden: true });
-  saved.presets = presets;
-  queueMicrotask(() => { renderSettingsPick(); renderCodeNote(); });
-  return el("div", { class: "settings-bar" }, bar, note, codeNote);
-}
-
-const closeMenu = () => { const m = $("#settings-more"); if (m) m.open = false; };
-document.addEventListener("click", (e) => { if (!e.target.closest?.("#settings-more")) closeMenu(); });
-
-function renderSettingsPick() {
-  const pick = $("#settings-pick");
-  if (!pick || !state.model) return;
-  const presets = state.model.presets || [];
-  pick.replaceChildren(
-    el("option", { value: "default", text: "Defaults" }),
-    presets.length ? el("optgroup", { label: "Presets" }, presets.map((ps, i) => el("option", { value: `preset:${i}`, text: ps.label }))) : null,
-    saved.list.length ? el("optgroup", { label: "Saved" }, saved.list.map((r) => el("option", { value: `saved:${r.id}`,
-      text: r.edits && Object.keys(r.edits).length ? `${r.name} · code edited` : r.name }))) : null);
-  pick.value = saved.active || "default";
-  if (pick.selectedIndex < 0) pick.value = "default";
-  const isSaved = (saved.active || "").startsWith("saved:");
-  $("#settings-rename").disabled = !isSaved;
-  $("#settings-delete").disabled = !isSaved;
-  $("#settings-export").disabled = false;
-}
+/** What the saved-settings bar above the form does (web/ui/savedsettings.js). */
+const barActions = {
+  choose: (value) => chooseSettings(value),
+  save: () => openSaveDialog("save"),
+  copy: () => copySettings(),
+  rename: () => openSaveDialog("rename"),
+  remove: () => deleteSaved(),
+  exportAll: () => exportSettings(),
+  importFile: () => $("#settings-import").click(),
+};
 
 async function loadSaved() {
   const key = state.model.key;
   try { saved.list = await store.settings.list(key); } catch { saved.list = []; }
-  if (state.model?.key === key) renderSettingsPick();
+  if (state.model?.key === key) drawForm();
 }
 
 const activeSaved = () => saved.list.find((r) => `saved:${r.id}` === saved.active) || null;
 
 let noteTimer = null;
 function note(text, kind = "") {
-  const n = $("#settings-note");
-  if (!n) return;
-  n.textContent = text;
-  n.className = `settings-note ${kind}`;
-  n.hidden = false;
+  saved.note = { text, kind };
+  drawForm();
   clearTimeout(noteTimer);
-  noteTimer = setTimeout(() => { n.hidden = true; }, 9000);
+  noteTimer = setTimeout(() => { saved.note = null; drawForm(); }, 9000);
 }
 
 const skippedText = (n) => (n ? ` ${plural(n, "setting")} didn't match this version of the model and stayed at the default.` : "");
@@ -742,7 +467,7 @@ function chooseSettings(value) {
   // Defaults and saved settings bring their own code (saved without edits: the original), presets only values
   const replacesCode = value === "default" || value.startsWith("saved:");
   if (replacesCode && codeStatus(key) === "unsaved" && !confirm("Go back to the original code? Your edits to the code aren't saved.")) {
-    renderSettingsPick();
+    drawForm();
     return;
   }
   if (value === "default") {
@@ -764,29 +489,25 @@ function chooseSettings(value) {
     else if (skipped.length) note(skippedText(skipped.length).trim(), "warn");
   }
   saved.active = value;
-  renderSettingsPick();
+  drawForm();
   generate();
 }
 
+let saveOpened = 0;
 function openSaveDialog(mode) {
   if (!state.model) return;
-  const dlg = $("#save-dialog");
   const cur = activeSaved();
   const changes = Object.keys(changedValues(state.model, state.values)).length;
-  dlg.dataset.mode = mode;
-  $("#save-title").textContent = mode === "rename" ? "Rename saved settings" : "Save settings";
-  const name = $("#save-name");
-  name.value = mode === "rename" ? cur?.name || "" : cur ? cur.name : suggestName();
-  const updating = mode === "save" && !!cur;
-  dlg.dataset.updating = updating ? "1" : "";
-  $("#save-alt").hidden = !updating; // "Save as new"
-  $("#save-primary").textContent = mode === "rename" ? "Rename" : updating ? `Update “${cur.name}”` : "Save";
   const files = Object.keys(editsOf(state.model.key)).length;
-  $("#save-note").textContent = mode === "rename" ? "" :
-    (files && !changes ? `Keeps your edits to ${plural(files, "file")} of code (the original stays as it is)`
-      : `Keeps the ${plural(changes, "setting")} you changed from the defaults` + (files ? ` and your edits to ${plural(files, "file")} of code (the original stays as it is)` : "")) + ".";
-  dlg.showModal();
-  name.select();
+  const spec = {
+    mode, name: mode === "rename" ? cur?.name || "" : cur ? cur.name : suggestName(),
+    updating: mode === "save" && cur ? cur.name : null,
+    note: mode === "rename" ? "" : (files && !changes ? `Keeps your edits to ${plural(files, "file")} of code (the original stays as it is)`
+      : `Keeps the ${plural(changes, "setting")} you changed from the defaults` + (files ? ` and your edits to ${plural(files, "file")} of code (the original stays as it is)` : "")) + ".",
+  };
+  saved.dialogMode = mode;
+  render(html`<${SaveDialog} key=${++saveOpened} spec=${spec} save=${saveSettings} />`, $("#save-dialog"));
+  $("#save-dialog").showModal();
 }
 
 function suggestName() {
@@ -815,11 +536,9 @@ function editsRecord(model) {
   return ed.length ? Object.fromEntries(ed) : null;
 }
 
-async function saveSettings(asNew) {
+async function saveSettings(asNew, name) {
   const dlg = $("#save-dialog");
-  const mode = dlg.dataset.mode;
-  const name = $("#save-name").value.trim();
-  if (!name) { $("#save-name").focus(); return; }
+  const mode = saved.dialogMode;
   const cur = activeSaved();
   const key = state.model.key;
   try {
@@ -876,7 +595,7 @@ document.addEventListener("paste", (e) => {
   const s = sets[0];
   setAllValues(withChanges(state.model, s.changes).values);
   saved.active = null;
-  renderSettingsPick();
+  drawForm();
   generate();
   const n = Object.keys(s.changes).length;
   note(`Pasted “${s.name}”: ${plural(n, "setting")} changed from the defaults.${s.skipped ? ` ${plural(s.skipped, "value")} didn't match this model and ${s.skipped === 1 ? "was" : "were"} skipped.` : ""}`, s.skipped ? "warn" : "ok");
@@ -909,9 +628,6 @@ async function importSettings(file) {
   note(`Imported ${plural(sets.length, "set")} and opened “${first.name}”.${skipped ? ` ${plural(skipped, "value")} didn't match this model and ${skipped === 1 ? "was" : "were"} skipped.` : ""}`, skipped ? "warn" : "ok");
 }
 
-$("#save-form").addEventListener("submit", (e) => { e.preventDefault(); saveSettings(!$("#save-dialog").dataset.updating); });
-$("#save-alt").addEventListener("click", () => saveSettings(true));
-$("#save-cancel").addEventListener("click", () => $("#save-dialog").close());
 $("#settings-import").addEventListener("change", (e) => { importSettings(e.target.files[0]); e.target.value = ""; });
 
 // ---------------------------------------------------------------- rendering
@@ -933,27 +649,6 @@ function updateStatusForEdits() {
     setStatus("stale", valuesSame ? "Code changed. Generate to update the preview and download." : "Settings changed. Generate to update the preview and download.");
     if (!a.classList.contains("is-disabled")) a.textContent = $("#download-format").hidden ? "Download last render" : "Last render";
   }
-}
-
-/** Settings that are sizes (grid units, width, depth...), for naming what a model makes. */
-const SIZE_KEYS = ["gridx", "gridy", "gridz", "Width", "Depth", "Height", "Width_Units", "Length_Units",
-  "Board_Width", "Board_Height", "shelf_width", "shelf_depth", "GridSize", "plate_size"];
-
-/** The sizes among a model's settings, for naming what it makes. */
-function sizesOf(values) {
-  const dims = [];
-  for (const k of SIZE_KEYS) {
-    if (k in values) [].concat(values[k]).forEach((x) => { if (typeof x === "number") dims.push(String(x)); });
-  }
-  return dims;
-}
-
-function friendlyName(model, values) {
-  let base = model.kind === "component" ? `${model.component?.library || "component"}-${model.id}` : `${model.family}-${model.id}`;
-  const dims = sizesOf(values);
-  const part = model.part_parameter;
-  if (part && ["string", "number"].includes(typeof values[part])) base += `-${values[part]}`;
-  return (base + (dims.length ? "-" + dims.slice(0, 4).join("x") : "")).replace(/[^A-Za-z0-9._-]+/g, "_").slice(0, 120) + ".stl";
 }
 
 function setDownload(blob, name) {
@@ -1112,13 +807,6 @@ $("#download-format").addEventListener("change", (e) => {
 const previewCurrent = () => !state.job && !!state.rendered && same(JSON.parse(state.rendered), state.values)
   && (state.renderedEdits || "") === editsKey(editsOf(state.model.key));
 
-/** "Basic Bin 3×2": the model's name and the part and sizes it's set to. */
-function partName(model, values) {
-  const part = model.part_parameter && ["string", "number"].includes(typeof values[model.part_parameter]) ? ` ${values[model.part_parameter]}` : "";
-  const dims = sizesOf(values).slice(0, 3);
-  return `${model.name}${part}${dims.length ? ` ${dims.join("×")}` : ""}`;
-}
-
 $("#save-part").addEventListener("click", () => {
   const m = state.model;
   if (!m) return;
@@ -1233,7 +921,7 @@ function applyRecipe(r) {
   setAllValues(values);
   setEdits(key, r.edits ? editTexts(r.edits) : null);
   saved.active = null;
-  renderSettingsPick();
+  drawForm();
   if (skipped.length) note(skippedText(skipped.length).trim(), "warn");
   state.afterRender = r.again
     ? { key, values: structuredClone(state.values), run: () => writePart({ name: r.stem, category: r.category, replace: true, folder: r.folder, format: r.output || "stl" }) }
@@ -1425,312 +1113,100 @@ $("#params").addEventListener("keydown", (e) => {
 $("#cancel").addEventListener("click", () => { cancelJob(); setStatus("stale", "Render cancelled."); });
 
 // ---------------------------------------------------------------- batch
-const BATCH_MAX = 200;
-// what to make: combinations of settings (rows), or saved settings (Batch generate, milestone 4)
-const batch = { rows: [], running: null, mode: "vary", picked: new Set() };
-// settings that tune the render or debug it, not what's made: not offered (Review 7, item 2)
-const BATCH_SKIP_GROUP = /^(debug|hidden|help)\b/i;
-const BATCH_SKIP_NAME = /^\$?(fa|fs|fn)$|^random_?seed$|^enable_?help$/i;
-const axesOf = (p) => p.axes || (p.default.length <= 3 ? ["X", "Y", "Z"] : p.default.map((_, i) => `${i + 1}`));
-
-/**
- * What Batch generate can vary: { key, p, index, label, type }. A paired or vector setting (a bin's
- * Width: units and mm) offers each of its numbers on its own: key "width[0]", label "Width (units)".
- */
-function batchEntries() {
-  const out = [];
-  for (const p of state.model.parameters) {
-    if (p.hidden || BATCH_SKIP_GROUP.test(p.group || "") || BATCH_SKIP_NAME.test(p.name)) continue;
-    const label = p.label || humanize(p.name);
-    if (Array.isArray(p.default)) {
-      const axes = axesOf(p);
-      p.default.forEach((v, i) => {
-        if (typeof v === "number") out.push({ key: `${p.name}[${i}]`, p, index: i, label: `${label} (${axes[i] || i + 1})`, type: "number" });
-      });
-    } else if (["number", "string", "boolean"].includes(p.type)) out.push({ key: p.name, p, index: null, label, type: p.type });
-  }
-  return out;
-}
-const entryValue = (e, values) => (e.index == null ? values[e.p.name] : values[e.p.name]?.[e.index]);
-/** Values with one entry set: a vector setting is copied before one of its numbers changes. */
-function withEntry(values, e, v) {
-  if (e.index == null) values[e.p.name] = v;
-  else { values[e.p.name] = [...values[e.p.name]]; values[e.p.name][e.index] = v; }
-  return values;
-}
-
-function batchRow(e) {
-  // sensible starting values for the chosen setting
-  const v = entryValue(e, state.values);
-  if (e.index == null && e.p.widget === "dropdown") return { key: e.key, kind: "choice", picked: [v] };
-  if (e.type === "boolean") return { key: e.key, kind: "choice", picked: [false, true] };
-  if (e.type === "number") {
-    const step = e.p.step && e.p.step > 0 ? e.p.step : (Number.isInteger(v) ? Math.max(1, Math.round(Math.abs(v) / 5) || 1) : 1);
-    return { key: e.key, kind: "range", from: v, to: v + step * 4, step };
-  }
-  return { key: e.key, kind: "list", text: String(v) };
-}
-
-function rowValues(row) {
-  const e = batchEntries().find((x) => x.key === row.key);
-  if (!e) return [];
-  if (row.kind === "choice") return row.picked;
-  if (row.kind === "list") return row.text.split(",").map((s) => s.trim()).filter(Boolean)
-    .map((s) => (e.type === "number" ? Number(s) : s)).filter((x) => e.type !== "number" || Number.isFinite(x));
-  const out = [];
-  const { from, to, step } = row;
-  if (!(step > 0) || !Number.isFinite(from) || !Number.isFinite(to)) return out;
-  for (let x = from, i = 0; (from <= to ? x <= to + 1e-9 : x >= to - 1e-9) && i <= BATCH_MAX; x = from <= to ? x + step : x - step, i++) {
-    out.push(Math.round(x * 1e6) / 1e6);
-  }
-  return out;
-}
-
-function batchCombos() {
-  let combos = [{}];
-  for (const row of batch.rows) {
-    const vals = rowValues(row);
-    combos = combos.flatMap((c) => vals.map((v) => ({ ...c, [row.key]: v })));
-  }
-  return combos;
-}
-
-/**
- * What Batch generate makes: { values, file, part } for each, with the whole form's values, a file
- * name for the ZIP, and a name for the Parts Library ("Basic Bin 2×1": the model, its sizes, and
- * whatever else varies).
- */
-function batchItems() {
-  const m = state.model;
-  if (batch.mode === "saved") {
-    return saved.list.filter((r) => batch.picked.has(r.id) && !hasCode(r)).map((r) => ({
-      values: withChanges(m, r.values).values, file: `${m.family}-${m.id}-${r.name}`, part: `${m.name} ${r.name}` }));
-  }
-  if (!batch.rows.length) return [];
-  const entries = new Map(batchEntries().map((e) => [e.key, e]));
-  return batchCombos().map((c) => {
-    const values = structuredClone(state.values);
-    for (const [k, v] of Object.entries(c)) withEntry(values, entries.get(k), v);
-    const other = Object.entries(c).filter(([k]) => !SIZE_KEYS.includes(entries.get(k).p.name)).map(([k, v]) => {
-      const e = entries.get(k), p = e.p;
-      if (typeof v === "boolean") return v ? e.label : `no ${e.label.toLowerCase()}`;
-      if (e.index != null) return `${(p.label || humanize(p.name)).toLowerCase()} ${v} ${axesOf(p)[e.index] || ""}`.trim();
-      return p.options?.find((o) => same(o.value, v))?.label || (p.type === "number" ? `${e.label.toLowerCase()} ${v}` : String(v));
-    });
-    const fileBit = (k, v) => { const e = entries.get(k); return `${e.p.name}${e.index != null ? `-${axesOf(e.p)[e.index] || e.index}` : ""}-${v}`; };
-    return { values, file: `${m.family}-${m.id}-` + Object.entries(c).map(([k, v]) => fileBit(k, v)).join("-"), part: [partName(m, values), ...other].join(" ") };
-  });
-}
-
-/** A saved setting with code edits: Batch generate uses the form's code, so it isn't offered. */
-const hasCode = (r) => !!r.edits && Object.keys(r.edits).length > 0;
-
-function renderBatchSaved() {
-  const box = $("#batch-saved");
-  box.replaceChildren(
-    el("p", { class: "muted", text: "Each one you tick becomes its own part, with its own settings." }),
-    ...saved.list.map((r) => {
-      const cb = el("input", { type: "checkbox", value: r.id, disabled: hasCode(r), onchange: (e) => {
-        if (e.target.checked) batch.picked.add(r.id); else batch.picked.delete(r.id);
-        updateBatchCount();
-      } });
-      cb.checked = batch.picked.has(r.id) && !hasCode(r);
-      return el("label", { class: "batch-saved-row", title: hasCode(r) ? "Saved with code edits: open it to make it" : null }, cb, r.name,
-        hasCode(r) ? el("small", { class: "muted", text: " (code edited: open it to make it)" }) : null);
-    }));
-}
-
-function setBatchMode(mode) {
-  batch.mode = mode;
-  document.querySelectorAll('#batch-mode input').forEach((i) => { i.checked = i.value === mode; });
-  $("#batch-vary").hidden = mode !== "vary";
-  $("#batch-saved").hidden = mode !== "saved";
-  updateBatchCount();
-}
-document.querySelectorAll('#batch-mode input').forEach((i) => i.addEventListener("change", () => setBatchMode(i.value)));
-
-function renderBatchRows() {
-  const box = $("#batch-rows");
-  const entries = batchEntries();
-  // the settings by their groups, as in the form
-  const groups = new Map();
-  for (const e of entries) {
-    const g = e.p.group && e.p.group !== "Parameters" ? e.p.group : "";
-    if (!groups.has(g)) groups.set(g, []);
-    groups.get(g).push(e);
-  }
-  const option = (e) => el("option", { value: e.key, text: e.label });
-  box.replaceChildren(...batch.rows.map((row, ri) => {
-    const entry = entries.find((x) => x.key === row.key);
-    const p = entry.p;
-    const pick = el("select", { "aria-label": "Setting to vary", onchange: (ev) => {
-      batch.rows[ri] = batchRow(entries.find((x) => x.key === ev.target.value)); renderBatchRows();
-    } }, [...groups].map(([g, list]) => (g ? el("optgroup", { label: g }, list.map(option)) : list.map(option))).flat());
-    pick.value = row.key;
-    let editor;
-    if (row.kind === "range") {
-      const num = (k, text) => el("label", {}, text, el("input", { type: "number", step: "any", value: row[k],
-        oninput: (e) => { row[k] = e.target.value === "" ? NaN : +e.target.value; updateBatchCount(); } }));
-      editor = el("div", { class: "batch-range" }, num("from", "From"), num("to", "To"), num("step", "Step"));
-    } else if (row.kind === "choice") {
-      const opts = entry.index == null && p.widget === "dropdown" ? p.options : [{ value: false, label: "Off" }, { value: true, label: "On" }];
-      editor = el("div", { class: "batch-choices" }, opts.map((o) => {
-        const cb = el("input", { type: "checkbox", onchange: (e) => {
-          row.picked = e.target.checked ? [...row.picked, o.value] : row.picked.filter((x) => !same(x, o.value));
-          updateBatchCount();
-        } });
-        cb.checked = row.picked.some((x) => same(x, o.value));
-        return el("label", {}, cb, o.label);
-      }));
-    } else {
-      editor = el("label", { class: "batch-list" }, "Values, separated by commas",
-        el("input", { type: "text", value: row.text, oninput: (e) => { row.text = e.target.value; updateBatchCount(); } }));
-    }
-    const remove = batch.rows.length > 1 ? el("button", { type: "button", class: "ghost", text: "Remove",
-      onclick: () => { batch.rows.splice(ri, 1); renderBatchRows(); } }) : null;
-    return el("fieldset", { class: "batch-row" }, el("legend", { text: ri ? "And vary" : "Vary" }), el("div", { class: "batch-row-head" }, pick, remove), editor);
-  }));
-  $("#batch-add").hidden = batch.rows.length >= 2 || entries.length < 2;
-  updateBatchCount();
-}
-
-function updateBatchCount() {
-  const n = batchItems().length;
-  const run = $("#batch-run"), keep = $("#batch-keep");
-  $("#batch-count").textContent = n > BATCH_MAX ? `${n} combinations: the limit is ${BATCH_MAX}. Narrow the ranges.`
-    : n ? `${plural(n, "part")} will be made.` : batch.mode === "saved" ? "Tick at least one." : "Pick at least one value.";
-  run.disabled = keep.disabled = !n || n > BATCH_MAX || !!batch.running;
-  run.textContent = n && n <= BATCH_MAX ? `Make ${n} and download ZIP` : "Make and download ZIP";
-  keep.textContent = n && n <= BATCH_MAX ? `Save ${n} to the Parts Library` : "Save to the Parts Library";
-}
+// Batch generate (⋯ on the model page): the dialog is web/ui/batch.js; this makes what it lists.
+let batchOpened = 0;
 
 /** Batch generate… (⋯ on the model page). */
 function openBatch() {
   if (!state.model) return;
-  const entries = batchEntries();
-  if (!batch.rows.length || batch.model !== state.model.key) {
-    batch.model = state.model.key;
-    // start from the most likely thing to vary: the first number of the form's first group (a bin's
-    // Width in units), else the first number, else the first setting
-    const first = entries[0]?.p.group;
-    const guess = entries.find((e) => e.type === "number" && e.p.group === first) || entries.find((e) => e.type === "number") || entries[0];
-    batch.rows = guess ? [batchRow(guess)] : [];
-    batch.picked = new Set();
-    batch.mode = "vary";
-  }
-  $("#batch-progress").hidden = true;
-  // saved settings as another way to choose (when there are any); the Parts Library as another way out (the app)
-  $("#batch-mode").hidden = !saved.list.length;
-  if (!saved.list.length) batch.mode = "vary";
-  $("#batch-keep").hidden = !!state.catalog.library?.read_only || isFlat();
-  renderBatchRows();
-  renderBatchSaved();
-  setBatchMode(batch.mode);
+  render(html`<${Batch} key=${state.model.key} model=${state.model} values=${state.values} saved=${saved.list} opened=${++batchOpened}
+    keepable=${!state.catalog.library?.read_only && !isFlat()} make=${makeBatch} />`, $("#batch"));
   $("#batch").showModal();
 }
-$("#batch-add").addEventListener("click", () => {
-  const used = new Set(batch.rows.map((r) => r.key));
-  const next = batchEntries().find((e) => !used.has(e.key));
-  if (next) { batch.rows.push(batchRow(next)); renderBatchRows(); }
-});
-$("#batch-close").addEventListener("click", () => {
-  if (batch.running) { batch.running.cancel(); batch.running = null; }
-  $("#batch").close();
-});
-$("#batch").addEventListener("cancel", () => { if (batch.running) { batch.running.cancel(); batch.running = null; } });
 
-$("#batch-run").addEventListener("click", () => runBatch(false));
-$("#batch-keep").addEventListener("click", () => runBatch(true));
-
-/** Make every part Batch generate lists, then download them as one ZIP or (keep) save each to the Parts Library. */
-async function runBatch(keep) {
-  const model = state.model;
-  const combos = batchItems();
-  if (!combos.length || combos.length > BATCH_MAX) return;
-  cancelJob();
-  const files = [];
-  const names = new Set();
-  const bar = $("#batch-bar"), text = $("#batch-progress-text");
-  $("#batch-progress").hidden = false;
-  batch.running = { cancelled: false, job: null, cancel() { this.cancelled = true; this.job?.cancel(); } };
-  const run = batch.running;
-  updateBatchCount();
-  const started = Date.now();
-  run.jobs = new Set();
-  run.cancel = function () { this.cancelled = true; for (const j of this.jobs) j.cancel(); };
-  const width = Math.max(1, Math.min(state.engine.concurrency || 1, combos.length));
-  const results = new Array(combos.length);
-  // 3MF chosen beside Download: each made as OpenSCAD's own 3MF, colours and objects kept (F-28)
-  // a 2D model: its drawings, in the format chosen beside Download (0.4.23)
-  const flat = isFlat() ? state.downloadFormat : null;
-  if (flat && keep) { text.textContent = "A 2D model's drawings can't be kept in the Parts Library yet: download them as a ZIP."; batch.running = null; return; }
-  const as3mf = !flat && partsAs3mf();
-  const ext = flat || (as3mf ? "3mf" : "stl");
-  let next = 0, done = 0;
-  const progress = () => {
-    bar.style.width = `${(done / combos.length) * 100}%`;
-    text.textContent = width > 1 ? `Making ${combos.length} parts, ${width} at a time: ${done} done`
-      : `Making ${Math.min(done + 1, combos.length)} of ${combos.length}: ${combos[Math.min(done, combos.length - 1)].part}`;
-  };
-  const worker = async () => {
-    while (next < combos.length) {
-      if (run.cancelled) throw Object.assign(new Error("Batch cancelled."), { cancelled: true });
-      const i = next++;
-      const { values } = combos[i];
-      const job = state.engine.render(as3mf || flat ? { ...forRender(model), format: ext } : forRender(model), renderValues(model, values));
-      run.jobs.add(job);
-      try { results[i] = { values, result: await job.promise }; } finally { run.jobs.delete(job); }
-      done++;
-      progress();
-    }
-  };
-  // the preview shows the last one: made as an STL too when the parts are 3MFs
-  const previewOf = async (r) => as3mf || flat === "dxf" ? { values: r.values, result: await state.engine.render(forRender(model), renderValues(model, r.values)).promise } : r;
-  try {
-    progress();
-    await Promise.all(Array.from({ length: width }, worker));
-    if (keep) {
-      // each to local/Made parts/<model>/ with its recipe, named from what varies
-      let first = null;
-      for (let i = 0; i < combos.length; i++) {
-        if (run.cancelled) throw Object.assign(new Error("Batch cancelled."), { cancelled: true });
-        text.textContent = `Saving ${i + 1} of ${combos.length} to the Parts Library…`;
-        const r = await savePartFile(model, results[i].result.blob, results[i].values, { name: combos[i].part, category: model.kind === "component" ? null : model.category || null, format: ext });
-        first ||= r;
+/**
+ * Make every part Batch generate lists (`combos`: { values, file, part }), then download them as one
+ * ZIP or (keep) save each to the Parts Library. `report(text, done)`: progress, done from 0 to 1.
+ * Returns { promise (what happened, in words), cancel }.
+ */
+function makeBatch(combos, keep, report) {
+  const run = { cancelled: false, jobs: new Set(), cancel() { this.cancelled = true; for (const j of this.jobs) j.cancel(); } };
+  run.promise = (async () => {
+    const model = state.model;
+    cancelJob();
+    const files = [];
+    const names = new Set();
+    const started = Date.now();
+    const width = Math.max(1, Math.min(state.engine.concurrency || 1, combos.length));
+    const results = new Array(combos.length);
+    // 3MF chosen beside Download: each made as OpenSCAD's own 3MF, colours and objects kept (F-28)
+    // a 2D model: its drawings, in the format chosen beside Download (0.4.23)
+    const flat = isFlat() ? state.downloadFormat : null;
+    if (flat && keep) return "A 2D model's drawings can't be kept in the Parts Library yet: download them as a ZIP.";
+    const as3mf = !flat && partsAs3mf();
+    const ext = flat || (as3mf ? "3mf" : "stl");
+    let next = 0, done = 0;
+    const progress = () => report(width > 1 ? `Making ${combos.length} parts, ${width} at a time: ${done} done`
+      : `Making ${Math.min(done + 1, combos.length)} of ${combos.length}: ${combos[Math.min(done, combos.length - 1)].part}`, done / combos.length);
+    const stopped = () => Object.assign(new Error("Batch cancelled."), { cancelled: true });
+    const worker = async () => {
+      while (next < combos.length) {
+        if (run.cancelled) throw stopped();
+        const i = next++;
+        const { values } = combos[i];
+        const job = state.engine.render(as3mf || flat ? { ...forRender(model), format: ext } : forRender(model), renderValues(model, values));
+        run.jobs.add(job);
+        try { results[i] = { values, result: await job.promise }; } finally { run.jobs.delete(job); }
+        done++;
+        progress();
       }
-      const href = await madePartHref(first);
-      text.textContent = `Done: ${plural(combos.length, "part")} saved to the Parts Library under Made parts › ${first.folder}, in ${Math.round((Date.now() - started) / 1000)} s.`;
-      toast(`Saved ${plural(combos.length, "part")} to the Parts Library.`, href ? { label: "Show", run: () => { $("#batch").close(); location.hash = href; } } : null);
+    };
+    // the preview shows the last one: made as an STL too when the parts are 3MFs
+    const previewOf = async (r) => as3mf || flat === "dxf" ? { values: r.values, result: await state.engine.render(forRender(model), renderValues(model, r.values)).promise } : r;
+    const showLast = async () => {
       const last = await previewOf(results[combos.length - 1]);
       state.viewerOwner = "model";
       await showResult(last.result, last.values, true, editsKey(editsOf(model.key)));
-      bar.style.width = "100%";
-      setStatus("ok", `${plural(combos.length, "part")} saved to the Parts Library. The preview shows the last one.`);
-      return;
+    };
+    try {
+      progress();
+      await Promise.all(Array.from({ length: width }, worker));
+      if (keep) {
+        // each to local/Made parts/<model>/ with its recipe, named from what varies
+        let first = null;
+        for (let i = 0; i < combos.length; i++) {
+          if (run.cancelled) throw stopped();
+          report(`Saving ${i + 1} of ${combos.length} to the Parts Library…`);
+          const r = await savePartFile(model, results[i].result.blob, results[i].values, { name: combos[i].part, category: model.kind === "component" ? null : model.category || null, format: ext });
+          first ||= r;
+        }
+        const href = await madePartHref(first);
+        const text = `Done: ${plural(combos.length, "part")} saved to the Parts Library under Made parts › ${first.folder}, in ${Math.round((Date.now() - started) / 1000)} s.`;
+        toast(`Saved ${plural(combos.length, "part")} to the Parts Library.`, href ? { label: "Show", run: () => { $("#batch").close(); location.hash = href; } } : null);
+        await showLast();
+        report(text, 1);
+        setStatus("ok", `${plural(combos.length, "part")} saved to the Parts Library. The preview shows the last one.`);
+        return text;
+      }
+      for (let i = 0; i < combos.length; i++) {
+        let name = combos[i].file;
+        name = name.replace(/[^A-Za-z0-9._-]+/g, "_").slice(0, 140);
+        while (names.has(name)) name += "_";
+        names.add(name);
+        files.push({ name: `${name}.${ext}`, data: new Uint8Array(await results[i].result.blob.arrayBuffer()) });
+      }
+      await showLast();
+      const zip = makeZip(files);
+      const took = Math.round((Date.now() - started) / 1000);
+      const where = await deliver(zip, `${model.family}-${model.id}-batch-${files.length}.zip`);
+      setStatus("ok", `Batch of ${files.length} ${where === null ? "made" : where ? "saved" : "downloaded"}. The preview shows the last one.`);
+      return `Done: ${files.length} files (${bytes(zip.size)}) in ${took} s. ` +
+        (where === null ? "Not saved." : where ? `Saved to ${where}.` : "Your download has started.");
+    } catch (e) {
+      return e.cancelled ? `Cancelled. ${keep ? "Parts already saved stay in the Parts Library." : "Nothing was downloaded."}` : `Stopped: ${e.message}`;
     }
-    for (let i = 0; i < combos.length; i++) {
-      let name = combos[i].file;
-      name = name.replace(/[^A-Za-z0-9._-]+/g, "_").slice(0, 140);
-      while (names.has(name)) name += "_";
-      names.add(name);
-      files.push({ name: `${name}.${ext}`, data: new Uint8Array(await results[i].result.blob.arrayBuffer()) });
-    }
-    const last = await previewOf(results[combos.length - 1]);
-    state.viewerOwner = "model";
-    await showResult(last.result, last.values, true, editsKey(editsOf(model.key)));
-    bar.style.width = "100%";
-    const zip = makeZip(files);
-    const took = Math.round((Date.now() - started) / 1000);
-    const saved = await deliver(zip, `${model.family}-${model.id}-batch-${files.length}.zip`);
-    text.textContent = `Done: ${files.length} files (${bytes(zip.size)}) in ${took} s. ` +
-      (saved === null ? "Not saved." : saved ? `Saved to ${saved}.` : "Your download has started.");
-    setStatus("ok", `Batch of ${files.length} ${saved === null ? "made" : saved ? "saved" : "downloaded"}. The preview shows the last one.`);
-  } catch (e) {
-    text.textContent = e.cancelled ? `Cancelled. ${keep ? "Parts already saved stay in the Parts Library." : "Nothing was downloaded."}` : `Stopped: ${e.message}`;
-  } finally {
-    batch.running = null;
-    updateBatchCount();
-  }
+  })();
+  return run;
 }
 
 // ---------------------------------------------------------------- part libraries
