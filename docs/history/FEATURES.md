@@ -1,6 +1,6 @@
 # Feature backlog — pick the order
 
-> Historical: the website-era backlog from 2026-10-03. The roadmap is now [DESKTOP_PLAN.md](DESKTOP_PLAN.md), and what was built is in [CHANGELOG.md](../CHANGELOG.md).
+> Historical: the website-era backlog from 2026-10-03. The roadmap is now [DESKTOP_PLAN.md](../DESKTOP_PLAN.md), and what was built is in [CHANGELOG.md](../../CHANGELOG.md).
 
 **Built:** A1, A2, F4 (in-browser OpenSCAD, hosted on GitHub Pages), most of A3 for projects that ship an editor.toml (GridFlock, Gridfinity Extended), a first version of C1 and C2. **On hold:** the server (G1), kept on the `archive/server-v1` branch. Reply with the IDs you want next.
 

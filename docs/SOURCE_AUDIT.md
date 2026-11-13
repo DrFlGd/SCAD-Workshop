@@ -58,3 +58,31 @@ Benchmark (Node, same engine as the browser, default settings): **24 of 26 model
 Two Underware models, **T channel** and **I bridge channel**, crash the WebAssembly engine on both 2026.01.19 and 2026.10.02 (memory corruption consistent with deep recursion overflowing the engine's fixed stack). They render natively, so they're marked `"browser": false` and left off the site. The 2025.03.25 build used by Cabinet Workshop fails on more models (all Underware, openGrid tile), which is why the newer snapshot is pinned.
 
 These checks use default settings. They don't prove every combination works, or that parts fit and print well.
+
+## The test projects and their licences
+
+These were the website's catalog and the app's starter library until 0.4.3, and are the test projects now (CI builds them into a starter library for the tests; the app doesn't ship them). The licences are why some were never cleared for sharing prints.
+
+| Family | Models | License / public use |
+| --- | --- | --- |
+| Gridfinity Rebuilt | Bin, Baseplate, Vase Bin | MIT · ok |
+| Gridfinity Extended | Bin, Baseplate, Connector Clips, Drawers, Item Holder, Lid, Sliding Lid, Bin with Removable Walls, Tray, Silverware Holder, Socket Holder, Sieve, Vertical Divider, Chess Set, Glue Stick Holder, Marble Run | GPL-3.0 · ok |
+| GridFlock | Baseplate | MIT / CC-BY-4.0 · ok |
+| Gridfinity Rugged Box | Box (12 parts) | CC-BY-SA-4.0 + MIT · ok |
+| Gridfinity Basket | Basket | MIT · ok |
+| Cullenect Label | Label | MIT · ok |
+| Honeycomb Storage Wall | Grid (v2, v2.3) | CC-BY-4.0 · ok |
+| openGrid | Grid, Snap, Border | CC-BY-NC-SA-4.0 · review |
+| Label Generator for Gridfinity | Bin Label, Storage Box Label (for Pred's bins and boxes) | GPL-3.0 · ok |
+| Gridfinity Storage Box Label (Kevenaar) | Box Label | CC-BY-4.0 · ok |
+| Gridfinity Screw Label (Santalla) | Screw Label | GPL-3.0-or-later · ok |
+| Just Fit Base Grid | Skeleton Baseplate (units, cm or inches) | Unstated · review |
+| Modular Minimalist Kitchen | Scoop Bin | Unstated · review |
+| Gridfinity Bin for Pred Labels (3DLG) | Bin with snap-in label holder | CC-BY-NC-SA · private use |
+| Gridfinity Kitchen | Full Cutout Bin, Edge Cutout Bin (12 size presets from the original files), Spacer, Spacer with Walls | MIT |
+| Gridfinity Anylid | Lid | Unstated · review |
+| openGrid Shelf | Shelf | Unstated · review |
+| Underware (Monokini) | 17 channels, labels and textured variants | Conflict · private use only |
+| Multiboard | — | — |
+
+GRIPS and GridPlates are intentionally excluded (superseded).
