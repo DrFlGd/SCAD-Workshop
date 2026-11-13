@@ -40,6 +40,7 @@ python3 tools/build_site.py --engine build/engine --out _site --native-engine bu
 python3 tools/thumbnails.py --site _site --native-engine build/native/squashfs-root/AppRun
 python3 tools/fetch_libraries.py --out build/desktop/libs   # the bundled OpenSCAD libraries (or --from-git <folder of clones>)
 python3 tools/build_desktop.py --site _site --out build/desktop --fetch-fonts   # ui/, site/, starter/ (tests only), libs/index/
+python3 tools/component_thumbs.py --cli desktop/target/release/workshop-cli --engine build/native/squashfs-root   # libs/thumbs/ (needs Playwright)
 cd desktop && npx @tauri-apps/cli@2 build          # installers in desktop/target/release/bundle/
 ```
 

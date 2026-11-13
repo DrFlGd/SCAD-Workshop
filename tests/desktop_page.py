@@ -288,6 +288,16 @@ async def main():
             libs = await pg.evaluate("() => window.__workshop.catalog.component_libraries.map((l) => [l.name, l.provider, l.active])")
             check("Components: modules of the bundled libraries, your BOSL2 in use", comps > 700 and ["BOSL2", "project", True] in libs
                   and ["BOSL2", "bundled", False] in libs and ["NopSCADlib", "bundled", True] in libs, (comps, libs))
+            # the app's own pictures of its copies' components, made when it was built (tools/component_thumbs.py; Review 7, item 6)
+            if (Path(a.app_site).parent / "libs/thumbs/summary.json").is_file():
+                pics = await pg.evaluate("""async () => {
+                    const app = window.__workshop.index.items.filter((i) => i.kind === 'component' && i.thumb?.includes('/~app/'));
+                    const r = app.length ? await fetch(app[0].thumb) : null;
+                    return { nop: app.filter((i) => i.project === 'NopSCADlib').length, bosl2: app.filter((i) => i.project === 'BOSL2').length,
+                             bytes: r?.ok ? (await r.arrayBuffer()).byteLength : 0 };
+                }""")
+                check("components of the app's libraries have the pictures it came with (not your BOSL2's)",
+                      pics["nop"] > 100 and pics["bosl2"] == 0 and pics["bytes"] > 500, pics)
             # the bevel-gear flow: search, open the first result (a doc example's values), change teeth and module, preview, download
             t0 = time.time()
             await pg.goto(B + "#/")

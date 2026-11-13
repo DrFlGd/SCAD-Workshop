@@ -73,10 +73,16 @@ pub fn build(lib: &Library, engine: &str, common_files: &Value, url: &str, libs:
             summary.insert("needs".into(), d["needs"].clone());
             // a thumbnail saved after the component was first made, by this copy of its library
             // (thumbs/components/<library>/<copy>/<module>.webp)
+            // or else, for the app's copy, the one made when the app was built (libs/thumbs/<library>/<module>.webp)
             let thumb = format!("{}/{}.webp", component_thumb_dir(l), c.module);
             let mut d = d;
-            if comp_thumbs.join(&thumb).is_file() {
-                let u = url_of(&format!("thumbs/components/{thumb}"));
+            let own = comp_thumbs.join(&thumb).is_file().then(|| format!("thumbs/components/{thumb}"));
+            let app = || {
+                let rel = format!("thumbs/{}/{}.webp", crate::library::slug(&l.info.name), c.module);
+                (l.provider == "bundled" && l.root.parent().is_some_and(|libs| libs.join(&rel).is_file())).then(|| format!("{}/{rel}", crate::api::APP_LIBS))
+            };
+            if let Some(rel) = own.or_else(app) {
+                let u = url_of(&rel);
                 summary.insert("thumb".into(), json!(u));
                 d["thumb"] = json!(u);
             }

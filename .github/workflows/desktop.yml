@@ -39,7 +39,7 @@ jobs:
   site:
     name: Build site data
     runs-on: ubuntu-24.04
-    timeout-minutes: 40
+    timeout-minutes: 75
     defaults:
       run: { shell: bash }
     outputs:
@@ -81,6 +81,11 @@ jobs:
           python tools/fetch_libraries.py --out build/desktop/libs
           pip install fonttools   # cuts Layer Line's heading font to the letters the app uses
           python tools/build_desktop.py --site _site --out build/desktop --fetch-fonts
+      - name: Pictures of the components (the app's own previews, shipped in libs/thumbs/)
+        run: |
+          python tools/component_thumbs.py --cli desktop/target/release/workshop-cli --desktop build/desktop \
+            --engine build/native/squashfs-root 2>&1 | tee component-thumbs.log
+          echo "::notice title=Component pictures::$(tail -1 component-thumbs.log)"
       - uses: actions/upload-artifact@v4
         with:
           name: desktop-site
@@ -154,6 +159,7 @@ jobs:
           dpkg -c "$deb" > ci-out/deb-contents.txt
           if grep -q '/starter/' ci-out/deb-contents.txt; then echo "::error title=Installer::the .deb still ships starter/"; exit 1; fi
           grep -q '/libs/' ci-out/deb-contents.txt || { echo "::error title=Installer::the .deb has no libs/"; exit 1; }
+          grep -q '/libs/thumbs/bosl2/' ci-out/deb-contents.txt || { echo "::error title=Installer::the .deb has no component pictures"; exit 1; }
       - uses: actions/upload-artifact@v4
         with: { name: bundles-linux, path: dist/, retention-days: 3 }
       - name: Start the app once (startup log)

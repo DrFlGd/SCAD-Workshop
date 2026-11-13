@@ -1817,12 +1817,24 @@ impl App {
             let dir = lib.version_dir(&src, src["version"].as_str().unwrap_or(""))?;
             return Ok(std::fs::read(dir.join(library::rel_inside(inner)?))?);
         }
+        if let Some(rest) = rel.strip_prefix(APP_LIBS) {
+            // the component pictures made when the app was built
+            let inner = rest.trim_start_matches('/');
+            let libs = self.paths.libs.as_deref().context("the app has no libraries")?;
+            if !inner.starts_with("thumbs/") {
+                bail!("not an app picture");
+            }
+            return Ok(std::fs::read(libs.join(library::rel_inside(inner)?))?);
+        }
         Ok(std::fs::read(lib.resolve(&rel)?)?)
     }
 }
 
 /// Library paths under this name are a linked project's own folder: `~linked/<id>/<path>`.
 const LINKED: &str = "~linked";
+/// Library paths under this name are the app's own libraries folder (libs/), for the component
+/// pictures made when the app was built: `~app/thumbs/<library>/<module>.webp`.
+pub(crate) const APP_LIBS: &str = "~app";
 
 /// A project's folder as a library path (for its pictures and files in the side viewer): inside
 /// the library, or a linked project's folder through `~linked/<id>`.
