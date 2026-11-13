@@ -1149,8 +1149,9 @@ async def main():
                 await pg.get_by_role("button", name="Guide", exact=True).click()
                 await pg.wait_for_selector("#attachment-remove")
                 await pg.click("#attachment-remove")
+                # (the list is saved before the file is moved aside: wait for both)
                 for _ in range(40):
-                    if len(meta_of()["items"]["box"].get("attachments", [])) == 1:
+                    if len(meta_of()["items"]["box"].get("attachments", [])) == 1 and any((library / "backups" / "removed").glob(f"*-{sid}-Guide.pdf")):
                         break
                     await asyncio.sleep(0.25)
                 m6["left"] = [a.get("name") for a in meta_of()["items"]["box"].get("attachments", [])]
@@ -1419,7 +1420,8 @@ async def main():
             check("the status line reads a job and its time with a space before the timer",
                   bool(re.search(r"\S · \d+ s", job_text)), job_text)
             try:
-                await pg.wait_for_function(f"() => ({count_js})()[1] >= 22", timeout=300000)
+                # (the thumbnails of every project added so far are made first: about 180, 5 minutes on a slow machine)
+                await pg.wait_for_function(f"() => ({count_js})()[1] >= 22", timeout=600000)
             except Exception:
                 pass
             counts = await pg.evaluate(count_js)
