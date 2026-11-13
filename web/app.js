@@ -13,9 +13,10 @@ import { sideModelButtons, openSide, SideButtons } from "./ui/sideview.js";
 import { setContext } from "./ui/context.js";
 import { html, render } from "./lib/html.js";
 import { LibrarySettingsPage } from "./ui/libsettings.js";
+import { SettingsPage, applyProfile, preferredFormat } from "./ui/settings.js";
 import { unflagItems } from "./ui/actions.js";
 import { saveComponentThumb, when, sourceById, rescanLocal, madeFrom } from "./ui/library.js";
-import { ui, recordRecent, setTabs, layoutFor, isDark, setTheme, THEMES, setSkin, SKINS } from "./ui/state.js";
+import { ui, recordRecent, setTabs, layoutFor, isDark } from "./ui/state.js";
 import { scopeFromPath } from "./ui/context.js";
 import { scopeInfo } from "./ui/sidebar.js";
 import { refreshCollections } from "./ui/collections.js";
@@ -1017,8 +1018,6 @@ function setDownload(blob, name) {
 // A model's render downloads as STL or 3MF (the core writes the 3MF from the render); a part with
 // several formats has one Download button and a format beside it. The choice is kept per model or
 // part, and Settings › Downloads gives the default.
-const PREFERRED = [["stl", "STL where there is one"], ["3mf", "3MF where there is one, otherwise STL"], ["step", "STEP where there is one, otherwise STL"]];
-const preferredFormat = () => store.prefs.get("gw-format-pref") || "stl";
 /** The format to offer first among `formats` (["stl", "3mf", ...]): the one last chosen for `key`, else Settings' rule. */
 function pickFormat(key, formats) {
   const last = (store.prefs.get("gw-formats", {}) || {})[key];
@@ -2099,93 +2098,16 @@ if (platform.save) {
   });
 }
 
-// ---------------------------------------------------------------- printer profile
-// Values the user sets once (Settings) that generators asking for them start from.
-const PROFILE_FIELDS = [
-  { id: "bed", label: "Print bed size", unit: "mm", axes: ["width (X)", "depth (Y)"], kind: "vec2", min: 50, max: 2000 },
-  { id: "nozzle", label: "Nozzle diameter", unit: "mm", kind: "number", min: 0.1, max: 2, step: 0.05 },
-];
-const getProfile = () => store.prefs.get("gw-profile", {}) || {};
-
-function profileValue(path, profile = getProfile()) {
-  const [field, axis] = path.split(".");
-  const v = profile[field];
-  if (v == null) return undefined;
-  if (axis) return Array.isArray(v) ? v[{ x: 0, y: 1, z: 2 }[axis]] : undefined;
-  return v;
-}
-
-function applyProfile(detail) {
-  for (const p of detail.parameters) {
-    if (!p.profile) continue;
-    const v = profileValue(p.profile);
-    const d = p.default;
-    const fits = Array.isArray(d) ? Array.isArray(v) && v.length === d.length && v.every((x) => typeof x === "number")
-      : typeof d === "number" && typeof v === "number";
-    if (fits) { p.default = structuredClone(v); p.profiled = true; }
-  }
-}
-
 function showSettings() {
   showView("about");
   document.title = "Settings | SCAD Workshop";
   $("#about-title").textContent = "Settings";
-  const profile = getProfile();
-  const uses = state.catalog?.profile_uses || {};
-  const nameOf = (key) => { const m = state.catalog?.models.find((x) => x.key === key); return m ? `${m.family_name} ${m.name}` : key; };
-  const saveProfile = (id, value) => {
-    const next = { ...getProfile() };
-    if (value == null) delete next[id]; else next[id] = value;
-    store.prefs.set("gw-profile", next);
-    if (state.model) state.model = null; // reopen models with the new defaults
-    $("#profile-note").textContent = "Saved. Models open with these values from now on.";
-  };
-  const fields = PROFILE_FIELDS.map((f) => {
-    const cur = profile[f.id];
-    const used = [...new Set((uses[f.id] || []).map((u) => u.key))].map((k) => el("a", { href: `#/m/${k}`, text: nameOf(k) }));
-    let inputs;
-    if (f.kind === "vec2") {
-      inputs = el("div", { class: "vector named", style: "--n:2" }, f.axes.map((ax, i) => el("label", { "data-axis": ax, style: `--ax:${ax.length}` }, ax,
-        el("input", { type: "number", min: f.min, max: f.max, step: "any", value: cur ? cur[i] : "", "aria-label": `${f.label} ${ax}`, placeholder: "not set",
-          onchange: (e) => {
-            const ins = e.target.closest(".vector").querySelectorAll("input");
-            const vals = [...ins].map((x) => (x.value === "" ? null : +x.value));
-            saveProfile(f.id, vals.every((x) => x != null && x > 0) ? vals : null);
-          } }))));
-    } else {
-      inputs = el("input", { type: "number", min: f.min, max: f.max, step: f.step || "any", value: cur ?? "", placeholder: "not set", "aria-label": f.label,
-        onchange: (e) => saveProfile(f.id, e.target.value === "" ? null : +e.target.value) });
-    }
-    return el("div", { class: "field profile-field" },
-      el("div", { class: "field-head" }, el("span", { class: "label", text: `${f.label} (${f.unit})` })), inputs,
-      el("p", { class: "help-inline" }, used.length ? ["Used by ", ...used.flatMap((a, i) => [i ? ", " : "", a]), "."] : "No model uses this yet."));
-  });
-  const appearance = section("appearance", "Appearance", "The skin is the app's look: its colours, lettering, shapes and icons. Each skin has light and dark colours, chosen by the theme.",
-    el("div", { class: "theme-pick", id: "skin-pick", role: "radiogroup", "aria-label": "Skin" }, el("b", { text: "Skin" }), SKINS.map(([id, label]) => el("label", {},
-      el("input", { type: "radio", name: "skin", value: id, checked: ui.get().skin === id, onchange: () => setSkin(id) }), " ", label))),
-    el("div", { class: "theme-pick", id: "theme-pick", role: "radiogroup", "aria-label": "Theme" }, el("b", { text: "Theme" }), THEMES.map(([id, label]) => el("label", {},
-      el("input", { type: "radio", name: "theme", value: id, checked: ui.get().theme === id, onchange: () => setTheme(id) }), " ", label))));
-  const printer = section("profile", "Printer profile", "Models that ask for these start with your values instead of the author's. Leave a value empty to keep the defaults. Magnet and tolerance settings aren't linked: each project measures them differently.",
-    el("div", { class: "profile-grid" }, fields),
-    el("p", { id: "profile-note", class: "muted", role: "status" }));
-  const downloads = section("downloads", "Downloads", "Which format a part's Download offers first when it comes in several, and a model's render. What you pick for one part or model is kept for it.",
-    el("div", { class: "theme-pick", id: "format-pref", role: "radiogroup", "aria-label": "Preferred format" }, el("b", { text: "Preferred format" }), PREFERRED.map(([id, label]) => el("label", {},
-      el("input", { type: "radio", name: "format-pref", value: id, checked: preferredFormat() === id, onchange: () => store.prefs.set("gw-format-pref", id) }), " ", label))));
-  const sections = [appearance, printer, downloads, ...desktopSettings()];
-  showPage([el("div", { class: "library-settings" }, settingsToc(sections), sections)]);
+  const box = el("div", { id: "settings-page" });
+  showPage([box]);
+  // (a changed profile: models open with its values from then on)
+  render(html`<${SettingsPage} onProfileChange=${() => { if (state.model) state.model = null; }} />`, box);
+  mountedPage = box;
 }
-
-/** One section of a settings page, laid out like Library settings: a heading, a grey intro, then its contents. */
-function section(id, title, intro, ...children) {
-  return el("section", { class: "ls-section", id: `ls-${id}` }, el("h2", { text: title }), intro ? el("p", { class: "muted", text: intro }) : null, ...children);
-}
-/** Jump links to a page's sections. */
-function settingsToc(sections) {
-  return el("nav", { class: "ls-toc", "aria-label": "On this page" }, sections.filter(Boolean).map((sec) => el("a", { href: location.hash,
-    text: sec.querySelector("h2").textContent, onclick: (e) => { e.preventDefault(); sec.scrollIntoView({ behavior: "smooth" }); } })));
-}
-
-const RELEASES_URL = "https://github.com/DrFlGd/SCAD-Workshop/releases";
 
 /** The text pages share #about-body; a Preact page mounted there is unmounted when another page replaces it. */
 let mountedPage = null;
@@ -2208,26 +2130,6 @@ function showLibrarySettings(section) {
   showPage([box]);
   render(html`<${LibrarySettingsPage} />`, box);
   mountedPage = box;
-}
-
-function desktopSettings() {
-  const info = platform.info || {};
-  const gb = (n) => (n == null ? "unknown" : bytes(n));
-  const cacheLine = el("span", { text: gb(info.cache_bytes) });
-  // (the library folder and everything about it: Library settings; Review 7, item 9)
-  return [
-    section("engine", "Engine", null,
-    info.engine
-      ? el("p", {}, `OpenSCAD ${info.engine}, native, up to ${info.concurrency || 1} render${info.concurrency > 1 ? "s" : ""} at once. `, el("br"), el("code", { text: info.engine_path || "" }))
-      : el("p", { class: "lic-summary", text: info.engine_error || "OpenSCAD isn't available." }),
-    el("p", {}, "Finished renders are kept so repeating one is instant: ", cacheLine, ". ",
-      el("button", { type: "button", class: "ghost", text: "Clear", onclick: async () => {
-        try { await platform.workspace.clearCache(); const i = await platform.refreshInfo(); cacheLine.textContent = gb(i.cache_bytes); } catch (e) { toast(String(e)); }
-      } }))),
-    section("about", "About", null,
-    el("p", { id: "app-version" }, `SCAD Workshop ${info.version || "(version unknown)"}. `,
-      el("a", { href: RELEASES_URL, target: "_blank", rel: "noopener", text: "All releases and what changed" }))),
-  ];
 }
 
 // ---------------------------------------------------------------- boot
