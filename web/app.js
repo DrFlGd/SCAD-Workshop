@@ -1543,26 +1543,55 @@ $("#cancel").addEventListener("click", () => { cancelJob(); setStatus("stale", "
 const BATCH_MAX = 200;
 // what to make: combinations of settings (rows), or saved settings (Batch generate, milestone 4)
 const batch = { rows: [], running: null, mode: "vary", picked: new Set() };
-const batchable = () => state.model.parameters.filter((p) => !p.hidden && !Array.isArray(p.default) &&
-  ["number", "string", "boolean"].includes(p.type));
+// settings that tune the render or debug it, not what's made: not offered (Review 7, item 2)
+const BATCH_SKIP_GROUP = /^(debug|hidden|help)\b/i;
+const BATCH_SKIP_NAME = /^\$?(fa|fs|fn)$|^random_?seed$|^enable_?help$/i;
+const axesOf = (p) => p.axes || (p.default.length <= 3 ? ["X", "Y", "Z"] : p.default.map((_, i) => `${i + 1}`));
 
-function batchRow(p) {
-  // sensible starting values for the chosen setting
-  const v = state.values[p.name];
-  if (p.widget === "dropdown") return { name: p.name, kind: "choice", picked: [v] };
-  if (p.type === "boolean") return { name: p.name, kind: "choice", picked: [false, true] };
-  if (p.type === "number") {
-    const step = p.step && p.step > 0 ? p.step : (Number.isInteger(v) ? Math.max(1, Math.round(Math.abs(v) / 5) || 1) : 1);
-    return { name: p.name, kind: "range", from: v, to: v + step * 4, step };
+/**
+ * What Batch generate can vary: { key, p, index, label, type }. A paired or vector setting (a bin's
+ * Width: units and mm) offers each of its numbers on its own: key "width[0]", label "Width (units)".
+ */
+function batchEntries() {
+  const out = [];
+  for (const p of state.model.parameters) {
+    if (p.hidden || BATCH_SKIP_GROUP.test(p.group || "") || BATCH_SKIP_NAME.test(p.name)) continue;
+    const label = p.label || humanize(p.name);
+    if (Array.isArray(p.default)) {
+      const axes = axesOf(p);
+      p.default.forEach((v, i) => {
+        if (typeof v === "number") out.push({ key: `${p.name}[${i}]`, p, index: i, label: `${label} (${axes[i] || i + 1})`, type: "number" });
+      });
+    } else if (["number", "string", "boolean"].includes(p.type)) out.push({ key: p.name, p, index: null, label, type: p.type });
   }
-  return { name: p.name, kind: "list", text: String(v) };
+  return out;
+}
+const entryValue = (e, values) => (e.index == null ? values[e.p.name] : values[e.p.name]?.[e.index]);
+/** Values with one entry set: a vector setting is copied before one of its numbers changes. */
+function withEntry(values, e, v) {
+  if (e.index == null) values[e.p.name] = v;
+  else { values[e.p.name] = [...values[e.p.name]]; values[e.p.name][e.index] = v; }
+  return values;
+}
+
+function batchRow(e) {
+  // sensible starting values for the chosen setting
+  const v = entryValue(e, state.values);
+  if (e.index == null && e.p.widget === "dropdown") return { key: e.key, kind: "choice", picked: [v] };
+  if (e.type === "boolean") return { key: e.key, kind: "choice", picked: [false, true] };
+  if (e.type === "number") {
+    const step = e.p.step && e.p.step > 0 ? e.p.step : (Number.isInteger(v) ? Math.max(1, Math.round(Math.abs(v) / 5) || 1) : 1);
+    return { key: e.key, kind: "range", from: v, to: v + step * 4, step };
+  }
+  return { key: e.key, kind: "list", text: String(v) };
 }
 
 function rowValues(row) {
-  const p = state.model.parameters.find((x) => x.name === row.name);
+  const e = batchEntries().find((x) => x.key === row.key);
+  if (!e) return [];
   if (row.kind === "choice") return row.picked;
   if (row.kind === "list") return row.text.split(",").map((s) => s.trim()).filter(Boolean)
-    .map((s) => (p.type === "number" ? Number(s) : s)).filter((x) => p.type !== "number" || Number.isFinite(x));
+    .map((s) => (e.type === "number" ? Number(s) : s)).filter((x) => e.type !== "number" || Number.isFinite(x));
   const out = [];
   const { from, to, step } = row;
   if (!(step > 0) || !Number.isFinite(from) || !Number.isFinite(to)) return out;
@@ -1576,7 +1605,7 @@ function batchCombos() {
   let combos = [{}];
   for (const row of batch.rows) {
     const vals = rowValues(row);
-    combos = combos.flatMap((c) => vals.map((v) => ({ ...c, [row.name]: v })));
+    combos = combos.flatMap((c) => vals.map((v) => ({ ...c, [row.key]: v })));
   }
   return combos;
 }
@@ -1593,14 +1622,18 @@ function batchItems() {
       values: withChanges(m, r.values).values, file: `${m.family}-${m.id}-${r.name}`, part: `${m.name} ${r.name}` }));
   }
   if (!batch.rows.length) return [];
+  const entries = new Map(batchEntries().map((e) => [e.key, e]));
   return batchCombos().map((c) => {
-    const values = { ...structuredClone(state.values), ...c };
-    const other = Object.entries(c).filter(([k]) => !SIZE_KEYS.includes(k)).map(([k, v]) => {
-      const p = m.parameters.find((x) => x.name === k);
-      if (typeof v === "boolean") return v ? (p?.label || humanize(k)) : `no ${(p?.label || humanize(k)).toLowerCase()}`;
-      return p?.options?.find((o) => same(o.value, v))?.label || String(v);
+    const values = structuredClone(state.values);
+    for (const [k, v] of Object.entries(c)) withEntry(values, entries.get(k), v);
+    const other = Object.entries(c).filter(([k]) => !SIZE_KEYS.includes(entries.get(k).p.name)).map(([k, v]) => {
+      const e = entries.get(k), p = e.p;
+      if (typeof v === "boolean") return v ? e.label : `no ${e.label.toLowerCase()}`;
+      if (e.index != null) return `${(p.label || humanize(p.name)).toLowerCase()} ${v} ${axesOf(p)[e.index] || ""}`.trim();
+      return p.options?.find((o) => same(o.value, v))?.label || (p.type === "number" ? `${e.label.toLowerCase()} ${v}` : String(v));
     });
-    return { values, file: `${m.family}-${m.id}-` + Object.entries(c).map(([k, v]) => `${k}-${v}`).join("-"), part: [partName(m, values), ...other].join(" ") };
+    const fileBit = (k, v) => { const e = entries.get(k); return `${e.p.name}${e.index != null ? `-${axesOf(e.p)[e.index] || e.index}` : ""}-${v}`; };
+    return { values, file: `${m.family}-${m.id}-` + Object.entries(c).map(([k, v]) => fileBit(k, v)).join("-"), part: [partName(m, values), ...other].join(" ") };
   });
 }
 
@@ -1633,21 +1666,29 @@ document.querySelectorAll('#batch-mode input').forEach((i) => i.addEventListener
 
 function renderBatchRows() {
   const box = $("#batch-rows");
-  const params = batchable();
+  const entries = batchEntries();
+  // the settings by their groups, as in the form
+  const groups = new Map();
+  for (const e of entries) {
+    const g = e.p.group && e.p.group !== "Parameters" ? e.p.group : "";
+    if (!groups.has(g)) groups.set(g, []);
+    groups.get(g).push(e);
+  }
+  const option = (e) => el("option", { value: e.key, text: e.label });
   box.replaceChildren(...batch.rows.map((row, ri) => {
-    const p = params.find((x) => x.name === row.name);
-    const label = (x) => x.label || humanize(x.name);
-    const pick = el("select", { "aria-label": "Setting to vary", onchange: (e) => {
-      batch.rows[ri] = batchRow(params[e.target.selectedIndex]); renderBatchRows();
-    } }, params.map((x) => el("option", { text: `${label(x)}${x.group !== "Parameters" ? ` (${x.group})` : ""}` })));
-    pick.selectedIndex = params.indexOf(p);
+    const entry = entries.find((x) => x.key === row.key);
+    const p = entry.p;
+    const pick = el("select", { "aria-label": "Setting to vary", onchange: (ev) => {
+      batch.rows[ri] = batchRow(entries.find((x) => x.key === ev.target.value)); renderBatchRows();
+    } }, [...groups].map(([g, list]) => (g ? el("optgroup", { label: g }, list.map(option)) : list.map(option))).flat());
+    pick.value = row.key;
     let editor;
     if (row.kind === "range") {
       const num = (k, text) => el("label", {}, text, el("input", { type: "number", step: "any", value: row[k],
         oninput: (e) => { row[k] = e.target.value === "" ? NaN : +e.target.value; updateBatchCount(); } }));
       editor = el("div", { class: "batch-range" }, num("from", "From"), num("to", "To"), num("step", "Step"));
     } else if (row.kind === "choice") {
-      const opts = p.widget === "dropdown" ? p.options : [{ value: false, label: "Off" }, { value: true, label: "On" }];
+      const opts = entry.index == null && p.widget === "dropdown" ? p.options : [{ value: false, label: "Off" }, { value: true, label: "On" }];
       editor = el("div", { class: "batch-choices" }, opts.map((o) => {
         const cb = el("input", { type: "checkbox", onchange: (e) => {
           row.picked = e.target.checked ? [...row.picked, o.value] : row.picked.filter((x) => !same(x, o.value));
@@ -1664,7 +1705,7 @@ function renderBatchRows() {
       onclick: () => { batch.rows.splice(ri, 1); renderBatchRows(); } }) : null;
     return el("fieldset", { class: "batch-row" }, el("legend", { text: ri ? "And vary" : "Vary" }), el("div", { class: "batch-row-head" }, pick, remove), editor);
   }));
-  $("#batch-add").hidden = batch.rows.length >= 2 || params.length < 2;
+  $("#batch-add").hidden = batch.rows.length >= 2 || entries.length < 2;
   updateBatchCount();
 }
 
@@ -1680,12 +1721,13 @@ function updateBatchCount() {
 
 $("#batch-open").addEventListener("click", () => {
   if (!state.model) return;
-  const params = batchable();
+  const entries = batchEntries();
   if (!batch.rows.length || batch.model !== state.model.key) {
     batch.model = state.model.key;
-    // start from the most likely thing to vary: a length/size number, else the first number
-    const guess = params.find((p) => p.type === "number" && /len|length|size|width|height|grid/i.test(p.name)) ||
-      params.find((p) => p.type === "number") || params[0];
+    // start from the most likely thing to vary: the first number of the form's first group (a bin's
+    // Width in units), else the first number, else the first setting
+    const first = entries[0]?.p.group;
+    const guess = entries.find((e) => e.type === "number" && e.p.group === first) || entries.find((e) => e.type === "number") || entries[0];
     batch.rows = guess ? [batchRow(guess)] : [];
     batch.picked = new Set();
     batch.mode = "vary";
@@ -1701,8 +1743,8 @@ $("#batch-open").addEventListener("click", () => {
   $("#batch").showModal();
 });
 $("#batch-add").addEventListener("click", () => {
-  const used = new Set(batch.rows.map((r) => r.name));
-  const next = batchable().find((p) => !used.has(p.name));
+  const used = new Set(batch.rows.map((r) => r.key));
+  const next = batchEntries().find((e) => !used.has(e.key));
   if (next) { batch.rows.push(batchRow(next)); renderBatchRows(); }
 });
 $("#batch-close").addEventListener("click", () => {

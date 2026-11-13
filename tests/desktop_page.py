@@ -1353,6 +1353,20 @@ async def main():
             await pg.click("#batch-close")
             check("Batch generate saves each part to the Parts Library with its recipe, named from what varies",
                   len(several) == 4 and several_recipes.count("local-bevel/bevel-gear") == 4, several)
+            # (Review 7, item 2) a bin's Width is a pair (units, mm): each number can be varied, Width in units is
+            # the first guess, the settings come in the form's groups, and debug settings aren't offered
+            await pg.goto(B + "#/m/gridfinity-extended/bin")
+            await pg.wait_for_function("()=>document.body.dataset.model==='gridfinity-extended/bin'", timeout=60000)
+            await pg.click("#model-more summary")
+            await pg.click("#batch-open")
+            await pg.wait_for_selector("#batch[open] #batch-rows select")
+            vary = await pg.evaluate("""() => { const s = document.querySelector('#batch-rows select');
+                return [s.value, s.selectedOptions[0].textContent, s.selectedOptions[0].parentElement.label || '',
+                  [...s.options].some((o) => /^(Fa|Fn|Fs|Random seed|Enable help|Cut \\()/.test(o.textContent)),
+                  [...document.querySelectorAll('.batch-range input')].map((i) => i.value)] }""")
+            await pg.click("#batch-close")
+            check("Batch generate offers each number of a paired setting (a bin's Width in units first), in the form's groups, without debug settings",
+                  vary[:3] == ["width[0]", "Width (units)", "General Cup"] and vary[3] is False and vary[4][0] == "2", vary)
             # (0.4.13, UI-28) the Made parts shelf: no source line, Read again or Versions; cards say what each was made from
             await pg.goto(B + "#/browse/source/local-made-parts")
             await pg.wait_for_selector(".source-panel[data-source=local-made-parts]", timeout=20000)
