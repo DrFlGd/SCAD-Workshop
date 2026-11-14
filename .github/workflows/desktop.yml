@@ -1,7 +1,8 @@
 name: Desktop
 
 # Builds the desktop app (Tauri + native OpenSCAD) for Linux and Windows:
-# renders every model natively with the app's own render code (workshop-cli),
+# renders the test projects' models (tests/projects, tests/old-library) and a few
+# projects from GitHub natively with the app's own code (workshop-cli bench),
 # drives both apps through WebDriver, runs the library acceptance test, and when
 # everything passes on main publishes a numbered release (v0.2.0, v0.2.1, ...;
 # see tools/set_version.py). Reports and logs go to the desktop-ci-<os> branches.
@@ -12,14 +13,8 @@ on:
       - "desktop/**"
       - "web/**"
       - "tools/**"
-      - "catalog/**"
-      - "vendor/**"
-      - "adapters/**"
-      - "libraries/**"
-      - "sources/**"
-      - "tests/desktop_ui.py"
-      - "tests/desktop_page.py"
-      - "tests/tauri_shim.js"
+      - "tests/**"
+      - "assets/**"
       - "engine.json"
       - "libraries.json"
       - ".github/workflows/desktop.yml"
@@ -34,12 +29,18 @@ concurrency:
 
 env:
   CARGO_TERM_COLOR: never
+  # projects the bench adds from GitHub, at the commits the app's descriptions of them name: real
+  # projects of many files (Gridfinity Extended's are what include once is for, Review 7, item 1)
+  BENCH_GITHUB: >-
+    https://github.com/ostat/gridfinity_extended_openscad/commit/94d5a3e2d39e0b90894c042a255fc487cfcc9197
+    https://github.com/kennetek/gridfinity-rebuilt-openscad/commit/910e22d8607fd7f5f51ad5e5cbc5287a76810bfd
+    https://github.com/laurensguijt/Label-Generator-Gridfinity/commit/350b406dde4471e8be0a34b0147422db8a60226f
 
 jobs:
   site:
-    name: Build site data
+    name: App files
     runs-on: ubuntu-24.04
-    timeout-minutes: 75
+    timeout-minutes: 60
     defaults:
       run: { shell: bash }
     outputs:
@@ -52,35 +53,26 @@ jobs:
           v=$(python3 tools/set_version.py --next)
           echo "version=$v" >> "$GITHUB_OUTPUT"
           echo "::notice title=Version::$v"
-      - uses: actions/setup-node@v4
-        with: { node-version: "22" }
       - uses: actions/setup-python@v5
         with: { python-version: "3.12" }
       - name: Install tools
         run: |
-          pip install numpy playwright
+          pip install playwright fonttools   # fontTools cuts Layer Line's heading font to the letters the app uses
           python -m playwright install --with-deps chromium
           sudo apt-get update -q && sudo apt-get install -yq libopengl0 libegl1 libglx0
-      - name: Engines
-        run: |
-          python tools/fetch_engine.py --out build/engine
-          python tools/fetch_native_engine.py --out build/native-dl --extract build/native
+      - name: Native engine
+        run: python tools/fetch_native_engine.py --out build/native-dl --extract build/native
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
         with: { workspaces: desktop }
       - name: Build workshop-cli
         working-directory: desktop
         run: cargo build --release -p workshop-core
-      - name: Verify the test projects' vendored checksums
-        run: python tools/validate_sources.py
-      - name: Build site (including desktop-only models) and thumbnails
+      - name: The app's files (window, fonts, libraries and their index)
         run: |
-          python tools/build_site.py --engine build/engine --out _site --native-engine build/native/squashfs-root/AppRun
-          python tools/thumbnails.py --site _site --native-engine build/native/squashfs-root/AppRun
           # the OpenSCAD libraries the app ships with (pinned and hash-checked), indexed into Components by build_desktop.py
           python tools/fetch_libraries.py --out build/desktop/libs
-          pip install fonttools   # cuts Layer Line's heading font to the letters the app uses
-          python tools/build_desktop.py --site _site --out build/desktop --fetch-fonts
+          python tools/build_desktop.py --out build/desktop --fetch-fonts
       - name: Pictures of the components (the app's own previews, shipped in libs/thumbs/)
         run: |
           python tools/component_thumbs.py --cli desktop/target/release/workshop-cli --desktop build/desktop \
@@ -127,10 +119,13 @@ jobs:
           cargo build --release -p workshop-core 2>&1 | tee ../ci-out/core-build.log
           cargo test --release -p workshop-core 2>&1 | tee ../ci-out/core-test.log
           cp Cargo.lock ../ci-out/Cargo.lock
-      - name: Render every model natively from the starter library (workshop-cli)
+      - name: Render every model natively (workshop-cli bench)
+        env: { GITHUB_TOKEN: "${{ github.token }}" }
         run: |
-          desktop/target/release/workshop-cli bench --app-site build/desktop/site --starter build/desktop/starter \
-            --engine build/native/squashfs-root --out ci-out/bench-native-linux.json 2>&1 | tee ci-out/bench-native-linux.log
+          # the test projects, the old library's starter projects, and the projects added from GitHub
+          desktop/target/release/workshop-cli bench --app-site build/desktop/site --engine build/native/squashfs-root \
+            --seed tests/old-library --projects tests/projects $(printf -- '--github %s ' $BENCH_GITHUB) \
+            --out ci-out/bench-native-linux.json 2>&1 | tee ci-out/bench-native-linux.log
       - name: Components (every BOSL2 module with geometry renders its first doc example)
         run: |
           desktop/target/release/workshop-cli components-check --libs build/desktop/libs --app-site build/desktop/site \
@@ -153,11 +148,10 @@ jobs:
           mkdir -p dist
           find desktop/target/release/bundle -maxdepth 2 \( -name '*.AppImage' -o -name '*.deb' \) -exec cp {} dist/ \; || true
           ls -la dist | tee -a ci-out/bundles.txt
-      - name: The installer has no starter projects (owner, 2026-10-14), but has the component libraries
+      - name: The installer has the component libraries and their pictures
         run: |
           deb=$(ls dist/*.deb | head -1)
           dpkg -c "$deb" > ci-out/deb-contents.txt
-          if grep -q '/starter/' ci-out/deb-contents.txt; then echo "::error title=Installer::the .deb still ships starter/"; exit 1; fi
           grep -q '/libs/' ci-out/deb-contents.txt || { echo "::error title=Installer::the .deb has no libs/"; exit 1; }
           grep -q '/libs/thumbs/bosl2/' ci-out/deb-contents.txt || { echo "::error title=Installer::the .deb has no component pictures"; exit 1; }
       - uses: actions/upload-artifact@v4
@@ -174,8 +168,6 @@ jobs:
         run: |
           cargo install tauri-driver --locked 2>&1 | tail -3
           export HOME="$RUNNER_TEMP/home" && mkdir -p "$HOME"
-          # the installer has no starter projects; the test's projects come from the one built for tests
-          export WORKSHOP_STARTER="$PWD/build/desktop/starter"
           # one X server for tauri-driver, WebKitWebDriver and the app it launches
           Xvfb :99 -screen 0 1600x1000x24 > /dev/null 2>&1 &
           export DISPLAY=:99
@@ -191,7 +183,7 @@ jobs:
           pip install playwright
           python -m playwright install --with-deps chromium 2>&1 | tail -2
           timeout 2400 python tests/desktop_page.py --cli desktop/target/release/workshop-cli --ui build/desktop/ui \
-            --app-site build/desktop/site --starter build/desktop/starter --engine build/native/squashfs-root \
+            --app-site build/desktop/site --engine build/native/squashfs-root \
             --home "$RUNNER_TEMP/p2home" --out ci-out/p2 2>&1 | tee ci-out/desktop-page.log
       - uses: actions/upload-artifact@v4
         if: always()
@@ -241,14 +233,18 @@ jobs:
           mkdir -p ../ci-out
           cargo build --release -p workshop-core 2>&1 | tee ../ci-out/core-build.log
           cargo test --release -p workshop-core 2>&1 | tee ../ci-out/core-test.log
-      - name: Render every model natively from the starter library (workshop-cli)
+      - name: Render every model natively (workshop-cli bench)
+        env: { GITHUB_TOKEN: "${{ github.token }}" }
         run: |
-          desktop/target/release/workshop-cli.exe bench --app-site build/desktop/site --starter build/desktop/starter \
-            --engine build/desktop/engine --out ci-out/bench-native-windows.json 2>&1 | tee ci-out/bench-native-windows.log
+          desktop/target/release/workshop-cli.exe bench --app-site build/desktop/site --engine build/desktop/engine \
+            --seed tests/old-library --projects tests/projects $(printf -- '--github %s ' $BENCH_GITHUB) \
+            --out ci-out/bench-native-windows.json 2>&1 | tee ci-out/bench-native-windows.log
       - name: Include once (Review 7, item 1), the same models without it, meshes compared
+        env: { GITHUB_TOKEN: "${{ github.token }}" }
         run: |
-          WORKSHOP_INCLUDE_ONCE=0 desktop/target/release/workshop-cli.exe bench --app-site build/desktop/site --starter build/desktop/starter \
-            --engine build/desktop/engine --out ci-out/bench-native-windows-plain.json 2>&1 | tail -1
+          WORKSHOP_INCLUDE_ONCE=0 desktop/target/release/workshop-cli.exe bench --app-site build/desktop/site --engine build/desktop/engine \
+            --seed tests/old-library --projects tests/projects $(printf -- '--github %s ' $BENCH_GITHUB) \
+            --out ci-out/bench-native-windows-plain.json 2>&1 | tail -1
           python - <<'EOF'
           import json
           once, plain = (json.load(open(f"ci-out/bench-native-windows{s}.json"))["results"] for s in ("", "-plain"))
@@ -302,8 +298,6 @@ jobs:
           fi
           [ -f msedgedriver.exe ] || cp "$EDGEWEBDRIVER/msedgedriver.exe" .
           ls -la msedgedriver.exe
-          # the installer has no starter projects; the test's projects come from the one built for tests
-          export WORKSHOP_STARTER="$(cygpath -w "$PWD/build/desktop/starter")"
           tauri-driver --native-driver "$PWD/msedgedriver.exe" > ci-out/tauri-driver.log 2>&1 &
           sleep 3
           timeout 1200 python tests/desktop_ui.py --app desktop/target/release/scad-workshop.exe \

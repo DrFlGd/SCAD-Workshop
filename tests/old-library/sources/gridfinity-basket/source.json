@@ -1,0 +1,42 @@
+{
+  "added": "2026-11-12T23:47:55Z",
+  "detected": {
+    "authors": [
+      {
+        "name": "LeKoYa",
+        "url": "https://github.com/LeKoYa"
+      }
+    ],
+    "category": "carrying",
+    "license": {
+      "public_use": "ok",
+      "spdx": "MIT"
+    },
+    "name": "Gridfinity Basket",
+    "origin": "https://github.com/LeKoYa/gridfinity-basket-openscad",
+    "summary": "Open-wall Gridfinity baskets with patterned walls, handles and stacking.",
+    "tags": [
+      "baskets",
+      "handles",
+      "stacking"
+    ]
+  },
+  "format": 1,
+  "id": "gridfinity-basket",
+  "kind": "bundled",
+  "origin": {
+    "bundle": "scad-workshop",
+    "type": "app",
+    "url": "https://github.com/LeKoYa/gridfinity-basket-openscad"
+  },
+  "role": "project",
+  "version": "bundle-219b371339fb",
+  "version_date": "2025-08-31",
+  "versions": [
+    {
+      "added": "2026-11-12T23:47:55Z",
+      "date": "2025-08-31",
+      "id": "bundle-219b371339fb"
+    }
+  ]
+}

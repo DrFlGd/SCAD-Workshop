@@ -1,0 +1,9 @@
+{
+  "format": 1,
+  "name": "Test parts",
+  "summary": "Ready-made parts in STL, 3MF and OBJ, made for SCAD Workshop's tests.",
+  "category": "wall",
+  "tags": ["parts", "test"],
+  "license": "CC0-1.0",
+  "authors": [{ "name": "SCAD Workshop's tests" }]
+}

@@ -21,9 +21,9 @@ After the Fusion support was removed, the owner asked for a review of the app as
 | 4 | More components start on their own (NopSCADlib types with their other values guessed; MCAD) | Done: 509 of 800 start (438), none fail (7) |
 | 6 | Component pictures made by CI and shipped with the app | Done |
 | 1 | Windows renders about 8 times slower than Linux: measure on the Windows runner, fix, then drop the race against the WebAssembly engine | Done: include once (see CHANGELOG), all 58 test models about 225 s → 85 s on Windows; the race and its Forget button are gone |
-| 10 | The website half of the front end removed (`platform.js`'s browser branch, `store-browser.js`) | Done (the WebAssembly engine went with item 1; the site build still uses it until item 12) |
-| 11 | Converters for libraries older than format 2 removed (owner: old libraries can be added again instead) | Done (format 1 to 2 kept; the test library's `fill_in` waits for item 12) |
-| 12 | Small test projects in `tests/` instead of the 81 MB of website-era projects and the site build | |
+| 10 | The website half of the front end removed (`platform.js`'s browser branch, `store-browser.js`) | Done (the WebAssembly engine went with item 1, the site build with item 12) |
+| 11 | Converters for libraries older than format 2 removed (owner: old libraries can be added again instead) | Done (format 1 to 2 kept; so is `fill_in`, which starter projects in libraries from before 0.4.4 still need) |
+| 12 | Small test projects in `tests/` instead of the 81 MB of website-era projects and the site build | Done: `tests/projects/` (bins, labels and parts written for the tests), `tests/old-library/` (a library with two starter projects, as apps before 0.4.4 left them), `tests/fixtures/`; CI's bench adds Gridfinity Extended, Gridfinity Rebuilt and the Label Generator from GitHub at pinned commits (29 models in CI). `vendor/`, `catalog/`, `libraries/`, `adapters/`, `sources/`, `data/` and the site build are gone |
 | 13 | `app.js` moved to Preact, a page at a time | Done: Settings, Licenses, the parts pages and the model page (`web/ui/settings.js`, `licenses.js`, `parts.js`, `modelhead.js`, `modelform.js`, `savedsettings.js`, `batch.js`); `app.js` 2,296 → 1,450 lines, keeping routing, the open model's state, rendering and the 3D view |
 
 ## Backlog

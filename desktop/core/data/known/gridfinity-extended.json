@@ -1,0 +1,746 @@
+{
+  "$schema": "../../../../schema/family.schema.json",
+  "id": "gridfinity-extended",
+  "name": "Gridfinity Extended",
+  "category": "gridfinity",
+  "tags": [
+    "bins",
+    "baseplates",
+    "dividers",
+    "lids",
+    "drawers",
+    "holders"
+  ],
+  "summary": "Feature-rich Gridfinity bins, baseplates, lids, drawers and holders (silverware, sockets, items) with dividers, labels and patterns.",
+  "authors": [
+    {
+      "name": "ostat",
+      "url": "https://github.com/ostat"
+    }
+  ],
+  "source": {
+    "repository": "https://github.com/ostat/gridfinity_extended_openscad",
+    "commit": "94d5a3e2d39e0b90894c042a255fc487cfcc9197",
+    "vendor_path": "vendor/gridfinity-extended",
+    "commit_date": "2026-09-23T11:25:04+00:00"
+  },
+  "license": {
+    "spdx": "GPL-3.0-only",
+    "public_use": "ok",
+    "notes": "Generated source bundles must keep GPL notices."
+  },
+  "links": {
+    "Documentation": "https://docs.ostat.com/docs/openscad/gridfinity-extended",
+    "Donate": "http://paypal.me/ostat1"
+  },
+  "editor_toml": "vendor/gridfinity-extended/editor.toml",
+  "engine": {
+    "min_version": "2025.01 (development snapshot)",
+    "backend": "manifold",
+    "notes": "Uses syntax that OpenSCAD 2021.01 cannot parse.",
+    "library_paths": [
+      "vendor/libraries"
+    ]
+  },
+  "status": "available",
+  "ui": {
+    "label_size": {
+      "axes": [
+        "width",
+        "depth",
+        "height",
+        "radius"
+      ]
+    },
+    "label_relief": {
+      "axes": [
+        "width",
+        "depth",
+        "height",
+        "radius"
+      ]
+    },
+    "label_walls": {
+      "axes": [
+        "front",
+        "back",
+        "left",
+        "right"
+      ]
+    },
+    "fingerslide_walls": {
+      "axes": [
+        "front",
+        "back",
+        "left",
+        "right"
+      ]
+    },
+    "wallpattern_walls": {
+      "axes": [
+        "front",
+        "back",
+        "left",
+        "right"
+      ]
+    },
+    "wallplacard_walls": {
+      "axes": [
+        "front",
+        "back",
+        "left",
+        "right"
+      ]
+    },
+    "wallcutout_vertical_position": {
+      "axes": [
+        "1st",
+        "2nd",
+        "3rd",
+        "4th"
+      ]
+    },
+    "wallcutout_horizontal_position": {
+      "axes": [
+        "1st",
+        "2nd",
+        "3rd",
+        "4th"
+      ]
+    },
+    "extension_tab_size": {
+      "axes": [
+        "height",
+        "width",
+        "thickness",
+        "style"
+      ]
+    },
+    "handle_size": {
+      "axes": [
+        "width",
+        "depth",
+        "height",
+        "radius"
+      ]
+    },
+    "wallplacard_slot_frame": {
+      "axes": [
+        "reveal",
+        "coverage",
+        "width",
+        "depth"
+      ]
+    },
+    "wallplacard_offset": {
+      "axes": [
+        "horiz.",
+        "vertical",
+        "depth"
+      ]
+    },
+    "build_plate_size": {
+      "profile": "bed"
+    }
+  },
+  "models": [
+    {
+      "id": "bin",
+      "name": "Basic Bin",
+      "entrypoint": "vendor/gridfinity-extended/gridfinity_basic_cup.scad",
+      "status": "available",
+      "ui": {
+        "width": {
+          "axes": [
+            "units",
+            "mm"
+          ]
+        },
+        "depth": {
+          "axes": [
+            "units",
+            "mm"
+          ]
+        },
+        "height": {
+          "axes": [
+            "units",
+            "mm"
+          ]
+        }
+      }
+    },
+    {
+      "id": "baseplate",
+      "name": "Baseplate",
+      "entrypoint": "vendor/gridfinity-extended/gridfinity_baseplate.scad",
+      "fixed": {
+        "Connector_Only": false
+      },
+      "status": "available",
+      "ui": {
+        "width": {
+          "axes": [
+            "units",
+            "mm"
+          ]
+        },
+        "depth": {
+          "axes": [
+            "units",
+            "mm"
+          ]
+        },
+        "height": {
+          "axes": [
+            "units",
+            "mm"
+          ]
+        }
+      }
+    },
+    {
+      "id": "connector-clips",
+      "name": "Connector Clips",
+      "entrypoint": "vendor/gridfinity-extended/gridfinity_baseplate.scad",
+      "fixed": {
+        "Connector_Only": true
+      },
+      "defaults": {
+        "Connector_Clip_Enabled": true
+      },
+      "notes": "Same SCAD as the baseplate, rendering only the clips.",
+      "status": "available",
+      "ui": {
+        "width": {
+          "axes": [
+            "units",
+            "mm"
+          ]
+        },
+        "depth": {
+          "axes": [
+            "units",
+            "mm"
+          ]
+        },
+        "height": {
+          "axes": [
+            "units",
+            "mm"
+          ]
+        }
+      }
+    },
+    {
+      "id": "drawers",
+      "name": "Drawers",
+      "entrypoint": "vendor/gridfinity-extended/gridfinity_drawers.scad",
+      "status": "available",
+      "ui": {
+        "width": {
+          "axes": [
+            "units",
+            "mm"
+          ]
+        },
+        "depth": {
+          "axes": [
+            "units",
+            "mm"
+          ]
+        },
+        "height": {
+          "axes": [
+            "units",
+            "mm"
+          ]
+        }
+      }
+    },
+    {
+      "id": "item-holder",
+      "name": "Item Holder",
+      "entrypoint": "vendor/gridfinity-extended/gridfinity_item_holder.scad",
+      "status": "available",
+      "ui": {
+        "width": {
+          "axes": [
+            "units",
+            "mm"
+          ]
+        },
+        "depth": {
+          "axes": [
+            "units",
+            "mm"
+          ]
+        },
+        "height": {
+          "axes": [
+            "units",
+            "mm"
+          ]
+        }
+      }
+    },
+    {
+      "id": "lid",
+      "name": "Lid",
+      "entrypoint": "vendor/gridfinity-extended/gridfinity_lid.scad",
+      "status": "available",
+      "ui": {
+        "width": {
+          "axes": [
+            "units",
+            "mm"
+          ]
+        },
+        "depth": {
+          "axes": [
+            "units",
+            "mm"
+          ]
+        },
+        "height": {
+          "axes": [
+            "units",
+            "mm"
+          ]
+        }
+      }
+    },
+    {
+      "id": "sliding-lid",
+      "name": "Sliding Lid",
+      "entrypoint": "vendor/gridfinity-extended/gridfinity_sliding_lid.scad",
+      "status": "available",
+      "ui": {
+        "width": {
+          "axes": [
+            "units",
+            "mm"
+          ]
+        },
+        "depth": {
+          "axes": [
+            "units",
+            "mm"
+          ]
+        },
+        "height": {
+          "axes": [
+            "units",
+            "mm"
+          ]
+        }
+      }
+    },
+    {
+      "id": "removable-walls",
+      "name": "Bin with Removable Walls",
+      "entrypoint": "vendor/gridfinity-extended/gridfinity_bin_removable_walls.scad",
+      "status": "available",
+      "ui": {
+        "width": {
+          "axes": [
+            "units",
+            "mm"
+          ]
+        },
+        "depth": {
+          "axes": [
+            "units",
+            "mm"
+          ]
+        },
+        "height": {
+          "axes": [
+            "units",
+            "mm"
+          ]
+        }
+      }
+    },
+    {
+      "id": "tray",
+      "name": "Tray",
+      "entrypoint": "vendor/gridfinity-extended/gridfinity_tray.scad",
+      "status": "available",
+      "ui": {
+        "width": {
+          "axes": [
+            "units",
+            "mm"
+          ]
+        },
+        "depth": {
+          "axes": [
+            "units",
+            "mm"
+          ]
+        },
+        "height": {
+          "axes": [
+            "units",
+            "mm"
+          ]
+        }
+      }
+    },
+    {
+      "id": "silverware",
+      "name": "Silverware Holder",
+      "entrypoint": "vendor/gridfinity-extended/gridfinity_silverware.scad",
+      "status": "available",
+      "ui": {
+        "width": {
+          "axes": [
+            "units",
+            "mm"
+          ]
+        },
+        "depth": {
+          "axes": [
+            "units",
+            "mm"
+          ]
+        },
+        "height": {
+          "axes": [
+            "units",
+            "mm"
+          ]
+        },
+        "number_of_utensils": {
+          "label": "Number of utensils",
+          "min": 1,
+          "max": 14,
+          "description": "How many utensil slots the holder has. Settings for each slot appear below."
+        },
+        "utensil_1": {
+          "label": "Utensil 1",
+          "axes": [
+            "narrow",
+            "wide",
+            "length",
+            "position"
+          ],
+          "description": "Width at the narrow and wide ends and overall length, in mm (wide 0 = same as narrow). Position is the slot it fills, counting from 1."
+        },
+        "utensil_2": {
+          "label": "Utensil 2",
+          "axes": [
+            "narrow",
+            "wide",
+            "length",
+            "position"
+          ],
+          "display-condition": {
+            "js": "number_of_utensils >= 2"
+          }
+        },
+        "utensil_3": {
+          "label": "Utensil 3",
+          "axes": [
+            "narrow",
+            "wide",
+            "length",
+            "position"
+          ],
+          "display-condition": {
+            "js": "number_of_utensils >= 3"
+          }
+        },
+        "utensil_4": {
+          "label": "Utensil 4",
+          "axes": [
+            "narrow",
+            "wide",
+            "length",
+            "position"
+          ],
+          "display-condition": {
+            "js": "number_of_utensils >= 4"
+          }
+        },
+        "utensil_5": {
+          "label": "Utensil 5",
+          "axes": [
+            "narrow",
+            "wide",
+            "length",
+            "position"
+          ],
+          "display-condition": {
+            "js": "number_of_utensils >= 5"
+          }
+        },
+        "utensil_6": {
+          "label": "Utensil 6",
+          "axes": [
+            "narrow",
+            "wide",
+            "length",
+            "position"
+          ],
+          "display-condition": {
+            "js": "number_of_utensils >= 6"
+          }
+        },
+        "utensil_7": {
+          "label": "Utensil 7",
+          "axes": [
+            "narrow",
+            "wide",
+            "length",
+            "position"
+          ],
+          "display-condition": {
+            "js": "number_of_utensils >= 7"
+          }
+        },
+        "utensil_8": {
+          "label": "Utensil 8",
+          "axes": [
+            "narrow",
+            "wide",
+            "length",
+            "position"
+          ],
+          "display-condition": {
+            "js": "number_of_utensils >= 8"
+          }
+        },
+        "utensil_9": {
+          "label": "Utensil 9",
+          "axes": [
+            "narrow",
+            "wide",
+            "length",
+            "position"
+          ],
+          "display-condition": {
+            "js": "number_of_utensils >= 9"
+          }
+        },
+        "utensil_10": {
+          "label": "Utensil 10",
+          "axes": [
+            "narrow",
+            "wide",
+            "length",
+            "position"
+          ],
+          "display-condition": {
+            "js": "number_of_utensils >= 10"
+          }
+        },
+        "utensil_11": {
+          "label": "Utensil 11",
+          "axes": [
+            "narrow",
+            "wide",
+            "length",
+            "position"
+          ],
+          "display-condition": {
+            "js": "number_of_utensils >= 11"
+          }
+        },
+        "utensil_12": {
+          "label": "Utensil 12",
+          "axes": [
+            "narrow",
+            "wide",
+            "length",
+            "position"
+          ],
+          "display-condition": {
+            "js": "number_of_utensils >= 12"
+          }
+        },
+        "utensil_13": {
+          "label": "Utensil 13",
+          "axes": [
+            "narrow",
+            "wide",
+            "length",
+            "position"
+          ],
+          "display-condition": {
+            "js": "number_of_utensils >= 13"
+          }
+        },
+        "utensil_14": {
+          "label": "Utensil 14",
+          "axes": [
+            "narrow",
+            "wide",
+            "length",
+            "position"
+          ],
+          "display-condition": {
+            "js": "number_of_utensils >= 14"
+          }
+        }
+      }
+    },
+    {
+      "id": "socket-holder",
+      "name": "Socket Holder",
+      "entrypoint": "vendor/gridfinity-extended/gridfinity_socket_holder.scad",
+      "status": "available",
+      "ui": {
+        "width": {
+          "axes": [
+            "units",
+            "mm"
+          ]
+        },
+        "depth": {
+          "axes": [
+            "units",
+            "mm"
+          ]
+        },
+        "height": {
+          "axes": [
+            "units",
+            "mm"
+          ]
+        }
+      }
+    },
+    {
+      "id": "sieve",
+      "name": "Sieve",
+      "entrypoint": "vendor/gridfinity-extended/gridfinity_sieve.scad",
+      "status": "available",
+      "ui": {
+        "width": {
+          "axes": [
+            "units",
+            "mm"
+          ]
+        },
+        "depth": {
+          "axes": [
+            "units",
+            "mm"
+          ]
+        },
+        "height": {
+          "axes": [
+            "units",
+            "mm"
+          ]
+        }
+      }
+    },
+    {
+      "id": "vertical-divider",
+      "name": "Vertical Divider",
+      "entrypoint": "vendor/gridfinity-extended/gridfinity_vertical_divider.scad",
+      "status": "available",
+      "ui": {
+        "width": {
+          "axes": [
+            "units",
+            "mm"
+          ]
+        },
+        "depth": {
+          "axes": [
+            "units",
+            "mm"
+          ]
+        },
+        "height": {
+          "axes": [
+            "units",
+            "mm"
+          ]
+        }
+      }
+    },
+    {
+      "id": "chess",
+      "name": "Chess Set",
+      "entrypoint": "vendor/gridfinity-extended/gridfinity_chess.scad",
+      "status": "available",
+      "ui": {
+        "width": {
+          "axes": [
+            "units",
+            "mm"
+          ]
+        },
+        "depth": {
+          "axes": [
+            "units",
+            "mm"
+          ]
+        },
+        "height": {
+          "axes": [
+            "units",
+            "mm"
+          ]
+        }
+      }
+    },
+    {
+      "id": "glue-stick",
+      "name": "Glue Stick Holder",
+      "entrypoint": "vendor/gridfinity-extended/gridfinity_glue_stick.scad",
+      "status": "available",
+      "ui": {
+        "width": {
+          "axes": [
+            "units",
+            "mm"
+          ]
+        },
+        "depth": {
+          "axes": [
+            "units",
+            "mm"
+          ]
+        },
+        "height": {
+          "axes": [
+            "units",
+            "mm"
+          ]
+        }
+      }
+    },
+    {
+      "id": "marble",
+      "name": "Marble Run",
+      "entrypoint": "vendor/gridfinity-extended/gridfinity_marble.scad",
+      "status": "available",
+      "ui": {
+        "width": {
+          "axes": [
+            "units",
+            "mm"
+          ]
+        },
+        "depth": {
+          "axes": [
+            "units",
+            "mm"
+          ]
+        },
+        "height": {
+          "axes": [
+            "units",
+            "mm"
+          ]
+        }
+      }
+    }
+  ]
+}

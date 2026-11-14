@@ -1005,18 +1005,18 @@ pub fn clean_versions(lib: &Library, src: &Value) -> Result<Vec<String>> {
 /// generated file) that GitHub's download leaves out, openGrid uses the app's own adapter, and the
 /// rest were supplied by the owner and aren't on GitHub.
 const STARTER_ON_GITHUB: [(&str, &str); 6] = [
-    ("cullenect-label", include_str!("../../../catalog/families/cullenect-label.json")),
-    ("gridfinity-basket", include_str!("../../../catalog/families/gridfinity-basket.json")),
-    ("gridfinity-extended", include_str!("../../../catalog/families/gridfinity-extended.json")),
-    ("gridfinity-rebuilt", include_str!("../../../catalog/families/gridfinity-rebuilt.json")),
-    ("label-generator-gridfinity", include_str!("../../../catalog/families/label-generator-gridfinity.json")),
-    ("underware", include_str!("../../../catalog/families/underware.json")),
+    ("cullenect-label", include_str!("../data/known/cullenect-label.json")),
+    ("gridfinity-basket", include_str!("../data/known/gridfinity-basket.json")),
+    ("gridfinity-extended", include_str!("../data/known/gridfinity-extended.json")),
+    ("gridfinity-rebuilt", include_str!("../data/known/gridfinity-rebuilt.json")),
+    ("label-generator-gridfinity", include_str!("../data/known/label-generator-gridfinity.json")),
+    ("underware", include_str!("../data/known/underware.json")),
 ];
 
 /// Files that draw something in these projects but that the app's description leaves out on purpose
 /// (helpers, demos, combined copies): a name, or a folder ending in "/". Any other file the description
 /// doesn't list (one upstream adds later) is read as a model (Review 3, F-14). Checked against the
-/// app's old copies in vendor/ by `starter_projects_on_github`.
+/// app's old copies while they were in this repository.
 const LEFT_OUT: [(&str, &[&str]); 3] = [
     ("gridfinity-basket", &["animate.scad"]),
     ("gridfinity-extended", &["combined/", "demos/", "modules/", "gridfinity_baseplate_flsun_q5.scad", "gridfinity_silverware_legacy.scad", "stanley_basic_cup.scad"]),
@@ -1036,10 +1036,10 @@ pub fn left_out(description: &Value, entry: &str) -> bool {
 /// they record the repository and commit their copy is from, and an update check says when GitHub
 /// has something newer.
 const BUNDLED_ON_GITHUB: [(&str, &str, &str); 4] = [
-    ("hsw", include_str!("../../../catalog/families/hsw.json"), "its first model is a file from an older commit"),
-    ("gridflock", include_str!("../../../catalog/families/gridflock.json"), "it needs git submodules and a generated file that GitHub's download leaves out"),
-    ("gridfinity-rugged-box", include_str!("../../../catalog/families/gridfinity-rugged-box.json"), "it needs git submodules that GitHub's download leaves out"),
-    ("opengrid", include_str!("../../../catalog/families/opengrid.json"), "its snap uses the app's own adapter"),
+    ("hsw", include_str!("../data/known/hsw.json"), "its first model is a file from an older commit"),
+    ("gridflock", include_str!("../data/known/gridflock.json"), "it needs git submodules and a generated file that GitHub's download leaves out"),
+    ("gridfinity-rugged-box", include_str!("../data/known/gridfinity-rugged-box.json"), "it needs git submodules that GitHub's download leaves out"),
+    ("opengrid", include_str!("../data/known/opengrid.json"), "its snap uses the app's own adapter"),
 ];
 
 /// Where a starter project's copy came from on GitHub: (repository, commit, why it can't be updated
@@ -1111,7 +1111,7 @@ pub fn starter_on_github(id: &str) -> Option<StarterOnGitHub> {
     d.insert("left_out".into(), json!(skip));
     d.insert("description_version".into(), json!(DESCRIPTION_VERSION));
     d.insert("app_version".into(), json!(env!("CARGO_PKG_VERSION")));
-    d.insert("made_by".into(), json!(format!("SCAD Workshop {}, from the family manifest of the app's copy (catalog/families/{id}.json)", env!("CARGO_PKG_VERSION"))));
+    d.insert("made_by".into(), json!(format!("SCAD Workshop {}, from the description of the app's copy (desktop/core/data/known/{id}.json)", env!("CARGO_PKG_VERSION"))));
     Some(StarterOnGitHub {
         repository: s["repository"].as_str()?.to_string(),
         commit: s["commit"].as_str()?.to_string(),
@@ -1321,19 +1321,8 @@ mod tests {
             }
         }
         assert!(starter_on_github("hsw").is_none());
-        // (F-14) in the app's old copies, every file that draws something is listed or left out on purpose,
-        // so only files upstream adds later become models
-        let repo = Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
         for (id, _) in STARTER_ON_GITHUB {
-            let s = starter_on_github(id).unwrap();
-            let root = repo.join(&s.vendor_path);
-            if !root.is_dir() {
-                continue;
-            }
-            let listed: Vec<&str> = s.description["models"].as_array().unwrap().iter().filter_map(|m| m["entrypoint"].as_str()).collect();
-            let unlisted: Vec<String> = crate::scan::survey(&root).entries.into_iter().filter(|e| !listed.contains(&e.as_str()) && !left_out(&s.description, e)).collect();
-            assert!(unlisted.is_empty(), "{id}: neither listed nor left out: {unlisted:?}");
-            assert_eq!(s.description["description_version"], DESCRIPTION_VERSION);
+            assert_eq!(starter_on_github(id).unwrap().description["description_version"], DESCRIPTION_VERSION);
         }
         assert_eq!(known_on_github("Kennetek", "gridfinity-rebuilt-openscad").map(|s| s.vendor_path), Some("vendor/gridfinity-rebuilt".to_string()));
     }

@@ -1,0 +1,78 @@
+{
+  "$schema": "../../../../schema/family.schema.json",
+  "id": "gridfinity-rebuilt",
+  "name": "Gridfinity Rebuilt",
+  "category": "gridfinity",
+  "tags": [
+    "bins",
+    "baseplates",
+    "vase-mode"
+  ],
+  "summary": "Ground-up rebuild of the stock Gridfinity bins and baseplates.",
+  "authors": [
+    {
+      "name": "kennetek",
+      "url": "https://github.com/kennetek"
+    }
+  ],
+  "source": {
+    "repository": "https://github.com/kennetek/gridfinity-rebuilt-openscad",
+    "commit": "910e22d8607fd7f5f51ad5e5cbc5287a76810bfd",
+    "vendor_path": "vendor/gridfinity-rebuilt",
+    "commit_date": "2025-08-31T19:31:41-04:00"
+  },
+  "license": {
+    "spdx": "MIT",
+    "public_use": "ok"
+  },
+  "links": {
+    "Documentation": "https://kennetek.github.io/gridfinity-rebuilt-openscad/"
+  },
+  "engine": {
+    "min_version": "2025.01 (development snapshot)",
+    "backend": "manifold",
+    "notes": "Uses syntax that OpenSCAD 2021.01 cannot parse.",
+    "library_paths": [
+      "vendor/libraries"
+    ]
+  },
+  "status": "available",
+  "models": [
+    {
+      "id": "bin",
+      "name": "Basic Bin",
+      "entrypoint": "vendor/gridfinity-rebuilt/gridfinity-rebuilt-bins.scad",
+      "engine_override": {
+        "min_version": "2025.01 (development snapshot)",
+        "backend": "manifold",
+        "notes": "Uses syntax that OpenSCAD 2021.01 cannot parse."
+      },
+      "status": "available"
+    },
+    {
+      "id": "baseplate",
+      "name": "Baseplate",
+      "entrypoint": "vendor/gridfinity-rebuilt/gridfinity-rebuilt-baseplate.scad",
+      "engine_override": {
+        "min_version": "2021.01",
+        "backend": "manifold"
+      },
+      "status": "available"
+    },
+    {
+      "id": "vase-bin",
+      "name": "Vase Mode Bin",
+      "entrypoint": "vendor/gridfinity-rebuilt/gridfinity-spiral-vase.scad",
+      "engine_override": {
+        "min_version": "2021.01",
+        "backend": "manifold"
+      },
+      "status": "available",
+      "ui": {
+        "nozzle": {
+          "profile": "nozzle"
+        }
+      }
+    }
+  ]
+}

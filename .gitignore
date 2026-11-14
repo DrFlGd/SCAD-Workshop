@@ -2,12 +2,10 @@ __pycache__/
 .venv/
 node_modules/
 *.log
-# build output: engine download, static site, check reports
+# build output: the app's files, the engine, test reports
 build/
-_site/
 shots/
 bench.json
-parity.json
 /*.stl
 /*.3mf
 desktop/target/

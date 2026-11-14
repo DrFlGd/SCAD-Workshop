@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "family.schema.json",
   "title": "Generator family",
-  "description": "One OpenSCAD project (family) and the models it exposes on the site. Drop a new file in catalog/families/ to add a generator.",
+  "description": "One OpenSCAD project (family) as the website described it. The app keeps them for the starter projects that came with apps before 0.4.4 (desktop/core/data/known/).",
   "type": "object",
   "required": [
     "id",

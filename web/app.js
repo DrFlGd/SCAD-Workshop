@@ -692,7 +692,7 @@ async function applyDownloadFormat() {
   name = name.replace(/\.(stl|svg)$/i, `.${isFlat() ? fmt : "stl"}`);
   if (blob && fmt === "3mf") {
     try {
-      // (the WebAssembly engine, or the code edited since: the app writes one from the render)
+      // OpenSCAD's own 3MF; without one (the code was edited since), the app writes one from the render
       a.classList.add("is-disabled");
       a.textContent = "Making the 3MF…";
       const r = await colour3mf().catch(() => null);

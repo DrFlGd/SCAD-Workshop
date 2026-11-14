@@ -663,7 +663,7 @@ fn ensure_tree(site: &BlobResolver, trees: &Path, files: &BTreeMap<String, Strin
         if vpath.ends_with(".scad") {
             // Windows line endings stop OpenSCAD's Customizer reading dropdowns (library files arrive as they are)
             let data = std::fs::read(&src).with_context(|| format!("reading {vpath}"))?;
-            let fixed = if data.contains(&b'\r') { crate::sitebuild::replace_crlf(&data) } else { data };
+            let fixed = if data.contains(&b'\r') { crate::assemble::replace_crlf(&data) } else { data };
             std::fs::write(&dst, fixed).with_context(|| format!("copying {vpath}"))?;
         } else {
             std::fs::copy(&src, &dst).with_context(|| format!("copying {vpath}"))?;

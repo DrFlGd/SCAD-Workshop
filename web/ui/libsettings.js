@@ -205,7 +205,6 @@ function Projects({ ro }) {
       <button type="button" class="ghost" disabled=${ro} onClick=${() => ui.set({ dialog: { type: "add-project" } })} id="settings-add-project">${Icon.plus(14)} Add a project…</button>
       <button type="button" class="ghost" disabled=${ro} onClick=${() => rescanLocal(false)} id="library-rescan"
         title="Read projects again whose files changed outside the app (local/ folders, linked folders and the copies of added projects), and list ones whose files are gone">Scan for changes</button>
-      ${ctx.platform.info?.starter ? html`<button type="button" class="ghost" disabled=${ro} onClick=${async () => { const r = await api("source_restore_starter"); await ctx.reloadCatalog(); ctx.toast(r.installed.length ? `Brought back ${plural(r.installed.length, "project")}.` : "All the starter projects are there."); }}>Bring back starter projects</button>` : null}
     </div>
     <${FromGitHub} ro=${ro} sources=${sources} />
     <${Unchecked} ro=${ro} />

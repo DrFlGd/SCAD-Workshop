@@ -1,0 +1,48 @@
+{
+  "$schema": "../../../../schema/family.schema.json",
+  "id": "cullenect-label",
+  "name": "Cullenect Label",
+  "category": "labels",
+  "tags": [
+    "labels",
+    "icons",
+    "fasteners"
+  ],
+  "summary": "Snap-in bin labels with text and fastener/hardware icons.",
+  "authors": [
+    {
+      "name": "CullenJWebb",
+      "url": "https://github.com/CullenJWebb"
+    }
+  ],
+  "source": {
+    "repository": "https://github.com/CullenJWebb/Cullenect-Labels",
+    "commit": "d6dc0bb2a6491f53c27e5f9db2dfc38ebb07f8db",
+    "vendor_path": "vendor/cullenect-label",
+    "commit_date": "2026-08-10T11:51:19-04:00"
+  },
+  "license": {
+    "spdx": "MIT",
+    "public_use": "ok"
+  },
+  "links": {
+    "MakerWorld": "https://makerworld.com/en/models/446624"
+  },
+  "engine": {
+    "min_version": "2021.01",
+    "backend": "manifold",
+    "library_paths": [
+      "vendor/libraries"
+    ]
+  },
+  "status": "available",
+  "models": [
+    {
+      "id": "label",
+      "name": "Label",
+      "entrypoint": "vendor/cullenect-label/OpenSCAD/Cullenect.scad",
+      "part_parameter": "Select_Output",
+      "status": "available"
+    }
+  ]
+}

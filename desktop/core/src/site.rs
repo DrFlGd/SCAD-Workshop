@@ -1,6 +1,7 @@
-//! Read-only access to the built site that ships with the app: `data/` (catalog
-//! and model JSON), `fs/<sha256>` (content-addressed model sources and fonts) and
-//! `parts/` (ready-made parts).
+//! The app's own files (`site/` beside the window's files, made by
+//! tools/build_desktop.py): `data/catalog.json` names the OpenSCAD version and the
+//! files every render gets (a fontconfig file and the fonts), stored by content
+//! hash in `fs/<sha256>`.
 
 use anyhow::{bail, Context, Result};
 use serde_json::Value;
@@ -54,13 +55,5 @@ impl SiteDir {
 
     pub fn catalog(&self) -> Result<Value> {
         self.json("data/catalog.json")
-    }
-
-    /// Built model JSON for "family/model".
-    pub fn model(&self, key: &str) -> Result<Value> {
-        if !key.bytes().all(|b| b.is_ascii_alphanumeric() || b == b'-' || b == b'/') || key.matches('/').count() != 1 {
-            bail!("invalid model key {key}");
-        }
-        self.json(&format!("data/models/{}.json", key.replace('/', "--")))
     }
 }

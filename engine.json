@@ -1,12 +1,10 @@
 {
   "version": "2026.10.02",
-  "url": "https://files.openscad.org/snapshots/OpenSCAD-2026.10.02-WebAssembly-web.zip",
-  "sha256": "9e3c5af25954371503de2ec4dbe8119dcfcb6385a91832a7eee2299ad5b1259b",
   "license": "GPL-2.0-or-later",
   "source": "https://github.com/openscad/openscad",
-  "note": "OpenSCAD WebAssembly build from the official snapshots, unmodified. Pinned by checksum; tools/fetch_engine.py downloads and verifies it.",
+  "note": "OpenSCAD's official snapshot, unmodified. The app bundles the native build for Linux and Windows (\"native\", tools/fetch_native_engine.py); its version is the one the app records with renders and checks.",
   "native": {
-    "note": "Native OpenSCAD snapshots of the same version, bundled with the desktop app (tools/fetch_native_engine.py). Linux needs libOpenGL, libEGL and libGLX from the system.",
+    "note": "Native OpenSCAD snapshots, bundled with the desktop app (tools/fetch_native_engine.py). Linux needs libOpenGL, libEGL and libGLX from the system.",
     "linux-x86_64": {
       "url": "https://files.openscad.org/snapshots/OpenSCAD-2026.10.02-x86_64.AppImage",
       "sha256": "4d81b816058ee7a60128b7fd25f13ac642e8adc68490140d3cb600f3aea26a98",

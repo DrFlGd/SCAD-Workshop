@@ -1,0 +1,49 @@
+{
+  "added": "2026-11-12T23:47:55Z",
+  "detected": {
+    "authors": [
+      {
+        "name": "Xander",
+        "url": "https://www.printables.com/model/380870"
+      },
+      {
+        "name": "Edwin Eefting",
+        "url": "https://www.printables.com/model/530149"
+      },
+      {
+        "name": "geru (continuation)",
+        "url": "https://github.com/geru/3d-scad-hsw-customizable"
+      }
+    ],
+    "category": "wall",
+    "license": {
+      "public_use": "ok",
+      "spdx": "CC-BY-4.0"
+    },
+    "name": "Honeycomb Storage Wall",
+    "origin": "https://github.com/geru/3d-scad-hsw-customizable",
+    "summary": "Customizable Honeycomb Storage Wall grids sized to your space.",
+    "tags": [
+      "wall",
+      "honeycomb"
+    ]
+  },
+  "format": 1,
+  "id": "hsw",
+  "kind": "bundled",
+  "origin": {
+    "bundle": "scad-workshop",
+    "type": "app",
+    "url": "https://github.com/geru/3d-scad-hsw-customizable"
+  },
+  "role": "project",
+  "version": "bundle-21613734a40b",
+  "version_date": "2024-12-14",
+  "versions": [
+    {
+      "added": "2026-11-12T23:47:55Z",
+      "date": "2024-12-14",
+      "id": "bundle-21613734a40b"
+    }
+  ]
+}

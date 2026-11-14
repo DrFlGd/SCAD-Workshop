@@ -1,10 +1,10 @@
 //! Core of the desktop app, kept free of any GUI so it builds and tests on its
-//! own (and powers `workshop-cli`: native renders in CI, the website build's
-//! catalog steps, and a local stand-in for the app's backend).
+//! own (and powers `workshop-cli`: native renders in CI, the libraries' index of
+//! components, and a local stand-in for the app's backend).
 //!
-//! - [`site`]: the app's own files (common fonts, engine version); the website build
+//! - [`site`]: the app's own files (common fonts, engine version)
 //! - [`engine`], [`render`]: the bundled native OpenSCAD, render queue and cache
-//! - [`ingest`], [`sitebuild`]: reading OpenSCAD projects (files, settings, metadata)
+//! - [`ingest`], [`assemble`]: reading OpenSCAD projects (files, settings, metadata)
 //! - [`config`]: what the app keeps on this computer (open library, preferences)
 //! - [`library`]: the portable library folder; [`format`]: its JSON files' format numbers; [`meta`]: layered metadata
 //! - [`sources`]: adding projects (GitHub, ZIP, folders); [`scan`], [`project`]: reading them
@@ -14,6 +14,7 @@
 //! - [`api`]: the commands the page calls
 
 pub mod api;
+pub mod assemble;
 pub mod backup;
 pub mod catalog;
 pub mod check;
@@ -35,7 +36,6 @@ pub mod scan;
 pub mod sources;
 pub mod render;
 pub mod site;
-pub mod sitebuild;
 
 pub use engine::NativeEngine;
 pub use render::{RenderEvent, RenderOutput, RenderRequest, Renderer};
