@@ -1,0 +1,7 @@
+serving on http://127.0.0.1:8790/ (home /home/runner/work/_temp/p2home)
+/invoke/api: Broken pipe (os error 32)
+render jmwfojba71b (local-defaults/broken): ERROR: Assertion '(size < 5)' failed: "size must be under 5" in file broken.scad, line 2
+render jmwfojbub1d (local-defaults/broken): ERROR: Assertion '(size < 5)' failed: "size must be under 5" in file broken.scad, line 2
+render jmwfojc5o1e (local-defaults/broken): ERROR: Assertion '(size < 5)' failed: "size must be under 5" in file broken.scad, line 2
+render jmwfojify1o (folder-settings-cases/bad): ERROR: Assertion '(size > 0)' failed: "size must be over 0" in file Bad.scad, line 2
+render jmwfojj5a1t (folder-settings-cases/bad): ERROR: Assertion '(size > 0)' failed: "size must be over 0" in file Bad.scad, line 2

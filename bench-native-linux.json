@@ -1,0 +1,472 @@
+{
+  "library": true,
+  "os": "linux",
+  "models": 29,
+  "failed": 0,
+  "results": [
+    {
+      "key": "github-kennetek-gridfinity-rebuilt-openscad/baseplate",
+      "status": "pass",
+      "seconds": 0.1,
+      "triangles": 3576,
+      "mesh": {
+        "volume": 6678.781155039977,
+        "area": 5158.118800129332,
+        "size": [
+          42.0,
+          42.0,
+          11.75
+        ]
+      },
+      "error": null
+    },
+    {
+      "key": "github-kennetek-gridfinity-rebuilt-openscad/bin",
+      "status": "pass",
+      "seconds": 0.25,
+      "triangles": 17132,
+      "mesh": {
+        "volume": 95981.65146251289,
+        "area": 59131.41112618578,
+        "size": [
+          125.5,
+          83.5,
+          45.54792785644531
+        ]
+      },
+      "error": null
+    },
+    {
+      "key": "github-kennetek-gridfinity-rebuilt-openscad/vase-bin",
+      "status": "pass",
+      "seconds": 0.12,
+      "triangles": 3582,
+      "mesh": {
+        "volume": 2596.747813750304,
+        "area": 5216.8373923796,
+        "size": [
+          41.5,
+          41.5,
+          5.800000190734863
+        ]
+      },
+      "error": null
+    },
+    {
+      "key": "github-laurensguijt-label-generator-gridfinity/bin-label",
+      "status": "pass",
+      "seconds": 0.09,
+      "triangles": 2850,
+      "mesh": {
+        "volume": 351.3207856410238,
+        "area": 937.549204764445,
+        "size": [
+          37.79418754577637,
+          11.499316215515137,
+          1.0
+        ]
+      },
+      "error": null
+    },
+    {
+      "key": "github-laurensguijt-label-generator-gridfinity/box-label",
+      "status": "pass",
+      "seconds": 0.13,
+      "triangles": 15514,
+      "mesh": {
+        "volume": 1437.1519997837063,
+        "area": 3510.8926474318628,
+        "size": [
+          67.5,
+          24.5,
+          1.0499999523162842
+        ]
+      },
+      "error": null
+    },
+    {
+      "key": "github-ostat-gridfinity-extended-openscad/baseplate",
+      "status": "pass",
+      "seconds": 0.2,
+      "triangles": 3348,
+      "mesh": {
+        "volume": 7622.750972672336,
+        "area": 9565.818556031318,
+        "size": [
+          126.0,
+          84.0,
+          4.0
+        ]
+      },
+      "error": null
+    },
+    {
+      "key": "github-ostat-gridfinity-extended-openscad/bin",
+      "status": "pass",
+      "seconds": 0.27,
+      "triangles": 3576,
+      "mesh": {
+        "volume": 23266.87990952576,
+        "area": 17167.127793088202,
+        "size": [
+          83.49468612670898,
+          41.49734115600586,
+          24.739999771118164
+        ]
+      },
+      "error": null
+    },
+    {
+      "key": "github-ostat-gridfinity-extended-openscad/chess",
+      "status": "pass",
+      "seconds": 0.11,
+      "triangles": 492,
+      "mesh": {
+        "volume": 4834.228561819316,
+        "area": 3393.4709965195243,
+        "size": [
+          38.97999954223633,
+          38.97999954223633,
+          3.490000009536743
+        ]
+      },
+      "error": null
+    },
+    {
+      "key": "github-ostat-gridfinity-extended-openscad/connector-clips",
+      "status": "pass",
+      "seconds": 0.18,
+      "triangles": 1184,
+      "mesh": {
+        "volume": 274.7203771967397,
+        "area": 601.9941074705025,
+        "size": [
+          10.0,
+          40.0,
+          3.200000047683716
+        ]
+      },
+      "error": null
+    },
+    {
+      "key": "github-ostat-gridfinity-extended-openscad/drawers",
+      "status": "pass",
+      "seconds": 0.66,
+      "triangles": 62672,
+      "mesh": {
+        "volume": 544163.3148959645,
+        "area": 466863.0530461124,
+        "size": [
+          739.25,
+          142.75,
+          120.19999694824219
+        ]
+      },
+      "error": null
+    },
+    {
+      "key": "github-ostat-gridfinity-extended-openscad/glue-stick",
+      "status": "pass",
+      "seconds": 0.15,
+      "triangles": 1838,
+      "mesh": {
+        "volume": 35560.742127740006,
+        "area": 12778.63363651309,
+        "size": [
+          41.5,
+          41.5,
+          38.7400016784668
+        ]
+      },
+      "error": null
+    },
+    {
+      "key": "github-ostat-gridfinity-extended-openscad/item-holder",
+      "status": "pass",
+      "seconds": 0.35,
+      "triangles": 9268,
+      "mesh": {
+        "volume": 40877.99904347966,
+        "area": 21426.158420345055,
+        "size": [
+          83.5,
+          41.5,
+          24.739999771118164
+        ]
+      },
+      "error": null
+    },
+    {
+      "key": "github-ostat-gridfinity-extended-openscad/lid",
+      "status": "pass",
+      "seconds": 0.2,
+      "triangles": 4552,
+      "mesh": {
+        "volume": 15704.029262798347,
+        "area": 9909.277633465617,
+        "size": [
+          83.5,
+          41.5,
+          8.619999885559082
+        ]
+      },
+      "error": null
+    },
+    {
+      "key": "github-ostat-gridfinity-extended-openscad/marble",
+      "status": "pass",
+      "seconds": 0.29,
+      "triangles": 5600,
+      "mesh": {
+        "volume": 58608.32816060941,
+        "area": 13031.348425325115,
+        "size": [
+          83.5,
+          41.5,
+          24.739999771118164
+        ]
+      },
+      "error": null
+    },
+    {
+      "key": "github-ostat-gridfinity-extended-openscad/removable-walls",
+      "status": "pass",
+      "seconds": 0.54,
+      "triangles": 24854,
+      "mesh": {
+        "volume": 124507.00319927422,
+        "area": 97178.67672923916,
+        "size": [
+          395.20001220703125,
+          165.09867668151855,
+          24.739999771118164
+        ]
+      },
+      "error": null
+    },
+    {
+      "key": "github-ostat-gridfinity-extended-openscad/sieve",
+      "status": "pass",
+      "seconds": 0.4,
+      "triangles": 4550,
+      "mesh": {
+        "volume": 12123.716285864824,
+        "area": 16423.90845714003,
+        "size": [
+          83.5,
+          41.5,
+          24.739999771118164
+        ]
+      },
+      "error": null
+    },
+    {
+      "key": "github-ostat-gridfinity-extended-openscad/silverware",
+      "status": "pass",
+      "seconds": 0.63,
+      "triangles": 33268,
+      "mesh": {
+        "volume": 445056.40935849526,
+        "area": 274953.0886535736,
+        "size": [
+          251.49468231201172,
+          251.49734497070312,
+          45.7400016784668
+        ]
+      },
+      "error": null
+    },
+    {
+      "key": "github-ostat-gridfinity-extended-openscad/sliding-lid",
+      "status": "pass",
+      "seconds": 0.37,
+      "triangles": 5284,
+      "mesh": {
+        "volume": 38961.79309525628,
+        "area": 24291.897995815278,
+        "size": [
+          187.9196891784668,
+          41.49734115600586,
+          24.739999771118164
+        ]
+      },
+      "error": null
+    },
+    {
+      "key": "github-ostat-gridfinity-extended-openscad/socket-holder",
+      "status": "pass",
+      "seconds": 0.21,
+      "triangles": 4166,
+      "mesh": {
+        "volume": 225604.12658594307,
+        "area": 32193.459209164866,
+        "size": [
+          167.5,
+          41.5,
+          45.7400016784668
+        ]
+      },
+      "error": null
+    },
+    {
+      "key": "github-ostat-gridfinity-extended-openscad/tray",
+      "status": "pass",
+      "seconds": 0.42,
+      "triangles": 18978,
+      "mesh": {
+        "volume": 176313.80605408738,
+        "area": 75528.50849848737,
+        "size": [
+          167.5,
+          125.5,
+          24.739999771118164
+        ]
+      },
+      "error": null
+    },
+    {
+      "key": "github-ostat-gridfinity-extended-openscad/vertical-divider",
+      "status": "pass",
+      "seconds": 0.37,
+      "triangles": 8830,
+      "mesh": {
+        "volume": 132698.00692070453,
+        "area": 75443.63600747181,
+        "size": [
+          125.5,
+          83.5,
+          56.70000076293945
+        ]
+      },
+      "error": null
+    },
+    {
+      "key": "gridfinity-basket/basket",
+      "status": "pass",
+      "seconds": 0.36,
+      "triangles": 37708,
+      "mesh": {
+        "volume": 91890.87468882352,
+        "area": 79217.13475900465,
+        "size": [
+          130.39999389648438,
+          130.39999389648438,
+          53.95000076293945
+        ]
+      },
+      "error": null
+    },
+    {
+      "key": "hsw/grid",
+      "status": "pass",
+      "seconds": 0.06,
+      "triangles": 1160,
+      "mesh": {
+        "volume": 12692.48110671106,
+        "area": 19381.663639885443,
+        "size": [
+          88.5655288696289,
+          94.4000015258789,
+          8.0
+        ]
+      },
+      "error": null
+    },
+    {
+      "key": "hsw/grid-v2-3",
+      "status": "pass",
+      "seconds": 0.23,
+      "triangles": 18014,
+      "mesh": {
+        "volume": 90357.15701845127,
+        "area": 87035.59061658681,
+        "size": [
+          211.2120446516201,
+          247.8199975565076,
+          8.0
+        ]
+      },
+      "error": null
+    },
+    {
+      "key": "local-bins/bin",
+      "status": "pass",
+      "seconds": 0.06,
+      "triangles": 596,
+      "mesh": {
+        "volume": 28595.867914672384,
+        "area": 21533.213549384483,
+        "size": [
+          83.5,
+          41.5,
+          28.399999618530273
+        ]
+      },
+      "error": null
+    },
+    {
+      "key": "local-bins/lid",
+      "status": "pass",
+      "seconds": 0.04,
+      "triangles": 12,
+      "mesh": {
+        "volume": 13062.500000000002,
+        "area": 13730.5,
+        "size": [
+          62.5,
+          104.5,
+          2.0
+        ]
+      },
+      "error": null
+    },
+    {
+      "key": "local-bins/tray",
+      "status": "pass",
+      "seconds": 0.05,
+      "triangles": 656,
+      "mesh": {
+        "volume": 47465.9818201826,
+        "area": 27931.26532610344,
+        "size": [
+          83.5,
+          83.5,
+          19.0
+        ]
+      },
+      "error": null
+    },
+    {
+      "key": "local-labels/label",
+      "status": "pass",
+      "seconds": 0.06,
+      "triangles": 1738,
+      "mesh": {
+        "volume": 358.9101867677506,
+        "area": 980.2892922953981,
+        "size": [
+          36.0,
+          11.0,
+          1.399999976158142
+        ]
+      },
+      "error": null
+    },
+    {
+      "key": "local-labels/tag",
+      "status": "pass",
+      "seconds": 0.06,
+      "triangles": 1520,
+      "mesh": {
+        "volume": 744.4627735631243,
+        "area": 1419.1408822012656,
+        "size": [
+          40.0,
+          16.0,
+          1.7999999523162842
+        ]
+      },
+      "error": null
+    }
+  ]
+}

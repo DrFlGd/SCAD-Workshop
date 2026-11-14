@@ -1,0 +1,34 @@
+read ["local-bins","local-labels","local-parts"]
+added https://github.com/ostat/gridfinity_extended_openscad/commit/94d5a3e2d39e0b90894c042a255fc487cfcc9197 as "github-ostat-gridfinity-extended-openscad"
+added https://github.com/kennetek/gridfinity-rebuilt-openscad/commit/910e22d8607fd7f5f51ad5e5cbc5287a76810bfd as "github-kennetek-gridfinity-rebuilt-openscad"
+added https://github.com/laurensguijt/Label-Generator-Gridfinity/commit/350b406dde4471e8be0a34b0147422db8a60226f as "github-laurensguijt-label-generator-gridfinity"
+pass  github-kennetek-gridfinity-rebuilt-openscad/baseplate     0.1s  3576 tris
+pass  github-kennetek-gridfinity-rebuilt-openscad/bin    0.25s  17132 tris
+pass  github-kennetek-gridfinity-rebuilt-openscad/vase-bin    0.12s  3582 tris
+pass  github-laurensguijt-label-generator-gridfinity/bin-label    0.09s  2850 tris
+pass  github-laurensguijt-label-generator-gridfinity/box-label    0.13s  15514 tris
+pass  github-ostat-gridfinity-extended-openscad/baseplate     0.2s  3348 tris
+pass  github-ostat-gridfinity-extended-openscad/bin    0.27s  3576 tris
+pass  github-ostat-gridfinity-extended-openscad/chess    0.11s  492 tris
+pass  github-ostat-gridfinity-extended-openscad/connector-clips    0.18s  1184 tris
+pass  github-ostat-gridfinity-extended-openscad/drawers    0.66s  62672 tris
+pass  github-ostat-gridfinity-extended-openscad/glue-stick    0.15s  1838 tris
+pass  github-ostat-gridfinity-extended-openscad/item-holder    0.35s  9268 tris
+pass  github-ostat-gridfinity-extended-openscad/lid     0.2s  4552 tris
+pass  github-ostat-gridfinity-extended-openscad/marble    0.29s  5600 tris
+pass  github-ostat-gridfinity-extended-openscad/removable-walls    0.54s  24854 tris
+pass  github-ostat-gridfinity-extended-openscad/sieve     0.4s  4550 tris
+pass  github-ostat-gridfinity-extended-openscad/silverware    0.63s  33268 tris
+pass  github-ostat-gridfinity-extended-openscad/sliding-lid    0.37s  5284 tris
+pass  github-ostat-gridfinity-extended-openscad/socket-holder    0.21s  4166 tris
+pass  github-ostat-gridfinity-extended-openscad/tray    0.42s  18978 tris
+pass  github-ostat-gridfinity-extended-openscad/vertical-divider    0.37s  8830 tris
+pass  gridfinity-basket/basket                        0.36s  37708 tris
+pass  hsw/grid                                        0.06s  1160 tris
+pass  hsw/grid-v2-3                                   0.23s  18014 tris
+pass  local-bins/bin                                  0.06s  596 tris
+pass  local-bins/lid                                  0.04s  12 tris
+pass  local-bins/tray                                 0.05s  656 tris
+pass  local-labels/label                              0.06s  1738 tris
+pass  local-labels/tag                                0.06s  1520 tris
+29 of 29 rendered
