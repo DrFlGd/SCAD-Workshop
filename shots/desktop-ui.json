@@ -1,0 +1,88 @@
+{
+ "report": {
+  "engine": "OpenSCAD 2026.10.02, native",
+  "platform": "desktop",
+  "library": {
+   "generators": 8,
+   "thumbnails": 8,
+   "first_row_loaded": true
+  },
+  "search_tray": "5 items \u00b7 8 ms",
+  "library_sources": [
+   "gridfinity-basket",
+   "hsw",
+   "local-bins",
+   "local-labels",
+   "local-parts"
+  ],
+  "added_from_github": 18,
+  "hsw/grid": "Preview matches your settings.",
+  "local-labels/label": "Preview matches your settings.",
+  "local-bins/bin": "Preview matches your settings.",
+  "bin_1": {
+   "status": "Preview matches your settings.",
+   "dims": "83.5 \u00d7 41.5 \u00d7 28.4 mmAbout 2 \u00d7 1 grid units, 4.1 height units596 triangles, 29 KB"
+  },
+  "bin_2": {
+   "status": "Preview matches your settings.",
+   "dims": "125.5 \u00d7 41.5 \u00d7 28.4 mmAbout 3 \u00d7 1 grid units, 4.1 height units692 triangles, 34 KB"
+  },
+  "local-bins/tray": "Preview matches your settings.",
+  "saved_files": [
+   "CI four wide"
+  ],
+  "settings_text": "AppearancePrinter profileDownloadsEngineAboutAppearanceThe skin is the app's look: its colours, lettering, shapes and icons. Each skin has light and dark colours, chosen by the theme.Skin Drafting Sheet Parts Bin Layer Line Classic (the look before skins)Theme Follow the system Light Dark Night (dim, warm, for a dark workshop)Printer profileModels that ask for these start with your values instead of the author's. Leave a value empty to keep the defaults. Magnet and tolerance settings aren't linked: each project measures them differently.Print bed size (mm)width (X)depth (Y)No model uses this y",
+  "version": "SCAD Workshop 0.4.32. All releases and what changed",
+  "library_settings_projects": 6,
+  "part_dims": "24 \u00d7 16 \u00d7 30 mm38 triangles",
+  "components": {
+   "count": 796,
+   "menu": [
+    "Parametric Models",
+    "Components",
+    "Parts Library"
+   ]
+  },
+  "@bosl2/bevel_gear": "Preview matches your settings.",
+  "side_viewer": {
+   "code": "// BOSL2 bevel_gear() made with SCAD Workshopinclude <BOSL2/std.scad>include <BO",
+   "readme": true,
+   "pdf_viewer": true
+  },
+  "side_tabs": [
+   [
+    "code",
+    34,
+    75
+   ],
+   [
+    "readme",
+    34,
+    98
+   ]
+  ],
+  "@threads-scad/MetricBolt": "Preview matches your settings.",
+  "libraries": [
+   "BOSL2:bundled",
+   "MCAD:bundled",
+   "NopSCADlib:bundled",
+   "Round-Anything:bundled",
+   "threads-scad:bundled"
+  ],
+  "tabs": [
+   "hsw/grid",
+   "local-labels/label",
+   "local-bins/bin",
+   "local-bins/tray",
+   "@bosl2/bevel_gear",
+   "@threads-scad/MetricBolt"
+  ],
+  "skin": [
+   "drafting",
+   true,
+   "color(srgb 0.0823529 0.137255 0.176471 / 0.2)"
+  ],
+  "theme": "night"
+ },
+ "failures": []
+}
