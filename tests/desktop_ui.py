@@ -112,9 +112,11 @@ try:
     if "native" not in report["engine"]:
         failures.append(f"engine label: {report['engine']}")
 
-    # the library: every model with a thumbnail (your own projects' are made when they're first read), in all three views
+    # the library: every model with a thumbnail (your own projects' are made when they're first read), in all three views.
+    # The test projects in local/ are read after the app starts: count once they're in (the starter projects come first)
+    wait("['gen:local-bins/bin', 'gen:local-labels/tag'].every(k => window.__workshop?.index?.get(k))", 180, "the test projects to be read")
     d.execute_script("location.hash = '#/browse/all'")
-    wait("document.querySelector('.results [data-item]')", 30, "the generator list")
+    wait("document.querySelector('.results [data-item=\"gen:local-bins/bin\"]')", 30, "the generator list")
     shown = d.execute_script("return document.querySelectorAll('.results [data-item]').length")
     wait("document.querySelectorAll('.results .card img').length >= document.querySelectorAll('.results [data-item]').length", 180, "every model's thumbnail")
     thumbs = d.execute_script("return document.querySelectorAll('.results .card img').length")
